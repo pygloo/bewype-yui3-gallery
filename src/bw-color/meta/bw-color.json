@@ -1,7 +1,0 @@
-{
-    "bw-color": {
-        "requires": [
-            "yui-base"
-        ]
-    }
-}
