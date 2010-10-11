@@ -1,17 +1,13 @@
 {
     "bewype-color-picker": {
-        "submodules": {
-            "bewype-color-picker": {
-                "requires": [
-                    "yui-base",
-                    "node",
-                    "widget",
-                    "stylesheet",
-                    "slider",
-                    "bewype-color"
-                ], 
-                "skinnable": true
-            }
-        }
+        "requires": [
+            "bewype-color",
+            "node",
+            "slider",
+            "stylesheet",
+            "widget",
+            "yui-base"
+        ], 
+        "skinnable": true
     }
 }
