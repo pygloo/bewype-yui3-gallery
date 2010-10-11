@@ -1,0 +1,16 @@
+{
+    "bw-font-family-picker": {
+        "submodules": {
+            "bw-font-family-picker": {
+                "requires": [
+                    "yui-base",
+                    "node",
+                    "widget",
+                    "stylesheet",
+                    "slider"
+                ], 
+                "skinnable": true
+            }
+        }
+    }
+}

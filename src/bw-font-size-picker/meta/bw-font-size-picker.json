@@ -1,0 +1,16 @@
+{
+    "bw-font-size-picker": {
+        "submodules": {
+            "bw-font-size-picker": {
+                "requires": [
+                    "yui-base",
+                    "node",
+                    "widget",
+                    "stylesheet",
+                    "slider"
+                ], 
+                "skinnable": true
+            }
+        }
+    }
+}

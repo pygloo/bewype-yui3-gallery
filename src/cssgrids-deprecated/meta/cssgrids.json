@@ -1,0 +1,12 @@
+{
+    "cssgrids-deprecated": {
+        "path": "cssgrids-deprecated/grids-min.css", 
+        "optional": [
+            "cssreset"
+        ], 
+        "requires": [
+            "cssfonts"
+        ], 
+        "type": "css"
+    }
+}

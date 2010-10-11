@@ -1,0 +1,16 @@
+{
+    "sortable": {
+        "requires": [
+            "dd-delegate", 
+            "dd-drop-plugin", 
+            "dd-proxy"
+        ],
+        "plugins": {
+            "sortable-scroll": {
+                "requires": [
+                    "dd-scroll"
+                ]
+            }
+        }
+    }
+}

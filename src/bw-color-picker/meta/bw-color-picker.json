@@ -1,0 +1,17 @@
+{
+    "bw-color-picker": {
+        "submodules": {
+            "bw-color-picker": {
+                "requires": [
+                    "yui-base",
+                    "node",
+                    "widget",
+                    "stylesheet",
+                    "slider",
+                    "bw-color"
+                ], 
+                "skinnable": true
+            }
+        }
+    }
+}

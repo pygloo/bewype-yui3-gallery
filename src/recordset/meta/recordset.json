@@ -1,0 +1,20 @@
+{
+    "recordset": {
+		"submodules": {
+			"recordset-base": {
+				"requires": ["base", "arraylist"]
+			},
+			"recordset-sort": {
+				"requires": [
+					"arraysort",
+					"recordset-base",
+					"plugin"
+					
+				]
+			},
+			"recordset-filter": {
+				"requires": ["recordset-base", "array-extras"]
+			}
+		}
+    }
+}

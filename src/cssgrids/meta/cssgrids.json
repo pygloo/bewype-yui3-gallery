@@ -1,0 +1,10 @@
+{
+    "cssgrids": {
+        "path": "cssgrids/grids-min.css", 
+        "optional": [
+            "cssreset",
+            "cssfonts"
+        ], 
+        "type": "css"
+    }
+}
