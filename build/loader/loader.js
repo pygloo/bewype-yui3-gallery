@@ -2457,6 +2457,13 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         ], 
         "skinnable": true
     }, 
+    "bewype-font-size-picker": {
+        "requires": [
+            "yui-base", 
+            "bewype-item-picker"
+        ], 
+        "skinnable": true
+    }, 
     "bewype-item-picker": {
         "requires": [
             "bewype", 
@@ -3761,7 +3768,7 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         }
     }
 };
-YUI.Env[Y.version].md5 = '1cd0da688888511dd3dfdb1cae0fc1d1';
+YUI.Env[Y.version].md5 = '130cd4d35adc55634c96419c01c2b399';
 
 
 }, '@VERSION@' ,{requires:['loader-base']});
