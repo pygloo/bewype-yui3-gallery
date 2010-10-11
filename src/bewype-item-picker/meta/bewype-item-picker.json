@@ -1,0 +1,14 @@
+{
+    "bewype-item-picker": {
+        "requires": [
+            "bewype",
+            "console",
+            "dump",
+            "node",
+            "stylesheet",
+            "widget",
+            "yui-base"
+        ], 
+        "skinnable": true
+    }
+}
