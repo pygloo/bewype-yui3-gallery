@@ -1,0 +1,1 @@
+YUI.add("bewype",function(B){var A=function(C){A.superclass.constructor.apply(this,arguments);};A.NAME="bewype";B.extend(A,B.Base,{initializer:function(C){},destructor:function(){}});B.Bewype=A;},"@VERSION@",{requires:["yui-base"]});

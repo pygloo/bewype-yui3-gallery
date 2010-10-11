@@ -138,34 +138,27 @@
             }
         }
     }, 
-    "bw-color": {
+    "bewype": {
         "requires": [
             "yui-base"
         ]
     }, 
-    "bw-color-picker": {
+    "bewype-color": {
+        "requires": [
+            "yui-base", 
+            "bewype"
+        ]
+    }, 
+    "bewype-color-picker": {
         "submodules": {
-            "bw-color-picker": {
+            "bewype-color-picker": {
                 "requires": [
                     "yui-base", 
                     "node", 
                     "widget", 
                     "stylesheet", 
                     "slider", 
-                    "bw-color"
-                ], 
-                "skinnable": true
-            }
-        }
-    }, 
-    "bw-font-picker": {
-        "submodules": {
-            "bw-font-picker-plugin": {
-                "requires": [
-                    "yui-base", 
-                    "node", 
-                    "plugin", 
-                    "stylesheet"
+                    "bewype-color"
                 ], 
                 "skinnable": true
             }
