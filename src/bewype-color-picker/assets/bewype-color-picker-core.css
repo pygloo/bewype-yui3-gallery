@@ -1,4 +1,20 @@
 
+
+#color-picker,
+#color-picker-small {
+    border: 1px solid #888;
+    font-family : Arial, Helvetica, sans-serif;
+    font-size   : 0.875em;
+}
+
+#color-picker {
+    width : 280px;
+}
+
+#color-picker-small {
+    width : 180px;
+}
+
 #color-picker table,
 #color-picker td,
 #color-picker-small table,

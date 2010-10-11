@@ -4,42 +4,42 @@ YUI.add('bewype-color-picker', function(Y) {
     /**
      *
      */
-    var BW_PICKER_TMPL = '',
-        BW_RGB_TMPL    = '';
+    var PICKER_TMPL = '',
+        RGB_TMPL    = '';
     
         /**
          *
          */
-        BW_PICKER_TMPL += '<div id="{pickerClass}-panel"><table>';
-        BW_PICKER_TMPL += '  <tr>';
-        BW_PICKER_TMPL += '    <td>';
-        BW_PICKER_TMPL += '      <div id="{pickerClass}-selector">';
-        BW_PICKER_TMPL += '        <img id="{pickerClass}-selector-bg" src="{pickerDir}/picker-{pickerSize}.png" />';
-        BW_PICKER_TMPL += '      </div>';
-        BW_PICKER_TMPL += '    </td>';
-        BW_PICKER_TMPL += '    <td>';
-        BW_PICKER_TMPL += '      <div id="{pickerClass}-hue">';
-        BW_PICKER_TMPL += '        <img id="{pickerClass}-hue-bg" src="{pickerDir}/hue-{pickerSize}.png" />';
-        BW_PICKER_TMPL += '      </div>';
-        BW_PICKER_TMPL += '    </td>';
-        BW_PICKER_TMPL += '    <td>';
-        BW_PICKER_TMPL += '      <div id="{pickerClass}-slider" class="{pickerSkin}"></div>';
-        BW_PICKER_TMPL += '    </td>';
-        BW_PICKER_TMPL += '    <td>';
-        BW_PICKER_TMPL += '      <div id="{pickerClass}-preview"></div>';
-        BW_PICKER_TMPL += '      <p>';
-        BW_PICKER_TMPL += '        <div id="{pickerClass}-r" class="{pickerClass}-rgb"></div>';
-        BW_PICKER_TMPL += '        <div id="{pickerClass}-g" class="{pickerClass}-rgb"></div>';
-        BW_PICKER_TMPL += '        <div id="{pickerClass}-b" class="{pickerClass}-rgb"></div>';
-        BW_PICKER_TMPL += '      </p>';
-        BW_PICKER_TMPL += '    </td>';
-        BW_PICKER_TMPL += '  </tr>';
-        BW_PICKER_TMPL += '</table></div>';
+        PICKER_TMPL += '<div id="{pickerClass}"><table>';
+        PICKER_TMPL += '  <tr>';
+        PICKER_TMPL += '    <td>';
+        PICKER_TMPL += '      <div id="{pickerClass}-selector">';
+        PICKER_TMPL += '        <img id="{pickerClass}-selector-bg" src="{pickerDir}/picker-{pickerSize}.png" />';
+        PICKER_TMPL += '      </div>';
+        PICKER_TMPL += '    </td>';
+        PICKER_TMPL += '    <td>';
+        PICKER_TMPL += '      <div id="{pickerClass}-hue">';
+        PICKER_TMPL += '        <img id="{pickerClass}-hue-bg" src="{pickerDir}/hue-{pickerSize}.png" />';
+        PICKER_TMPL += '      </div>';
+        PICKER_TMPL += '    </td>';
+        PICKER_TMPL += '    <td>';
+        PICKER_TMPL += '      <div id="{pickerClass}-slider" class="{sliderSkin}"></div>';
+        PICKER_TMPL += '    </td>';
+        PICKER_TMPL += '    <td>';
+        PICKER_TMPL += '      <div id="{pickerClass}-preview"></div>';
+        PICKER_TMPL += '      <p>';
+        PICKER_TMPL += '        <div id="{pickerClass}-r" class="{pickerClass}-rgb"></div>';
+        PICKER_TMPL += '        <div id="{pickerClass}-g" class="{pickerClass}-rgb"></div>';
+        PICKER_TMPL += '        <div id="{pickerClass}-b" class="{pickerClass}-rgb"></div>';
+        PICKER_TMPL += '      </p>';
+        PICKER_TMPL += '    </td>';
+        PICKER_TMPL += '  </tr>';
+        PICKER_TMPL += '</table></div>';
 
         /**
          *
          */
-        BW_RGB_TMPL += '<b>{rgb}</b>{value}';
+        RGB_TMPL += '<b>{rgb}</b>{value}';
 
     var ColorPicker = function(config) {
         ColorPicker.superclass.constructor.apply(this, arguments);
@@ -65,13 +65,6 @@ YUI.add('bewype-color-picker', function(Y) {
                 return Y.Lang.isString( val );
             }
         },
-        pickerSkin : {
-            value : 'yui3-skin-sam',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
         pickerSize : {
             value : 180, /* can be normal or small */
             writeOnce : true,
@@ -84,6 +77,13 @@ YUI.add('bewype-color-picker', function(Y) {
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isNumber( val );
+            }
+        },
+        sliderSkin : {
+            value : 'yui3-skin-sam',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
             }
         }
     };
@@ -109,27 +109,28 @@ YUI.add('bewype-color-picker', function(Y) {
         renderUI : function () {
 
             // vars
-            var _contentBox  = this.get( 'contentBox'  ),
-                _pickerSize  = this.get( 'pickerSize'  ),
-                _pClass      = this.get( 'pickerClass' ),
-                _pickerClass = ( _pickerSize == 180 ) ? _pClass : _pClass + '-small',
-                _sLength     = ( _pickerSize == 180 ) ?  192 :  102,
-                _table       = null,
-                _pickerNode  = Y.one( '#' + _pickerClass + '-selector' );
+            var _contentBox   = this.get( 'contentBox'  ),
+                _pickerSize   = this.get( 'pickerSize'  ),
+                _pClass       = this.get( 'pickerClass' ),
+                _pickerClass  = ( _pickerSize == 180 ) ? _pClass : _pClass + '-small',
+                _sLength      = ( _pickerSize == 180 ) ?  192 :  102,
+                _pickerNode   = null,
+                _selectorNode = null;
 
             // create table
-            _table = new Y.Node.create(
-                Y.substitute( BW_PICKER_TMPL, {
+            _pickerNode = new Y.Node.create(
+                Y.substitute( PICKER_TMPL, {
                     pickerClass : _pickerClass,
-                    pickerSkin  : this.get( 'pickerSkin' ),
                     pickerDir   : Y.config.base + 'bewype-color-picker/assets',
-                    pickerSize   : _pickerSize
+                    pickerSize  : _pickerSize,
+                    sliderSkin  : this.get( 'sliderSkin' )
                 } )
             );
-            _contentBox.append( _table );
+            _contentBox.append( _pickerNode );
 
             // set event callback
-            Y.on( 'mousemove', Y.bind( this._updatePicker, this ), _pickerNode );
+            _selectorNode = Y.one( '#' + _pickerClass + '-selector' );
+            Y.on( 'mousemove', Y.bind( this._onSelectorChange, this ), _selectorNode );
 
             this._slider = new Y.Slider( {
                 axis: 'y',
@@ -139,7 +140,7 @@ YUI.add('bewype-color-picker', function(Y) {
                 length: _sLength + 'px',  // rail extended to afford all values
                 // construction-time event subscription
                 after : {
-                    valueChange: Y.bind( this._sliderUpdate, this )
+                    valueChange: Y.bind( this._onSliderChange, this )
                 }
             } );
 
@@ -147,7 +148,7 @@ YUI.add('bewype-color-picker', function(Y) {
             this._slider.render( '#' + _pickerClass + '-slider' );
 
             // update all
-            this._sliderUpdate();
+            this._onSliderChange();
         },
 
         bindUI : function () {
@@ -156,7 +157,7 @@ YUI.add('bewype-color-picker', function(Y) {
         syncUI : function () {
 
             // update all
-            this._sliderUpdate();
+            this._onSliderChange();
         },
 
         /**
@@ -171,7 +172,7 @@ YUI.add('bewype-color-picker', function(Y) {
                 _pickerClass = ( _pickerSize == 180 ) ? _pClass : _pClass + '-small';
 
             // remove main div
-            _contentBox.one( '#' + _pickerClass + '-panel' ).remove();
+            _contentBox.one( '#' + _pickerClass ).remove();
         },
 
         getValue : function() {
@@ -179,13 +180,13 @@ YUI.add('bewype-color-picker', function(Y) {
         },
 
         _getRgbInnerHtml : function ( rgb, value) {
-            return Y.substitute( BW_RGB_TMPL, {
+            return Y.substitute( RGB_TMPL, {
                 rgb   : rgb,
                 value : value
             } );
         },
 
-        _updatePicker : function ( evt ) {
+        _onSelectorChange : function ( evt ) {
 
             // vars
             var _pickerNode   = evt ? evt.target : null,
@@ -249,7 +250,7 @@ YUI.add('bewype-color-picker', function(Y) {
             }
         },
 
-        _sliderUpdate : function ( evt ) {
+        _onSliderChange : function ( evt ) {
             //
             var _pickerSize   = this.get( 'pickerSize'  ),
                 _pClass       = this.get( 'pickerClass' ),
@@ -271,7 +272,7 @@ YUI.add('bewype-color-picker', function(Y) {
             _selectorNode.setStyle( 'backgroundColor', _bgVal );
             
             // refresh update picker
-            this._updatePicker();
+            this._onSelectorChange();
         }
 
     } );

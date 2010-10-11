@@ -1,7 +1,9 @@
 
 #item-picker {
-    border: 1px solid #888;
-    width   : 120px;
+    border      : 1px solid #888;
+    font-family : Arial, Helvetica, sans-serif;
+    font-size   : 0.875em;
+    width       : 120px;
 }
 
 #item-picker table {
@@ -27,14 +29,6 @@
 }
 
 .item-picker-row {
-    font-family : Arial, Helvetica, sans-serif;
-    font-size   : 0.875em;
-    height      : 14px;
-}
-
-.item-picker-row {
-    font-family : Arial, Helvetica, sans-serif;
-    font-size   : 0.875em;
     height      : 14px;
 }
 

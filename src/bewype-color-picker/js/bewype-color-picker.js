@@ -8,7 +8,7 @@
         /**
          *
          */
-        PICKER_TMPL += '<div id="{pickerClass}-panel"><table>';
+        PICKER_TMPL += '<div id="{pickerClass}"><table>';
         PICKER_TMPL += '  <tr>';
         PICKER_TMPL += '    <td>';
         PICKER_TMPL += '      <div id="{pickerClass}-selector">';
@@ -170,7 +170,7 @@
                 _pickerClass = ( _pickerSize == 180 ) ? _pClass : _pClass + '-small';
 
             // remove main div
-            _contentBox.one( '#' + _pickerClass + '-panel' ).remove();
+            _contentBox.one( '#' + _pickerClass ).remove();
         },
 
         getValue : function() {
