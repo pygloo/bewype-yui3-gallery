@@ -13,7 +13,7 @@ suite.add( new Y.Test.Case( {
     tearDown: function () {
         // destroy
         if ( this._picker ) {
-            this._picker.destroy();
+            // this._picker.destroy();
         }
     },
 

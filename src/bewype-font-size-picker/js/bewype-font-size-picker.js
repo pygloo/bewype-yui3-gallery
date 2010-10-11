@@ -29,7 +29,7 @@
             validator : function( val ) {
                 return Y.Lang. isArray( val );
             }
-        },
+        }
     };
 
     Y.extend( FontSizePicker, Y.Widget, {

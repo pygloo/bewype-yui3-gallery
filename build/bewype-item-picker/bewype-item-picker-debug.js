@@ -164,7 +164,7 @@ YUI.add('bewype-item-picker', function(Y) {
                         itemId    : _pickerClass + '-' + name,
                         itemClass : _pickerClass + '-row',
                         text      : text,
-                        style     : style ? ('style="font-family: ' + style + ';"').toString() : ''
+                        style     : style ? 'style="font-family: ' + style + ';"' : ''
                     } )
                 );
                 // do add

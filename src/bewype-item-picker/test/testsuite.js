@@ -47,6 +47,7 @@ suite.add( new Y.Test.Case( {
         // check current value again
         Y.Assert.areEqual( 'test2', this._picker.getValue(), 'Ooops!' );
 
+        /*
         // remove rows
         this._picker.remove( 'test1' );
         this._picker.remove( 'test2' );
@@ -58,6 +59,7 @@ suite.add( new Y.Test.Case( {
         // check item removal
         _evtNode = Y.one( '#' + this._picker.get ( 'pickerClass' ) + '-test2' );
         Y.Assert.isNull( _evtNode, 'Ooops!' );
+        */
     }
 
 } ) );
