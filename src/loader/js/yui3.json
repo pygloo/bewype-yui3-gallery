@@ -160,6 +160,13 @@
         ], 
         "skinnable": true
     }, 
+    "bewype-font-family-picker": {
+        "requires": [
+            "yui-base", 
+            "bewype-item-picker"
+        ], 
+        "skinnable": true
+    }, 
     "bewype-font-size-picker": {
         "requires": [
             "yui-base", 

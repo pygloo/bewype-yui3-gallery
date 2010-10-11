@@ -1,34 +1,35 @@
 
-#item-picker {
+#font-family-picker {
     border      : 1px solid #888;
     font-family : Arial, Helvetica, sans-serif;
-    font-size   : 0.875em;
-    width       : 120px;
+    font-size   : 0.8em;
+    width       : 140px;
 }
 
-#item-picker table {
+#font-family-picker table {
     border-collapse: collapse;
 }
 
-#item-picker table,
-#item-picker td {
+#font-family-picker table,
+#font-family-picker td {
     margin  : 0;
     padding : 0;
     width   : 100%;
 }
 
-#item-picker td {
-    padding        : 2px;
+#font-family-picker td {
+    padding        : 2px 4px;
     text-align     : left;
     vertical-align : middle;
 }
 
-#item-picker td:hover {
+#font-family-picker td:hover {
     background-color : #ddd;
     cursor           : pointer;
 }
 
-.item-picker-row {
+.font-family-picker-row {
     height      : 14px;
 }
+
 

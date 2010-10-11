@@ -162,7 +162,7 @@
                         itemId    : _pickerClass + '-' + name,
                         itemClass : _pickerClass + '-row',
                         text      : text,
-                        style     : style ? 'style="' + style + '"' : ''
+                        style     : style ? 'style="font-family: ' + style + ';"' : ''
                     } )
                 );
                 // do add
