@@ -68,7 +68,7 @@
 
             // add familys
             Y.Object.each( this.get( 'fontFamilies' ), function (v, k) {
-                var _style = v[ 1 ],
+                var _style = 'font-family: ' + v[ 1 ] + ';',
                     _text = v[ 1 ].split(',')[ 0 ].replace(/\'/g, '');
                 this._itemPicker.append( v[ 0 ], _text, _style );
             }, this );

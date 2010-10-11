@@ -55,7 +55,8 @@
 
             // add sizes
             Y.Object.each( this.get( 'fontSizes' ), function (v, k) {
-                this._itemPicker.append( v,  v);
+                var _style = 'font-size: ' + v + 'px;';
+                this._itemPicker.append( v,  v, _style);
             }, this );
         },
 
