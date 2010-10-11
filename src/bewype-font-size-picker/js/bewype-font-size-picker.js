@@ -22,7 +22,14 @@
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
-        }
+        },
+        fontSizes : {
+            value : [ '8', '10', '12', '16', '20', '24', '32', '40' ],
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang. isArray( val );
+            }
+        },
     };
 
     Y.extend( FontSizePicker, Y.Widget, {
@@ -42,15 +49,14 @@
          *
          */
         renderUI : function () {
+
+            // render base picker
             this._itemPicker.render( this.get( 'contentBox'  ) );
-            this._itemPicker.append(  '8',  '8');
-            this._itemPicker.append( '10', '10');
-            this._itemPicker.append( '12', '12');
-            this._itemPicker.append( '16', '16');
-            this._itemPicker.append( '20', '20');
-            this._itemPicker.append( '24', '24');
-            this._itemPicker.append( '32', '32');
-            this._itemPicker.append( '40', '40');
+
+            // add sizes
+            Y.Object.each( this.get( 'fontSizes' ), function (v, k) {
+                this._itemPicker.append( v,  v);
+            }, this );
         },
 
         /**
