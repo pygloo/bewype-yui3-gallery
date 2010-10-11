@@ -145,53 +145,55 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
             }
         }
     }, 
-    "bewype": {
-        "requires": [
-            "yui-base"
-        ]
-    }, 
     "bewype-color": {
         "requires": [
-            "yui-base", 
-            "bewype"
+            "yui-base"
         ]
     }, 
-    "bewype-color-picker": {
-        "requires": [
-            "bewype-color", 
-            "node", 
-            "slider", 
-            "stylesheet", 
-            "widget", 
-            "yui-base"
-        ], 
-        "skinnable": true
-    }, 
-    "bewype-font-family-picker": {
-        "requires": [
-            "yui-base", 
-            "bewype-item-picker"
-        ], 
-        "skinnable": true
-    }, 
-    "bewype-font-size-picker": {
-        "requires": [
-            "yui-base", 
-            "bewype-item-picker"
-        ], 
-        "skinnable": true
-    }, 
-    "bewype-item-picker": {
-        "requires": [
-            "bewype", 
-            "console", 
-            "dump", 
-            "node", 
-            "stylesheet", 
-            "widget", 
-            "yui-base"
-        ], 
-        "skinnable": true
+    "bewype-picker": {
+        "submodules": {
+            "bewype-picker-base": {
+                "requires": [
+                    "stylesheet", 
+                    "substitute", 
+                    "widget", 
+                    "yui-base"
+                ], 
+                "skinnable": true
+            }, 
+            "bewype-picker-color": {
+                "requires": [
+                    "bewype-color", 
+                    "slider", 
+                    "stylesheet", 
+                    "substitute", 
+                    "widget", 
+                    "yui-base"
+                ], 
+                "skinnable": true
+            }, 
+            "bewype-picker-font-family": {
+                "requires": [
+                    "bewype-picker-base"
+                ], 
+                "skinnable": true
+            }, 
+            "bewype-picker-font-size": {
+                "requires": [
+                    "bewype-picker-base"
+                ], 
+                "skinnable": true
+            }, 
+            "bewype-picker-url": {
+                "requires": [
+                    "stylesheet", 
+                    "substitute", 
+                    "widget", 
+                    "yui-base"
+                ], 
+                "skinnable": true
+            }
+        }
     }, 
     "cache": {
         "submodules": {
@@ -1485,4 +1487,4 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         }
     }
 };
-YUI.Env[Y.version].md5 = 'd9725cc249016bdac32f575f5a9c1cba';
+YUI.Env[Y.version].md5 = 'ac438adb3991d7b5314f45f3bd17b844';

@@ -1,8 +1,7 @@
 {
     "bewype-color": {
         "requires": [
-            "yui-base",
-            "bewype"
+            "yui-base"
         ]
     }
 }

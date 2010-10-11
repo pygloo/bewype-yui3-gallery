@@ -1,9 +1,0 @@
-{
-    "bewype-font-size-picker": {
-        "requires": [
-            "yui-base",
-            "bewype-item-picker"
-        ], 
-        "skinnable": true
-    }
-}

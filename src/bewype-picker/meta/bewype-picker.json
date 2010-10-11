@@ -1,0 +1,47 @@
+{
+    "bewype-picker": {
+        "submodules": {
+            "bewype-picker-base": {
+                "requires": [
+                    "stylesheet",
+                    "substitute",
+                    "widget",
+                    "yui-base"
+                ], 
+                "skinnable": true
+            },
+            "bewype-picker-color": {
+                "requires": [
+                    "bewype-color",
+                    "slider",
+                    "stylesheet",
+                    "substitute",
+                    "widget",
+                    "yui-base"
+                ], 
+                "skinnable": true
+            },
+            "bewype-picker-font-size": {
+                "requires": [
+                    "bewype-picker-base"
+                ], 
+                "skinnable": true
+            },
+            "bewype-picker-font-family": {
+                "requires": [
+                    "bewype-picker-base"
+                ], 
+                "skinnable": true
+            },
+            "bewype-picker-url": {
+                "requires": [
+                    "stylesheet",
+                    "substitute",
+                    "widget",
+                    "yui-base"
+                ], 
+                "skinnable": true
+            }
+        }
+    }
+}
