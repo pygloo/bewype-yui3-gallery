@@ -134,7 +134,7 @@
             }
 
             // set handler
-            Y.on( 'yui3-button-event|click' , Y.bind( this._onClick, this ) , _buttonNode );
+            _buttonNode.on( 'yui3-button-event|click' , Y.bind( this._onClick, this ) );
         },
 
         /**

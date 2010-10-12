@@ -8,7 +8,7 @@
     /**
      *
      */
-    PICKER_TMPL += '<div class="{buttonClass}-picker-host">';
+    PICKER_TMPL += '<div class="{buttonClass}-host">';
     PICKER_TMPL += '</div>';
 
     /**
@@ -69,6 +69,13 @@
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
+        },
+        zIndex : {
+            value : 4,
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
         }
     };
 
@@ -108,21 +115,44 @@
 
             // render default
             this._renderBaseUI();
+
+            // vars
+            var _contentBox = this.get( 'contentBox' );
+
+            // set handler
+            Y.after( 'yui3-button-event|click' , Y.bind( this._removePicker, this ) );
         },
 
         /**
          *
          */
-        _removePicker : function () {
+        _removePicker : function ( evt ) {
 
             if ( this._picker ) {
                 
-                // remove picker
-                this._picker.destroy();
-                delete( this._picker );
+                // vars
+                var _contentBox  = this.get( 'contentBox'  ),
+                    _buttonClass = this.get( 'buttonClass' ),
+                    _pickerClass = this._picker.get( 'pickerClass' ),
+                    _pickerHost  = _contentBox.one( '.' + _buttonClass + '-host');
 
-                // remove picker node
-                _pickerNode.remove();
+                if ( evt && evt.target.ancestor( '.' + _pickerClass ) ) {
+                    // do nothing
+                } else {
+                    // remove picker
+                    this._picker.destroy();
+    
+                    // remove picker node
+                    _pickerHost.remove();
+    
+                    // ...
+                    delete( this._picker );
+                }
+            }
+
+            if (evt) {
+                // stop event
+                evt.stopPropagation();
             }
         },
 
@@ -135,7 +165,8 @@
             var _contentBox  = this.get( 'contentBox'  ),
                 _buttonClass = this.get( 'buttonClass' ),
                 _pickerObj   = this.get( 'pickerObj'   ),
-                _pickerClass = this.get( 'pickerClass' );
+                _pickerClass = this.get( 'pickerClass' ),
+                _pickerHost  = null;
 
             // little check
             if ( _contentBox && _pickerObj ) {
@@ -144,15 +175,19 @@
 
                     // remove picker
                     this._removePicker();
+
                 } else {
 
+                    // get value
+                    this._value = null;
+
                     // add picker node
-                    _pickerNode = new Y.Node.create(
+                    _pickerHost = new Y.Node.create(
                         Y.substitute( PICKER_TMPL, {
                             buttonClass : _buttonClass
                         } )
                     );
-                    _contentBox.append( _pickerNode );
+                    _contentBox.append( _pickerHost );
                     
                     // create a picker
                     if ( _pickerClass ) {
@@ -164,7 +199,7 @@
                     }
 
                     // do render
-                    this._picker.render( _pickerNode );
+                    this._picker.render( _pickerHost );
 
                     // add custom event listener
                     this._picker.on( 'picker:onChange', Y.bind( this._onPickerChange, this ) );
@@ -173,16 +208,15 @@
                 // fire custom event
                 this.fire("button:onClick");
             }
+
+            // stop event
+            evt.stopPropagation();
         },
 
         _onPickerChange : function ( e ) {
 
-            // vars
-            var _contentBox  = this.get( 'contentBox'  ),
-                _buttonClass = this.get( 'buttonClass' ),
-                _pickerNode  = _contentBox.one( '.' + _buttonClass + '-picker-host');
-
             if ( this._picker ) {
+
                 // get value
                 this._value = this._picker.getValue();
 

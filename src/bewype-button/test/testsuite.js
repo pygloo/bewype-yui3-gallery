@@ -130,7 +130,7 @@ suite.add( new Y.Test.Case( {
         _evtNode.simulate( 'click' );
 
         // picker node should exist
-        _pickerNode = Y.one( '.' + _class + '-picker-host' );
+        _pickerNode = Y.one( '.' + _class + '-host' );
         Y.Assert.isNotNull( _pickerNode, 'no picker node!' );
         
         // select 12
@@ -143,7 +143,7 @@ suite.add( new Y.Test.Case( {
         Y.Assert.areEqual( '12', this._button.getValue(), 'click picker value' );
 
         // picker node should be undefined
-        _pickerNode = Y.one( '.' + _class + '-picker-host' );
+        _pickerNode = Y.one( '.' + _class + '-host' );
         Y.Assert.isNull( _pickerNode, 'a picker node!' );
     }
 
