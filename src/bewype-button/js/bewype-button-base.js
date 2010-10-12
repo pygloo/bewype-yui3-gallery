@@ -7,25 +7,25 @@
         IMAGE_TMPL  = '',
         Button      = null;
     
-        /**
-         *
-         */
-        BUTTON_TMPL += '<div class="{buttonClass}">';
-        BUTTON_TMPL += '</div>';
-    
-        /**
-         *
-         */
-        LABEL_TMPL += '<div class="{buttonClass}-label">';
-        LABEL_TMPL += '  {label}';
-        LABEL_TMPL += '</div>';
-    
-        /**
-         *
-         */
-        IMAGE_TMPL += '<div class="{buttonClass}-image">';
-        IMAGE_TMPL += '  <img src="{imageUrl}" />';
-        IMAGE_TMPL += '</div>';
+    /**
+     *
+     */
+    BUTTON_TMPL += '<div class="{buttonClass}">';
+    BUTTON_TMPL += '</div>';
+
+    /**
+     *
+     */
+    LABEL_TMPL += '<div class="{buttonClass}-label">';
+    LABEL_TMPL += '  {label}';
+    LABEL_TMPL += '</div>';
+
+    /**
+     *
+     */
+    IMAGE_TMPL += '<div class="{buttonClass}-image">';
+    IMAGE_TMPL += '  <img src="{imageUrl}" />';
+    IMAGE_TMPL += '</div>';
 
     Button = function(config) {
         Button.superclass.constructor.apply( this, arguments );
@@ -160,7 +160,7 @@
         /**
          *
          */
-        destructor : function() {
+        _destroyBase : function () {
 
             // vars
             var _contentBox  = this.get( 'contentBox'  ),
@@ -175,6 +175,13 @@
                 // remove nodes
                 _buttonNode.remove();
             }
+        },
+
+        /**
+         *
+         */
+        destructor : function () {
+            this._destroyBase();
         },
 
         /**
