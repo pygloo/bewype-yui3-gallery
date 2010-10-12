@@ -9,6 +9,12 @@
                     "yui-base"
                 ], 
                 "skinnable": true
+            },
+            "bewype-button-toggle": {
+                "requires": [
+                    "bewype-button-base"
+                ], 
+                "skinnable": true
             }
         }
     }

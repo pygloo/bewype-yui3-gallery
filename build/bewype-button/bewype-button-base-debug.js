@@ -12,7 +12,7 @@ YUI.add('bewype-button-base', function(Y) {
         /**
          *
          */
-        BUTTON_TMPL += '<div id="{buttonId}">';
+        BUTTON_TMPL += '<div class="{buttonClass}">';
         BUTTON_TMPL += '</div>';
     
         /**
@@ -47,7 +47,7 @@ YUI.add('bewype-button-base', function(Y) {
      */
     Button.ATTRS = {
         buttonClass : {
-            value : 'yui3-button',
+            value : 'yui3-button-base',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -108,7 +108,7 @@ YUI.add('bewype-button-base', function(Y) {
             // create table
             _buttonNode = new Y.Node.create(
                 Y.substitute( BUTTON_TMPL, {
-                    buttonId : _buttonClass
+                    buttonClass : _buttonClass
                 } )
             );
             _contentBox.append( _buttonNode );
@@ -166,11 +166,7 @@ YUI.add('bewype-button-base', function(Y) {
 
             // vars
             var _contentBox  = this.get( 'contentBox'  ),
-                _buttonId    = this.get( 'buttonClass' ),
-                _buttonNode  = null;
-
-            // get button node
-            _buttonNode = _contentBox.one( '#' + _buttonId );
+                _buttonNode  = _contentBox.one( 'div' );
 
             // little check
             if ( _buttonNode ) {
@@ -197,6 +193,13 @@ YUI.add('bewype-button-base', function(Y) {
                 // fire custom event
                 this.fire("button:onClick");
             }
+        },
+
+        /**
+         *
+         */
+        getValue : function () {
+            return null;
         }
 
     } );
