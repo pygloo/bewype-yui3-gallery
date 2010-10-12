@@ -42,17 +42,13 @@ YUI.add('bewype-picker-font-family', function(Y) {
         }
     };
 
-    Y.extend( PickerFontFamily, Y.Widget, {
-
-        _picker : null,       
+    Y.extend( PickerFontFamily, Y.Bewype.Picker, {
 
         /**
          *
          */
         initializer : function( config ) {
-            this._picker = new Y.Bewype.Picker( {
-                pickerClass : this.get( 'pickerClass' )
-            } );
+            this._init( config );
         },
 
         /**
@@ -60,34 +56,17 @@ YUI.add('bewype-picker-font-family', function(Y) {
          */
         renderUI : function () {
 
-            // render base picker
-            this._picker.render( this.get( 'contentBox'  ) );
+            // render default
+            this._renderBaseUI();
 
             // add familys
             Y.Object.each( this.get( 'fontFamilies' ), function (v, k) {
+                // prepare values
                 var _style = 'font-family: ' + v[ 1 ] + ';',
                     _text = v[ 1 ].split(',')[ 0 ].replace(/\'/g, '');
-                this._picker.append( v[ 0 ], _text, _style );
+                // do add
+                this.append( v[ 0 ], _text, _style );
             }, this );
-        },
-
-        /**
-         *
-         */
-        bindUI : function () {
-        },
-
-        /**
-         *
-         */
-        syncUI : function () {
-        },
-
-        /**
-         *
-         */
-        destructor : function() {
-            this._picker.destroy();
         },
 
         /**
@@ -95,34 +74,19 @@ YUI.add('bewype-picker-font-family', function(Y) {
          */
         getValue : function() {
 
-            // get selected name
-            var _name          = this._picker._currentName,
-                _currentFamily = null;
+            var _currentFamily = null;
 
             // get family
-            Y.Object.each( this.get( 'fontFamilies' ), function (v, k) {
-                if ( v[ 0 ] === _name ) {
+            Y.Object.each( this.get( 'fontFamilies' ), function ( v, k ) {
+                if ( v[ 0 ] == this._currentName ) {
                     _currentFamily = v[ 1 ];
                 }
             }, this );
 
             // return current or none
             return _currentFamily;
-        },
-
-        /**
-         *
-         */
-        append : function ( name, text, style ) {
-            this._picker.append( name, text, style );
-        },
-
-        /**
-         *
-         */
-        remove : function ( name ) {
-            this._picker.remove( name );
         }
+
     } );
 
     Y.namespace('Bewype');

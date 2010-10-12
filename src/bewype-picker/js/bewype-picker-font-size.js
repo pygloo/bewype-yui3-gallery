@@ -27,17 +27,13 @@
         }
     };
 
-    Y.extend( PickerFontSize, Y.Widget, {
-
-        _picker : null,       
+    Y.extend( PickerFontSize, Y.Bewype.Picker, {
 
         /**
          *
          */
         initializer : function( config ) {
-            this._picker = new Y.Bewype.Picker( {
-                pickerClass : this.get( 'pickerClass' )
-            } );
+            this._init( config );
         },
 
         /**
@@ -45,55 +41,16 @@
          */
         renderUI : function () {
 
-            // render base picker
-            this._picker.render( this.get( 'contentBox'  ) );
+            // render default
+            this._renderBaseUI();
 
             // add sizes
             Y.Object.each( this.get( 'fontSizes' ), function (v, k) {
                 var _style = 'font-size: ' + v + 'px;';
-                this._picker.append( v,  v, _style);
+                this.append( v,  v, _style);
             }, this );
-        },
-
-        /**
-         *
-         */
-        bindUI : function () {
-        },
-
-        /**
-         *
-         */
-        syncUI : function () {
-        },
-
-        /**
-         *
-         */
-        destructor : function() {
-            this._picker.destroy();
-        },
-
-        /**
-         *
-         */
-        getValue : function() {
-            return this._picker._currentName;
-        },
-
-        /**
-         *
-         */
-        append : function ( name, text, style ) {
-            this._picker.append( name, text, style );
-        },
-
-        /**
-         *
-         */
-        remove : function ( name ) {
-            this._picker.remove( name );
         }
+
     } );
 
     Y.namespace('Bewype');

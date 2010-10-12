@@ -42,9 +42,19 @@
             _picker.append( 'test2', 'Test2' );
             _picker.append( 'test3', 'Test3' );
 
+            // add custom event listner
+            _picker.on( 'picker:onChange', function ( e ) {
+                alert( 'Picker has changed to: ' + e.target.getValue() );
+            } );
+
             // picker color normal manual
             var _pickerColorNormal = new Y.Bewype.PickerColor();
             _pickerColorNormal.render( '#picker-color-normal' );
+
+            // add custom event listner
+            _pickerColorNormal.on( 'picker:onChange', function ( e ) {
+                alert( 'Picker Color Normal has changed to: ' + e.target.getValue() );
+            } );
 
             // picker color small manual
             var _pickerColorSmall = new Y.Bewype.PickerColor( {
@@ -52,17 +62,38 @@
             } );
             _pickerColorSmall.render( '#picker-color-small' );
 
+            // add custom event listner
+            _pickerColorSmall.on( 'picker:onChange', function ( e ) {
+                alert( 'Picker Color Small has changed to: ' + e.target.getValue() );
+            } );
+
             // picker font family manual
             var _pickerFontFamily = new Y.Bewype.PickerFontFamily();
             _pickerFontFamily.render( '#picker-font-family' );
+
+            // add custom event listner
+            _pickerFontFamily.on( 'picker:onChange', function ( e ) {
+                alert( 'Picker Font Family has changed to: ' + e.target.getValue() );
+            } );
 
             // picker font size manual
             var _pickerFontSize = new Y.Bewype.PickerFontSize();
             _pickerFontSize.render( '#picker-font-size' );
 
+            // add custom event listner
+            _pickerFontSize.on( 'picker:onChange', function ( e ) {
+                alert( 'Picker Font Size has changed to: ' + e.target.getValue() );
+            } );
+
             // picker url manual
             var _pickerUrl = new Y.Bewype.PickerUrl();
             _pickerUrl.render( '#picker-url' );
+
+            // add custom event listner
+            _pickerUrl.on( 'picker:onChange', function ( e ) {
+                alert( 'Picker Url has changed to: ' + e.target.getValue() );
+            } );
+
         } );
         -->
     </script>

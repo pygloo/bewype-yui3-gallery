@@ -96,6 +96,9 @@
          *
          */
         initializer : function( config ) {
+
+            // our custom event
+            this.publish( 'picker:onChange' );
         },
 
         renderUI : function () {
@@ -122,6 +125,7 @@
 
             // set event callback
             _selectorNode = Y.one( '#' + _pickerClass + '-selector' );
+            Y.on( 'yui3-picker-event|click'    , Y.bind( this._onSelectorClick, this ) , _selectorNode );
             Y.on( 'yui3-picker-event|mousemove', Y.bind( this._onSelectorChange, this ), _selectorNode );
 
             this._slider = new Y.Slider( {
@@ -168,7 +172,8 @@
             if ( _pickernode ) {
 
                 // remove events
-                Y.detach('yui3-picker-event|click');
+                Y.detach( 'yui3-picker-event|click'     );
+                Y.detach( 'yui3-picker-event|mousemove' );
                 
                 // remove main div
                 _pickernode.remove();
@@ -186,13 +191,28 @@
             } );
         },
 
-        _onSelectorChange : function ( evt ) {
+        _onSelectorClick : function ( evt ) {
 
             // vars
             var _selectorNode = evt ? evt.target : null,
                 _pickerSize   = this.get( 'pickerSize'  ),
-                _pThreshO     = this.get( 'pickerThreshold' ),
                 _pClass       = this.get( 'pickerClass' ),                
+                _pickerClass  = ( _pickerSize == 180 ) ? _pClass : _pClass + '-small';
+
+            // little check
+            if ( !evt || _selectorNode.get( 'id' ) === _pickerClass + '-selector-bg') {
+                // fire custom event
+                this.fire("picker:onChange");
+            }
+        },
+
+        _onSelectorChange : function ( evt ) {
+
+            // vars
+            var _selectorNode = evt ? evt.target : null,
+                _pickerSize   = this.get( 'pickerSize'      ),
+                _pThreshO     = this.get( 'pickerThreshold' ),
+                _pClass       = this.get( 'pickerClass'     ),                
                 _pickerClass  = ( _pickerSize == 180 ) ? _pClass : _pClass + '-small',
                 _value           = this._slider ? this._slider.getValue() : 0,
                 _x            = 0,
@@ -276,6 +296,9 @@
         }
 
     } );
+
+    // manage custom event
+    Y.augment( PickerColor, Y.EventTarget );
 
     Y.namespace('Bewype');
     Y.Bewype.PickerColor = PickerColor;

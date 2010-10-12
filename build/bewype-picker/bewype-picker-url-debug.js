@@ -48,6 +48,9 @@ YUI.add('bewype-picker-url', function(Y) {
          *
          */
         initializer : function( config ) {
+
+            // our custom event
+            this.publish( 'picker:onChange' );
         },
 
         renderUI : function () {
@@ -111,9 +114,14 @@ YUI.add('bewype-picker-url', function(Y) {
             if ( _inputNode.get( 'id' ) === _pickerClass + '-input') {
                 // TODO - may be check the url first ???
                 this._url = _inputNode.get( 'value' );
+                // fire custom event
+                this.fire("picker:onChange");
             }
         }
     } );
+
+    // manage custom event
+    Y.augment( PickerUrl, Y.EventTarget );
 
     Y.namespace('Bewype');
     Y.Bewype.PickerUrl = PickerUrl;

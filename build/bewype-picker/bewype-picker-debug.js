@@ -56,19 +56,23 @@ YUI.add('bewype-picker-base', function(Y) {
          */
         _currentName : null,
 
+        _init : function ( config ) {
+
+            // var init
+            this._currentName = null;
+
+            // our custom event
+            this.publish( 'picker:onChange' );
+        },
+
         /**
          *
          */
         initializer : function( config ) {
-
-            //
-            this._currentName = null;
+            this._init( config );
         },
 
-        /**
-         * 
-         */
-        renderUI : function () {
+        _renderBaseUI : function () {
 
             // vars
             var _contentBox = this.get( 'contentBox'  ),
@@ -82,6 +86,14 @@ YUI.add('bewype-picker-base', function(Y) {
                 } )
             );
             _contentBox.append( _pickerNode );
+        },
+
+        /**
+         * 
+         */
+        renderUI : function () {
+            // render default
+            this._renderBaseUI();
         },
 
         /**
@@ -132,6 +144,8 @@ YUI.add('bewype-picker-base', function(Y) {
             if (_itemNode) {
                 // update name
                 this._currentName = name;
+                // fire custom event
+                this.fire("picker:onChange");
             }
         },
 
@@ -202,6 +216,9 @@ YUI.add('bewype-picker-base', function(Y) {
         }
 
     } );
+
+    // manage custom event
+    Y.augment(Picker, Y.EventTarget);
 
     Y.namespace('Bewype');
     Y.Bewype.Picker = Picker;
@@ -309,6 +326,9 @@ YUI.add('bewype-picker-color', function(Y) {
          *
          */
         initializer : function( config ) {
+
+            // our custom event
+            this.publish( 'picker:onChange' );
         },
 
         renderUI : function () {
@@ -335,6 +355,7 @@ YUI.add('bewype-picker-color', function(Y) {
 
             // set event callback
             _selectorNode = Y.one( '#' + _pickerClass + '-selector' );
+            Y.on( 'yui3-picker-event|click'    , Y.bind( this._onSelectorClick, this ) , _selectorNode );
             Y.on( 'yui3-picker-event|mousemove', Y.bind( this._onSelectorChange, this ), _selectorNode );
 
             this._slider = new Y.Slider( {
@@ -381,7 +402,8 @@ YUI.add('bewype-picker-color', function(Y) {
             if ( _pickernode ) {
 
                 // remove events
-                Y.detach('yui3-picker-event|click');
+                Y.detach( 'yui3-picker-event|click'     );
+                Y.detach( 'yui3-picker-event|mousemove' );
                 
                 // remove main div
                 _pickernode.remove();
@@ -399,13 +421,28 @@ YUI.add('bewype-picker-color', function(Y) {
             } );
         },
 
-        _onSelectorChange : function ( evt ) {
+        _onSelectorClick : function ( evt ) {
 
             // vars
             var _selectorNode = evt ? evt.target : null,
                 _pickerSize   = this.get( 'pickerSize'  ),
-                _pThreshO     = this.get( 'pickerThreshold' ),
                 _pClass       = this.get( 'pickerClass' ),                
+                _pickerClass  = ( _pickerSize == 180 ) ? _pClass : _pClass + '-small';
+
+            // little check
+            if ( !evt || _selectorNode.get( 'id' ) === _pickerClass + '-selector-bg') {
+                // fire custom event
+                this.fire("picker:onChange");
+            }
+        },
+
+        _onSelectorChange : function ( evt ) {
+
+            // vars
+            var _selectorNode = evt ? evt.target : null,
+                _pickerSize   = this.get( 'pickerSize'      ),
+                _pThreshO     = this.get( 'pickerThreshold' ),
+                _pClass       = this.get( 'pickerClass'     ),                
                 _pickerClass  = ( _pickerSize == 180 ) ? _pClass : _pClass + '-small',
                 _value           = this._slider ? this._slider.getValue() : 0,
                 _x            = 0,
@@ -490,6 +527,9 @@ YUI.add('bewype-picker-color', function(Y) {
 
     } );
 
+    // manage custom event
+    Y.augment( PickerColor, Y.EventTarget );
+
     Y.namespace('Bewype');
     Y.Bewype.PickerColor = PickerColor;
 
@@ -527,17 +567,13 @@ YUI.add('bewype-picker-font-size', function(Y) {
         }
     };
 
-    Y.extend( PickerFontSize, Y.Widget, {
-
-        _picker : null,       
+    Y.extend( PickerFontSize, Y.Bewype.Picker, {
 
         /**
          *
          */
         initializer : function( config ) {
-            this._picker = new Y.Bewype.Picker( {
-                pickerClass : this.get( 'pickerClass' )
-            } );
+            this._init( config );
         },
 
         /**
@@ -545,55 +581,16 @@ YUI.add('bewype-picker-font-size', function(Y) {
          */
         renderUI : function () {
 
-            // render base picker
-            this._picker.render( this.get( 'contentBox'  ) );
+            // render default
+            this._renderBaseUI();
 
             // add sizes
             Y.Object.each( this.get( 'fontSizes' ), function (v, k) {
                 var _style = 'font-size: ' + v + 'px;';
-                this._picker.append( v,  v, _style);
+                this.append( v,  v, _style);
             }, this );
-        },
-
-        /**
-         *
-         */
-        bindUI : function () {
-        },
-
-        /**
-         *
-         */
-        syncUI : function () {
-        },
-
-        /**
-         *
-         */
-        destructor : function() {
-            this._picker.destroy();
-        },
-
-        /**
-         *
-         */
-        getValue : function() {
-            return this._picker._currentName;
-        },
-
-        /**
-         *
-         */
-        append : function ( name, text, style ) {
-            this._picker.append( name, text, style );
-        },
-
-        /**
-         *
-         */
-        remove : function ( name ) {
-            this._picker.remove( name );
         }
+
     } );
 
     Y.namespace('Bewype');
@@ -646,17 +643,13 @@ YUI.add('bewype-picker-font-family', function(Y) {
         }
     };
 
-    Y.extend( PickerFontFamily, Y.Widget, {
-
-        _picker : null,       
+    Y.extend( PickerFontFamily, Y.Bewype.Picker, {
 
         /**
          *
          */
         initializer : function( config ) {
-            this._picker = new Y.Bewype.Picker( {
-                pickerClass : this.get( 'pickerClass' )
-            } );
+            this._init( config );
         },
 
         /**
@@ -664,34 +657,17 @@ YUI.add('bewype-picker-font-family', function(Y) {
          */
         renderUI : function () {
 
-            // render base picker
-            this._picker.render( this.get( 'contentBox'  ) );
+            // render default
+            this._renderBaseUI();
 
             // add familys
             Y.Object.each( this.get( 'fontFamilies' ), function (v, k) {
+                // prepare values
                 var _style = 'font-family: ' + v[ 1 ] + ';',
                     _text = v[ 1 ].split(',')[ 0 ].replace(/\'/g, '');
-                this._picker.append( v[ 0 ], _text, _style );
+                // do add
+                this.append( v[ 0 ], _text, _style );
             }, this );
-        },
-
-        /**
-         *
-         */
-        bindUI : function () {
-        },
-
-        /**
-         *
-         */
-        syncUI : function () {
-        },
-
-        /**
-         *
-         */
-        destructor : function() {
-            this._picker.destroy();
         },
 
         /**
@@ -699,34 +675,19 @@ YUI.add('bewype-picker-font-family', function(Y) {
          */
         getValue : function() {
 
-            // get selected name
-            var _name          = this._picker._currentName,
-                _currentFamily = null;
+            var _currentFamily = null;
 
             // get family
-            Y.Object.each( this.get( 'fontFamilies' ), function (v, k) {
-                if ( v[ 0 ] === _name ) {
+            Y.Object.each( this.get( 'fontFamilies' ), function ( v, k ) {
+                if ( v[ 0 ] == this._currentName ) {
                     _currentFamily = v[ 1 ];
                 }
             }, this );
 
             // return current or none
             return _currentFamily;
-        },
-
-        /**
-         *
-         */
-        append : function ( name, text, style ) {
-            this._picker.append( name, text, style );
-        },
-
-        /**
-         *
-         */
-        remove : function ( name ) {
-            this._picker.remove( name );
         }
+
     } );
 
     Y.namespace('Bewype');
@@ -785,6 +746,9 @@ YUI.add('bewype-picker-url', function(Y) {
          *
          */
         initializer : function( config ) {
+
+            // our custom event
+            this.publish( 'picker:onChange' );
         },
 
         renderUI : function () {
@@ -848,9 +812,14 @@ YUI.add('bewype-picker-url', function(Y) {
             if ( _inputNode.get( 'id' ) === _pickerClass + '-input') {
                 // TODO - may be check the url first ???
                 this._url = _inputNode.get( 'value' );
+                // fire custom event
+                this.fire("picker:onChange");
             }
         }
     } );
+
+    // manage custom event
+    Y.augment( PickerUrl, Y.EventTarget );
 
     Y.namespace('Bewype');
     Y.Bewype.PickerUrl = PickerUrl;

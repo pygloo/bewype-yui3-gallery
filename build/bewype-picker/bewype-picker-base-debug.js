@@ -56,19 +56,23 @@ YUI.add('bewype-picker-base', function(Y) {
          */
         _currentName : null,
 
+        _init : function ( config ) {
+
+            // var init
+            this._currentName = null;
+
+            // our custom event
+            this.publish( 'picker:onChange' );
+        },
+
         /**
          *
          */
         initializer : function( config ) {
-
-            //
-            this._currentName = null;
+            this._init( config );
         },
 
-        /**
-         * 
-         */
-        renderUI : function () {
+        _renderBaseUI : function () {
 
             // vars
             var _contentBox = this.get( 'contentBox'  ),
@@ -82,6 +86,14 @@ YUI.add('bewype-picker-base', function(Y) {
                 } )
             );
             _contentBox.append( _pickerNode );
+        },
+
+        /**
+         * 
+         */
+        renderUI : function () {
+            // render default
+            this._renderBaseUI();
         },
 
         /**
@@ -132,6 +144,8 @@ YUI.add('bewype-picker-base', function(Y) {
             if (_itemNode) {
                 // update name
                 this._currentName = name;
+                // fire custom event
+                this.fire("picker:onChange");
             }
         },
 
@@ -202,6 +216,9 @@ YUI.add('bewype-picker-base', function(Y) {
         }
 
     } );
+
+    // manage custom event
+    Y.augment(Picker, Y.EventTarget);
 
     Y.namespace('Bewype');
     Y.Bewype.Picker = Picker;
