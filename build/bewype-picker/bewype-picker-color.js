@@ -13,27 +13,27 @@ YUI.add('bewype-picker-color', function(Y) {
     /**
      *
      */
-    PICKER_TMPL += '<div id="{pickerClass}"><table>';
+    PICKER_TMPL += '<div class="{pickerClass}"><table>';
     PICKER_TMPL += '  <tr>';
     PICKER_TMPL += '    <td>';
-    PICKER_TMPL += '      <div id="{pickerClass}-selector">';
-    PICKER_TMPL += '        <img id="{pickerClass}-selector-bg" src="{pickerDir}/picker-{pickerSize}.png" />';
+    PICKER_TMPL += '      <div class="{pickerClass}-selector">';
+    PICKER_TMPL += '        <img class="{pickerClass}-selector-bg" src="{pickerDir}/picker-{pickerSize}.png" />';
     PICKER_TMPL += '      </div>';
     PICKER_TMPL += '    </td>';
     PICKER_TMPL += '    <td>';
-    PICKER_TMPL += '      <div id="{pickerClass}-hue">';
-    PICKER_TMPL += '        <img id="{pickerClass}-hue-bg" src="{pickerDir}/hue-{pickerSize}.png" />';
+    PICKER_TMPL += '      <div class="{pickerClass}-hue">';
+    PICKER_TMPL += '        <img class="{pickerClass}-hue-bg" src="{pickerDir}/hue-{pickerSize}.png" />';
     PICKER_TMPL += '      </div>';
     PICKER_TMPL += '    </td>';
     PICKER_TMPL += '    <td>';
-    PICKER_TMPL += '      <div id="{pickerClass}-slider" class="{sliderSkin}"></div>';
+    PICKER_TMPL += '      <div class="{pickerClass}-slider {sliderSkin}"></div>';
     PICKER_TMPL += '    </td>';
     PICKER_TMPL += '    <td>';
-    PICKER_TMPL += '      <div id="{pickerClass}-preview"></div>';
+    PICKER_TMPL += '      <div class="{pickerClass}-preview"></div>';
     PICKER_TMPL += '      <p>';
-    PICKER_TMPL += '        <div id="{pickerClass}-r" class="{pickerClass}-rgb"></div>';
-    PICKER_TMPL += '        <div id="{pickerClass}-g" class="{pickerClass}-rgb"></div>';
-    PICKER_TMPL += '        <div id="{pickerClass}-b" class="{pickerClass}-rgb"></div>';
+    PICKER_TMPL += '        <div class="{pickerClass}-rgb {pickerClass}-r"></div>';
+    PICKER_TMPL += '        <div class="{pickerClass}-rgb {pickerClass}-g"></div>';
+    PICKER_TMPL += '        <div class="{pickerClass}-rgb {pickerClass}-b"></div>';
     PICKER_TMPL += '      </p>';
     PICKER_TMPL += '    </td>';
     PICKER_TMPL += '  </tr>';
@@ -126,7 +126,7 @@ YUI.add('bewype-picker-color', function(Y) {
             _contentBox.append( _pickerNode );
 
             // set event callback
-            _selectorNode = Y.one( '#' + _pickerClass + '-selector' );
+            _selectorNode = _contentBox.one( '.' + _pickerClass + '-selector' );
             Y.on( 'yui3-picker-event|click'    , Y.bind( this._onSelectorClick, this ) , _selectorNode );
             Y.on( 'yui3-picker-event|mousemove', Y.bind( this._onSelectorChange, this ), _selectorNode );
 
@@ -143,7 +143,7 @@ YUI.add('bewype-picker-color', function(Y) {
             } );
 
             // render slider                       
-            this._slider.render( '#' + _pickerClass + '-slider' );
+            this._slider.render( _contentBox.one( '.' + _pickerClass + '-slider' ) );
 
             // update all
             this._onSliderChange();
@@ -167,8 +167,8 @@ YUI.add('bewype-picker-color', function(Y) {
             var _contentBox  = this.get( 'contentBox' ),
                 _pickerSize  = this.get( 'pickerSize'  ),
                 _pClass      = this.get( 'pickerClass' ),
-                _pickerId    = ( _pickerSize == 180 ) ? '#' + _pClass : '#' + _pClass + '-small',
-                _pickernode  = _contentBox.one( _pickerId );
+                _pickerClass = ( _pickerSize == 180 ) ? '.' + _pClass : '.' + _pClass + '-small',
+                _pickernode  = _contentBox.one( _pickerClass );
 
             // little check
             if ( _pickernode ) {
@@ -211,7 +211,8 @@ YUI.add('bewype-picker-color', function(Y) {
         _onSelectorChange : function ( evt ) {
 
             // vars
-            var _selectorNode = evt ? evt.target : null,
+            var _contentBox   = this.get( 'contentBox' ),
+                _selectorNode = evt ? evt.target : null,
                 _pickerSize   = this.get( 'pickerSize'      ),
                 _pThreshO     = this.get( 'pickerThreshold' ),
                 _pClass       = this.get( 'pickerClass'     ),                
@@ -224,10 +225,10 @@ YUI.add('bewype-picker-color', function(Y) {
                 _v            = 0,
                 _rgb          = [],
                 _bgVal        = '',
-                _previewNode  = Y.one( '#' + _pickerClass + '-preview' ),
-                _rNode        = Y.one( '#' + _pickerClass + '-r' ),
-                _gNode        = Y.one( '#' + _pickerClass + '-g' ),
-                _bNode        = Y.one( '#' + _pickerClass + '-b' );
+                _previewNode  = _contentBox.one( '.' + _pickerClass + '-preview' ),
+                _rNode        = _contentBox.one( '.' + _pickerClass + '-r' ),
+                _gNode        = _contentBox.one( '.' + _pickerClass + '-g' ),
+                _bNode        = _contentBox.one( '.' + _pickerClass + '-b' );
 
             if ( evt ) {
                 // get picker position
@@ -274,14 +275,15 @@ YUI.add('bewype-picker-color', function(Y) {
 
         _onSliderChange : function ( evt ) {
             //
-            var _pickerSize   = this.get( 'pickerSize'  ),
+            var _contentBox   = this.get( 'contentBox' ),
+                _pickerSize   = this.get( 'pickerSize'  ),
                 _pClass       = this.get( 'pickerClass' ),
                 _pickerClass  = ( _pickerSize == 180 ) ? _pClass : _pClass + '-small',
                 _value           = evt ? evt.newVal : 0,
                 _h            = ( 180 - _value ),
                 _rgb          = Y.Bewype.Color.hsv2rgb( ( _h == 1 ) ? 0 : _h , 1, 1 ),
                 _bgVal        = '',
-                _selectorNode = Y.one( '#' + _pickerClass + '-selector' );
+                _selectorNode = _contentBox.one( '.' + _pickerClass + '-selector' );
 
             // set bg val
             _bgVal += 'rgb(';

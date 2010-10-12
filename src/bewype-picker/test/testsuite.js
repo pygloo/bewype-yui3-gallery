@@ -53,11 +53,11 @@ suite.add( new Y.Test.Case( {
         this._picker.remove( 'test3' );
 
         // check current value
-        Y.Assert.isNull( this._picker.getValue(), 'Ooops!' );
+        Y.Assert.isNull( this._picker.getValue(), 'check getValue!' );
 
         // check item removal
         _evtNode = Y.one( '#' + this._picker.get ( 'pickerClass' ) + '-test2' );
-        Y.Assert.isNull( _evtNode, 'Ooops!' );
+        Y.Assert.isNull( _evtNode, 'check item after removal!' );
     },
 
     "test picker color normal": function () {
@@ -153,7 +153,7 @@ suite.add( new Y.Test.Case( {
         Y.Assert.isNull( this._picker.getValue(), 'Ooops!' );
 
         // select test2
-        _inputNode = Y.one( '#' + this._picker.get ( 'pickerClass' ) + '-input' );
+        _inputNode = Y.one( '#test .' + this._picker.get ( 'pickerClass' ) + '-input' );
         _inputNode.set( 'value', 'http://www.test.com' )
         _inputNode.simulate( 'blur' );
 

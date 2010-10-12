@@ -10,13 +10,13 @@
     /**
      *
      */
-    PICKER_TMPL += '<div id="{pickerClass}"><table>';
+    PICKER_TMPL += '<div class="{pickerClass}"><table>';
     PICKER_TMPL += '  <tr>';
     PICKER_TMPL += '    <td>';
     PICKER_TMPL += '      <div class="{pickerClass}-label">Url</div>';
     PICKER_TMPL += '    </td>';
     PICKER_TMPL += '    <td>';
-    PICKER_TMPL += '      <input id="{pickerClass}-input" type="text">';
+    PICKER_TMPL += '      <input class="{pickerClass}-input" type="text">';
     PICKER_TMPL += '    </td>';
     PICKER_TMPL += '  </tr>';
     PICKER_TMPL += '</table></div>';
@@ -68,7 +68,7 @@
             _contentBox.append( _pickerNode );
 
             // set event callback
-            _inputNode = Y.one( '#' + _pickerClass + '-input' );
+            _inputNode = _contentBox.one( '.' + _pickerClass + '-input' );
             Y.on( 'yui3-picker-event|blur', Y.bind( this._onInputChange, this ), _inputNode );
         },
 
@@ -85,8 +85,7 @@
 
             // tmp vars
             var _contentBox  = this.get( 'contentBox' ),
-                _pickerId    = '#' + this.get( 'pickerClass' ),
-                _pickernode  = _contentBox.one( _pickerId );
+                _pickernode  = _contentBox.one( '.' + this.get( 'pickerClass' ) );
 
             // little check
             if ( _pickernode ) {
@@ -109,7 +108,7 @@
             var _inputNode   = evt ? evt.target : null,
                 _pickerClass = this.get( 'pickerClass' );
 
-            if ( _inputNode.get( 'id' ) === _pickerClass + '-input') {
+            if ( _inputNode ) {
                 // TODO - may be check the url first ???
                 this._url = _inputNode.get( 'value' );
                 // fire custom event

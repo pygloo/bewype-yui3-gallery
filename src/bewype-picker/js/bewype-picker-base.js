@@ -9,7 +9,7 @@
         /**
          *
          */
-        PICKER_TMPL += '<div id="{pickerId}"><table>';
+        PICKER_TMPL += '<div class="{pickerClass}"><table>';
         PICKER_TMPL += '</table></div>';
 
         /**
@@ -39,7 +39,7 @@
      */
     Picker.ATTRS = {
         pickerClass : {
-            value : 'yui3-picker',
+            value : 'yui3-picker-base',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -73,14 +73,14 @@
         _renderBaseUI : function () {
 
             // vars
-            var _contentBox = this.get( 'contentBox'  ),
-                _pickerId   = this.get( 'pickerClass' ),
-                _pickerNode = null;
+            var _contentBox  = this.get( 'contentBox'  ),
+                _pickerClass = this.get( 'pickerClass' ),
+                _pickerNode  = null;
 
             // create table
             _pickerNode = new Y.Node.create(
                 Y.substitute( PICKER_TMPL, {
-                    pickerId : _pickerId
+                    pickerClass : _pickerClass
                 } )
             );
             _contentBox.append( _pickerNode );
@@ -113,11 +113,8 @@
 
             // vars
             var _contentBox  = this.get( 'contentBox'  ),
-                _pickerId    = this.get( 'pickerClass' ),
-                _pickerNode  = null;
-
-            // get picker node
-            _pickerNode = _contentBox.one( '#' + _pickerId );
+                _pickerClass = this.get( 'pickerClass' ),
+                _pickerNode  = _contentBox.one( '.' + _pickerClass );
 
             // little check
             if ( _pickerNode ) {
@@ -162,11 +159,8 @@
             // vars
             var _contentBox  = this.get( 'contentBox'  ),
                 _pickerClass = this.get( 'pickerClass' ),
-                _pickerNode  = null,
-                _itemNode    = null;
-
-            // get picker node
-            _pickerNode = _contentBox.one( '#' + _pickerClass );
+                _pickerNode  = _contentBox.one( '.' + _pickerClass );
+                _itemNode    = null; 
 
             // little check
             if ( _pickerNode ) {

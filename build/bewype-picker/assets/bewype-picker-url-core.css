@@ -1,26 +1,26 @@
 
-#yui3-picker-url {
+.yui3-picker-url {
     border      : 1px solid #888;
     font-family : Arial, Helvetica, sans-serif;
     font-size   : 0.875em;
     width       : 240px;
 }
 
-#yui3-picker-url table {
+.yui3-picker-url table {
     width : 100%;
 }
 
-#yui3-picker-url table,
-#yui3-picker-url td {
+.yui3-picker-url table,
+.yui3-picker-url td {
 }
 
-#yui3-picker-url td {
+.yui3-picker-url td {
     padding        : 8px 8px;
     text-align     : center;
     vertical-align : middle;
 }
 
-#yui3-picker-url input {
+.yui3-picker-url input {
     border : 1px solid #ccc;
     margin : 0 auto;
     width  : 100%;

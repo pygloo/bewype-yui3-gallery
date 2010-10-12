@@ -1,33 +1,33 @@
 
-#yui3-picker {
+.yui3-picker-base {
     border      : 1px solid #888;
     font-family : Arial, Helvetica, sans-serif;
     font-size   : 0.875em;
     width       : 120px;
 }
 
-#yui3-picker table {
+.yui3-picker-base table {
     border-collapse: collapse;
 }
 
-#yui3-picker table,
-#yui3-picker td {
+.yui3-picker-base table,
+.yui3-picker-base td {
     margin  : 0;
     padding : 0;
     width   : 100%;
 }
 
-#yui3-picker td {
+.yui3-picker-base td {
     padding        : 2px 4px;
     text-align     : left;
     vertical-align : middle;
 }
 
-#yui3-picker td:hover {
+.yui3-picker-base td:hover {
     background-color : #ddd;
     cursor           : pointer;
 }
 
-.yui3-picker-row {
+.yui3-picker-base-row {
 }
 
