@@ -138,7 +138,7 @@ YUI.add('bewype-picker-base', function(Y) {
             var _itemNode   = evt ? evt.target : null;
 
             // little check
-            if (_itemNode) {
+            if ( _itemNode ) {
                 // update name
                 this._currentName = name;
                 // fire custom event
@@ -161,7 +161,7 @@ YUI.add('bewype-picker-base', function(Y) {
             // vars
             var _contentBox  = this.get( 'contentBox'  ),
                 _pickerClass = this.get( 'pickerClass' ),
-                _pickerNode  = _contentBox.one( '.' + _pickerClass );
+                _pickerNode  = _contentBox.one( '.' + _pickerClass ),
                 _itemNode    = null; 
 
             // little check
@@ -191,10 +191,7 @@ YUI.add('bewype-picker-base', function(Y) {
             // vars
             var _contentBox = this.get( 'contentBox'  ),
                 _itemId     = '#' + this.get( 'pickerClass' ) + '-' + name,
-                _itemNode   = null;
-
-            // get item node
-            _itemNode = _contentBox.one( _itemId );
+                _itemNode   = _contentBox.one( _itemId );
 
             // little check
             if ( _itemNode ) {

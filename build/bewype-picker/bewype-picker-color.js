@@ -202,7 +202,7 @@ YUI.add('bewype-picker-color', function(Y) {
                 _pickerClass  = ( _pickerSize == 180 ) ? _pClass : _pClass + '-small';
 
             // little check
-            if ( !evt || _selectorNode.get( 'id' ) === _pickerClass + '-selector-bg') {
+            if ( !evt || _selectorNode.get( 'className' ) === _pickerClass + '-selector-bg') {
                 // fire custom event
                 this.fire("picker:onChange");
             }
@@ -246,7 +246,7 @@ YUI.add('bewype-picker-color', function(Y) {
                 this._y = 90;
             }
 
-            if ( !evt || _selectorNode.get( 'id' ) === _pickerClass + '-selector-bg') {
+            if ( !evt || _selectorNode.get( 'className' ) === _pickerClass + '-selector-bg') {
 
                 _h   = ( 180 - _value ); /* compute hsv value */
                 _s   = this._x / 180;
