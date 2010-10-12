@@ -1,0 +1,17 @@
+
+#yui3-button {
+    border         : 1px solid #888;
+    font-family    : Arial, Helvetica, sans-serif;
+    font-size      : 0.875em;
+    text-align     : center;
+}
+
+#yui3-button:hover {
+    background-color : #ddd;
+    cursor           : pointer;
+}
+
+#yui3-button .yui3-button-label {
+    margin : 10px 0;
+}
+

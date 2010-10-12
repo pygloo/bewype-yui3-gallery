@@ -138,6 +138,19 @@
             }
         }
     }, 
+    "bewype-button": {
+        "submodules": {
+            "bewype-button-base": {
+                "requires": [
+                    "stylesheet", 
+                    "substitute", 
+                    "widget", 
+                    "yui-base"
+                ], 
+                "skinnable": true
+            }
+        }
+    }, 
     "bewype-color": {
         "requires": [
             "yui-base"
