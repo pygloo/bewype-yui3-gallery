@@ -8,7 +8,11 @@
 
     <h2>Button Base</h2>
 
-    <div id="button"></div>
+    <div id="button-base"></div>
+
+    <h2>Button Toggle</h2>
+
+    <div id="button-toggle"></div>
 
     <script>
         <!--
@@ -17,11 +21,27 @@
             var _button = new Y.Bewype.Button( {
                 label : 'test'
             } );
-            _button.render( '#button' );
+            _button.render( '#button-base' );
 
             // add custom event listener
             _button.on( 'button:onClick', function ( e ) {
                 alert( 'Button Base clicked!' );
+            } );
+            
+            // button manual
+            var _button = new Y.Bewype.ButtonToggle( {
+                label : 'test'
+            } );
+            _button.render( '#button-toggle' );
+
+            // add custom event listener
+            _button.on( 'button:onClick', function ( e ) {
+                alert( 'Button Toggle Clicked!' );
+            } );
+
+            // add custom event listener
+            _button.on( 'button:onChange', function ( e ) {
+                alert( 'Button Toggle Changed: ' + _button.getValue() );
             } );
 
         } );
