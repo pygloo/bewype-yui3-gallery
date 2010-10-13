@@ -169,6 +169,15 @@
             "yui-base"
         ]
     }, 
+    "bewype-editor": {
+        "requires": [
+            "bewype-button", 
+            "dataschema", 
+            "editor", 
+            "json-stringify"
+        ], 
+        "skinnable": true
+    }, 
     "bewype-picker": {
         "submodules": {
             "bewype-picker-base": {
@@ -213,6 +222,11 @@
                 "skinnable": true
             }
         }
+    }, 
+    "bewype-utils": {
+        "requires": [
+            "yui-base"
+        ]
     }, 
     "cache": {
         "submodules": {
