@@ -88,7 +88,7 @@ YUI.add('bewype-utils', function(Y) {
             // convert to dict
             Y.each( _results, function( v, k ) {
                 var _name  = camelize ? Y.Bewype.Utils.camelize( v.name ) : v.name.trim(),
-                    _value = v.value.trim(),
+                    _value = (v.value) ? v.value.trim() : null,
                     _s = null,
                     _r = null;
                 if ( _name && _value ) {
@@ -116,9 +116,85 @@ YUI.add('bewype-utils', function(Y) {
                     }
                 }
             } );
-
             // return dict
             return _cssDict;
+        },
+
+        setCssDict : function ( node, cssDict ) {
+
+            var _fn = null;                         
+
+            // first clear all
+            node.setStyle( 'cssText', '' );
+
+            // udpate loop
+            _fn = function ( key, val ) {
+                // udpate style
+                node.setStyle( this.camelize( key ) , val );
+                // always return val to continue!
+                return val;
+            };
+                     
+            // trigger update
+            Y.JSON.stringify( cssDict, Y.bind( _fn, this ) );
+        },
+
+        /**
+        * @private
+        * @method _getWindow
+        * @description Get the Window of the IFRAME
+        * @return {Object}
+        */
+        getWindow: function( node ) {
+            var _iFrame = node.one( 'iframe' );
+            return _iFrame.get( 'contentWindow' );
+        },
+                  
+        /**
+        * @private
+        * @method _getDoc
+        * @description Get the Document of the IFRAME
+        * @return {Object}
+        */
+        getDocument: function( node ) {
+            return this.getWindow( node ).get( 'document' );
+        },
+
+        /**
+        * @private
+        * @method getSelection
+        * @description Handles the different selection objects across the A-Grade list.
+        * @return {Object} Selection Object
+        */
+        getSelection : function ( node ) {
+            var _win = this.getWindow( node ),
+                _doc = _win.get( 'document' );
+
+            if ( _win && _win._node.getSelection ) {
+            	return _win._node.getSelection();
+            } else if ( _doc && _doc._node.selection ) { // should come last; Opera!
+            	return _doc._node.selection.createRange();
+            }
+            return null;
+        },
+
+        getRange : function ( selection ) {
+	        if ( selection.getRangeAt ) {
+                //
+        		return selection.getRangeAt(0);
+
+            } else { // Safari!
+        		var _range        = document.createRange(),
+                    _anchorNode   = selection.anchorNode,
+                    _anchorOffset = selection.anchorOffset,
+                    _focusNode    = selection.focusNode,
+                    _focusOffset  = selection.focusOffset;
+                // set range
+		        _range.setStart( _anchorNode, _anchorOffset );
+        		_range.setEnd( _focusNode, _focusOffset );
+                //
+		        return _range;
+        	}
         }
     };
 
@@ -132,4 +208,4 @@ YUI.add('bewype-utils', function(Y) {
 
 
 
-}, '@VERSION@' ,{requires:['yui-base']});
+}, '@VERSION@' ,{requires:['json-stringify', 'yui-base']});
