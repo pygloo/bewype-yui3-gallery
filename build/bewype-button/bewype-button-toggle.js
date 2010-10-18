@@ -72,6 +72,19 @@ YUI.add('bewype-button-toggle', function(Y) {
             this._renderBaseUI();
         },
 
+        refresh : function ( buttonNode ) {
+
+            // vars
+            var _buttonClass = this.get( 'buttonClass' ),
+                _buttonNode  = buttonNode || this.get( 'contentBox' ).one( 'div' );
+                    
+            // little check
+            if (_buttonNode) {
+                // update class name
+                _buttonNode.set( 'className', this._toggleState ? _buttonClass + '-active' : _buttonClass );
+            }
+        },
+
         /**
          *
          */
@@ -79,17 +92,16 @@ YUI.add('bewype-button-toggle', function(Y) {
 
             // vars
             var _contentBox  = this.get( 'contentBox'  ),
-                _buttonNode  = _contentBox.one( 'div' ),
-                _buttonClass = this.get( 'buttonClass' );
+                _buttonNode  = _contentBox.one( 'div' );
 
             // little check
             if (_buttonNode) {
                 
                 // update state
                 this._toggleState = !this._toggleState;
-                    
-                // update class name
-                _buttonNode.set( 'className', this._toggleState ? _buttonClass + '-active' : _buttonClass );
+
+                // refresh
+                this.refresh( _buttonNode );
 
                 // fire custom event
                 this.fire("button:onChange");
@@ -103,6 +115,19 @@ YUI.add('bewype-button-toggle', function(Y) {
          */
         getValue : function () {
             return this._toggleState;
+        },
+
+        /**
+         *
+         */
+        setValue : function ( toggleState ) {
+            // check changed
+            if ( this._toggleState != toggleState ) {
+                // update state
+                this._toggleState = toggleState;
+                // update ui
+                this.refresh();
+            }
         }
 
     } );

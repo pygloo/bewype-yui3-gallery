@@ -118,9 +118,6 @@ YUI.add('bewype-button-picker', function(Y) {
             // render default
             this._renderBaseUI();
 
-            // vars
-            var _contentBox = this.get( 'contentBox' );
-
             // set handler
             Y.after( 'yui3-button-event|click' , Y.bind( this._removePicker, this ) );
         },
