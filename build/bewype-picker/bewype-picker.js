@@ -582,6 +582,13 @@ YUI.add('bewype-picker-font-size', function(Y) {
                 var _style = 'font-size: ' + v + 'px;';
                 this.append( v,  v, _style);
             }, this );
+        },
+
+        /**
+         *
+         */
+        getValue : function() {
+            return this._currentName + 'px';
         }
 
     } );
@@ -762,7 +769,7 @@ YUI.add('bewype-picker-url', function(Y) {
 
             // set event callback
             _inputNode = _contentBox.one( '.' + _pickerClass + '-input' );
-            Y.on( 'yui3-picker-event|blur', Y.bind( this._onInputChange, this ), _inputNode );
+            _inputNode.on( 'yui3-picker-event|blur', Y.bind( this._onInputChange, this ) );
         },
 
         bindUI : function () {

@@ -49,6 +49,13 @@
                 var _style = 'font-size: ' + v + 'px;';
                 this.append( v,  v, _style);
             }, this );
+        },
+
+        /**
+         *
+         */
+        getValue : function() {
+            return this._currentName + 'px';
         }
 
     } );
