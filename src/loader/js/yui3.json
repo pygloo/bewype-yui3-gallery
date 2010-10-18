@@ -172,9 +172,12 @@
     "bewype-editor": {
         "requires": [
             "bewype-button", 
+            "bewype-utils", 
             "dataschema", 
             "editor", 
-            "json-stringify"
+            "json-stringify", 
+            "plugin", 
+            "stylesheet"
         ], 
         "skinnable": true
     }, 
@@ -225,6 +228,7 @@
     }, 
     "bewype-utils": {
         "requires": [
+            "json-stringify", 
             "yui-base"
         ]
     }, 

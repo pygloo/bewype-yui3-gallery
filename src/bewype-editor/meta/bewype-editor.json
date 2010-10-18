@@ -1,0 +1,14 @@
+{
+    "bewype-editor": {
+        "requires": [
+            "bewype-button",
+            "bewype-utils",
+            "dataschema",
+            "editor",
+            "json-stringify",
+            "plugin",
+            "stylesheet"
+        ], 
+        "skinnable": true
+    }
+}

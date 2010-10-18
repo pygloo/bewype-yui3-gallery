@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
+    <head> 
+        <title>Manual Test - Editor</title>
+        <script type="text/javascript" src="../../../../build/yui/yui.js"></script>
+    </head> 
+    <body> 
+        <div id="panel"></div>
+        <br />
+        <div id="content" style="border: 1px solid black; font-family: arial, sans-serif; font-size: medium; margin: 0; padding: 0; height: 120px; width: 240px;">This is a <b>test</b> ... <i>and</i> another <a href="">cool</a>!</div>
+        <a id="attach" href="#">Attach</a> | <a id="detach" href="#">Detach</a>
+
+        <script type="text/javascript">
+        <!--
+            YUI( { filter: 'debug' } ).use( 'bewype-editor', function ( Y ) {
+    
+                var _editor = null;
+
+                // attach event
+                Y.on( 'click',
+                    function(e) {
+                        if ( !Y.one( "#content" ).bewypeEditor ) {
+                            Y.one( "#content" ).plug( Y.Bewype.Editor, {
+                                panelNode : Y.one( "#panel" )
+                            } )
+                        }
+                    },
+                    Y.one( "#attach" )
+                );
+
+                // detach event
+                Y.on( 'click',
+                    function(e) {
+                        if ( Y.one( "#content" ).bewypeEditor ) {
+                            Y.one( "#content" ).unplug( Y.Bewype.Editor )
+                        }
+                    },
+                    Y.one( "#detach" )
+                );
+            } );
+        -->
+        </script>
+    </body> 
+</html> 
