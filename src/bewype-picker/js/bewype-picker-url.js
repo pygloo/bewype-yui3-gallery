@@ -105,8 +105,7 @@
         _onInputChange : function ( evt ) {
 
             // vars
-            var _inputNode   = evt ? evt.target : null,
-                _pickerClass = this.get( 'pickerClass' );
+            var _inputNode   = evt ? evt.target : null;
 
             if ( _inputNode ) {
                 // TODO - may be check the url first ???

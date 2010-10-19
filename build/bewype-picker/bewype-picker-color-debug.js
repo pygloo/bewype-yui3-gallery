@@ -164,7 +164,7 @@ YUI.add('bewype-picker-color', function(Y) {
         destructor : function() {
 
             // tmp vars
-            var _contentBox  = this.get( 'contentBox' ),
+            var _contentBox  = this.get( 'contentBox'  ),
                 _pickerSize  = this.get( 'pickerSize'  ),
                 _pClass      = this.get( 'pickerClass' ),
                 _pickerClass = ( _pickerSize == 180 ) ? '.' + _pClass : '.' + _pClass + '-small',
@@ -211,13 +211,13 @@ YUI.add('bewype-picker-color', function(Y) {
         _onSelectorChange : function ( evt ) {
 
             // vars
-            var _contentBox   = this.get( 'contentBox' ),
-                _selectorNode = evt ? evt.target : null,
-                _pickerSize   = this.get( 'pickerSize'      ),
-                _pThreshO     = this.get( 'pickerThreshold' ),
-                _pClass       = this.get( 'pickerClass'     ),                
+            var _contentBox   = this.get( 'contentBox'  ),
+                _pickerSize   = this.get( 'pickerSize'  ),
+                _pClass       = this.get( 'pickerClass' ),  
                 _pickerClass  = ( _pickerSize == 180 ) ? _pClass : _pClass + '-small',
-                _value           = this._slider ? this._slider.getValue() : 0,
+                _targetNode   = evt ? evt.target : null,
+                _pThreshO     = this.get( 'pickerThreshold' ),
+                _value        = this._slider ? this._slider.getValue() : 0,
                 _x            = 0,
                 _y            = 0,
                 _h            = 0,
@@ -230,10 +230,10 @@ YUI.add('bewype-picker-color', function(Y) {
                 _gNode        = _contentBox.one( '.' + _pickerClass + '-g' ),
                 _bNode        = _contentBox.one( '.' + _pickerClass + '-b' );
 
-            if ( evt ) {
+            if ( _targetNode && _targetNode.get( 'className' ) === _pickerClass + '-selector-bg' ) {
                 // get picker position
-                _x = evt.pageX - _selectorNode.get( 'x' );
-                _y = evt.pageY - _selectorNode.get( 'y' );
+                _x = evt.pageX - _targetNode.get( 'x' ) - _contentBox.get( 'offsetParent' ).get( 'offsetLeft' );
+                _y = evt.pageY - _targetNode.get( 'y' ) - _contentBox.get( 'offsetParent' ).get( 'offsetTop' );
                 // manage small picker
                 _x = ( _pickerSize == 180 ) ? _x : _x * 2;
                 _y = ( _pickerSize == 180 ) ? _y : _y * 2;
@@ -246,7 +246,7 @@ YUI.add('bewype-picker-color', function(Y) {
                 this._y = 90;
             }
 
-            if ( !evt || _selectorNode.get( 'className' ) === _pickerClass + '-selector-bg') {
+            if ( !evt || _targetNode.get( 'className' ) === _pickerClass + '-selector-bg') {
 
                 _h   = ( 180 - _value ); /* compute hsv value */
                 _s   = this._x / 180;
