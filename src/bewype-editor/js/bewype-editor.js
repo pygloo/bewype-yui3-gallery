@@ -47,7 +47,7 @@
             }
         },
         activeButtons : {
-            value : [ 'bold', 'italic', 'underline', 'font-family', 'font-size'  ],
+            value : [ 'bold', 'italic', 'underline', 'font-family', 'font-size', 'color', 'background-color' ],
             writeOnce : true
         },
         panelNode : {
@@ -76,18 +76,22 @@
 
         _toggleButtons  : [ 'bold', 'italic', 'underline' ],
 
-        _pickerButtons  : [ 'font-family', 'font-size' ],
+        _pickerButtons  : [ 'font-family', 'font-size', 'color', 'background-color' ],
 
         _pickerObjDict : {
-            'font-family' : Y.Bewype.PickerFontFamily,
-            'font-size'   : Y.Bewype.PickerFontSize
+            'font-family'      : Y.Bewype.PickerFontFamily,
+            'font-size'        : Y.Bewype.PickerFontSize,
+            'color' : Y.Bewype.PickerColor,
+            'background-color' : Y.Bewype.PickerColor
         },
 
         _tagButtons  : [ 'bold', 'italic', 'underline' ],
 
-        _cssButtons  : [ 'font-family', 'font-size' ],
+        _cssButtons  : [ 'font-family', 'font-size', 'color', 'background-color' ],
 
         _selectedNodeList : null,
+
+        _oMainCssdict : {},
 
         /**
          *
@@ -154,7 +158,10 @@
                     // style for the edited place
                     _placeNode.setStyle( Y.Bewype.Utils.camelize( key ), val );
 
-                } else if ( key ) {                    
+                } else if ( key ) {
+
+                    // keep value in starting dict
+                    this._oMainCssdict[ key ] = val;
 
                     // style for the edited content
                     _main.setStyle( Y.Bewype.Utils.camelize( key ), val );
@@ -636,20 +643,21 @@
             _selectionNode.setStyle( 'display',         'inline-block'  );
         },
 
-        _resetSelection : function () {
+        _resetNode : function ( main ) {
 
-            var _inst          = this._editor.getInstance(),
-                _selectionNode = _inst.one( 'body' ).one( '.selection' );
+            var _inst = this._editor.getInstance(),
+                _body = _inst.one( 'body' ),
+                _node = main ? _body.one( '.main' ) : _body.one( '.selection' );
 
-            if ( !_selectionNode ) {
+            if ( !_node ) {
                 return;
             }
 
             // do reset
-            this._removeTag( _selectionNode, 'span' );
-            this._removeTag( _selectionNode, 'b' );
-            this._removeTag( _selectionNode, 'i' );
-            this._removeTag( _selectionNode, 'u' );
+            this._removeTag( _node, 'span' );
+            this._removeTag( _node, 'b' );
+            this._removeTag( _node, 'i' );
+            this._removeTag( _node, 'u' );
         },
 
         _refreshButtons : function ( reset ) {
@@ -698,7 +706,12 @@
                 if ( this._cssButtons.indexOf( name ) != -1 ) {
                     return this._updateMainStyle( name );
                 } else if ( name === 'reset') {
-                    return;
+
+                    // reset main node
+                    this._resetNode( true );
+
+                    // restore original values and quit
+                    return Y.Bewype.Utils.setCssDict( _main, this._oMainCssdict );
                 }
             }
             
@@ -731,7 +744,7 @@
                 } else if ( name === 'reset' ) {
                     
                     // do reset
-                    this._resetSelection();
+                    this._resetNode();
 
                     // refresh buttons
                     this._refreshButtons( true );
