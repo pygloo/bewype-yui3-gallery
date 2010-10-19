@@ -47,7 +47,7 @@
             }
         },
         activeButtons : {
-            value : [ 'bold', 'italic', 'underline', 'font-family', 'font-size', 'color', 'background-color' ],
+            value : [ 'reset', 'bold', 'italic', 'underline', 'font-family', 'font-size', 'color', 'background-color' ],
             writeOnce : true
         },
         panelNode : {
@@ -71,8 +71,6 @@
         _editor     : null,
 
         _buttonDict : {},
-
-        _fontDict   : {},
 
         _toggleButtons  : [ 'bold', 'italic', 'underline' ],
 
@@ -100,6 +98,7 @@
 
             var _host        = this.get( 'host'        ),
                 _editorClass = this.get( 'editorClass' ),
+                _cssDict     = Y.Bewype.Utils.getCssDict( _host ),
                 _placeNode   = null,
                 _main        = new Y.Node.create( '<div><div class="main" /></div>' );
 
@@ -128,13 +127,15 @@
 
             // add custom event listener
             this._editor.after( 'nodeChange', Y.bind( this._onEditorChange, this ) );
+
+            //
+            return _cssDict;
         },
 
-        _initContent : function () {
+        _initContent : function ( cssDict ) {
 
             // get host
             var _host       = this.get( 'host' ),
-                _cssDict    = Y.Bewype.Utils.getCssDict( _host ),
                 _placeClass = this.get( 'editorClass' ) + '-place',
                 _placeNode  = _host.one( '.' + _placeClass ),
                 _body       = this._editor.getInstance().one( 'body' ),
@@ -142,14 +143,13 @@
                 _fn         = null;
 
             // ensure nice body
-            _body.setStyle( 'cssText',  'padding: 0; margin: 0;');
+            _body.setStyle( 'cssText', 'padding: 0; margin: 0; height: 100%; width: 100%;');
 
             _fn = function ( key, val ) {
 
                 var _isHeightOrWidth = [ 'height', 'width' ].indexOf( key ) != -1,
                     _keySplt         = key.split( '-' ),
                     _hasBorder       = _keySplt.indexOf( 'border'  ) != -1,
-                    _hasFont         = _keySplt.indexOf( 'font'    ) != -1,
                     _hasPadding      = _keySplt.indexOf( 'padding' ) != -1;
 
                 // place or content style factory
@@ -159,26 +159,22 @@
                     _placeNode.setStyle( Y.Bewype.Utils.camelize( key ), val );
 
                 } else if ( key ) {
-
-                    // keep value in starting dict
-                    this._oMainCssdict[ key ] = val;
-
                     // style for the edited content
                     _main.setStyle( Y.Bewype.Utils.camelize( key ), val );
-
-                }
-
-                // update font dict
-                if ( _hasFont ) {
-                    this._fontDict[ key ] = val;
                 }
 
                 // return something to continue
                 return val;
             };
 
+            // ensure height width
+            this._oMainCssdict.height = '100%';
+            this._oMainCssdict.width  = '100%';
+            _main.setStyle( 'height', '100%' );
+            _main.setStyle( 'width' , '100%' );
+
             // separate place and content style
-            Y.JSON.stringify( _cssDict, Y.bind( _fn, this ) );
+            Y.JSON.stringify( cssDict, Y.bind( _fn, this ) );
 
             // clear previous css
             _host.setStyle( 'cssText',  '');
@@ -278,10 +274,10 @@
         initializer : function( config ) {
 
             // add editor
-            this._initEditor();
+            var _cssDict = this._initEditor();
 
             // set editor content
-            this._initContent();
+            this._initContent( _cssDict );
 
             // set panel
             this._initPanel();
@@ -298,7 +294,6 @@
     
             // tmp vars
             var _host          = this.get( 'host'        ),
-                _panelNode     = this.get( 'panelNode'   ),
                 _editorClass   = this.get( 'editorClass' ),
                 _placeClass    = '.' + _editorClass + '-place',
                 _placeNode     = _host.one( _placeClass ),
@@ -311,7 +306,9 @@
             this._editor.hide();
 
             // remove selection node
-            _selectionNode.replace( this._getInnerHTML( _selectionNode ) );
+            if ( _selectionNode ) {
+                _selectionNode.replace( this._getInnerHTML( _selectionNode ) );
+            }
 
             // restore content
             _host.set( 'innerHTML', _main.get( 'innerHTML' ) );
@@ -320,7 +317,7 @@
             _fn = function ( type_, key, val ) {
                 // do update
                 if ( key ) {
-                    if ( type_ === 'content' && key.split( '-' ).indexOf( 'padding' ) != -1 ) {
+                    if ( type_ === 'content' && ( key.split( '-' ).indexOf( 'padding' ) != -1 || key === 'height' || key === 'width' ) ) {
                         // do nothing
                     } else {
                         _host.setStyle( Y.Bewype.Utils.camelize( key ), val );
@@ -342,14 +339,9 @@
                 this._buttonDict[ v ].destroy();
                 delete( this._buttonDict[ v ] );
 
-                // remove node
-                _panelNode.one( '.' + _editorClass + '-toggle-button-' + v ).remove();
-
             }, this );
 
             this._buttonDict = {};
-
-            this._fontDict   = {};
         },
 
         _hasLeftBlank : function (str){
@@ -402,17 +394,21 @@
 
         _removeTag : function ( node, selector, styleProperty ) {
             // little check
-            if ( node ) {
+            if ( node && node._node.innerHTML ) {
+
                 node.all( selector ).each( function ( v, k ) {
-                    var _cssDict = null,
+                    var _cssDict   = null,
                         _innerHTML = null,
-                        _l = null;
+                        _l         = null;
                     if ( styleProperty ) {
                         // get css dict
                         _cssDict = Y.Bewype.Utils.getCssDict( v );
                         // remove property
-                        if ( _cssDict[ styleProperty ] ) {                    
+                        if ( _cssDict[ styleProperty ] ) {
                             delete( _cssDict[ styleProperty ] );
+                            if ( styleProperty === 'background-color' ) {
+                                delete( _cssDict.display );
+                            }
                         }
                         // reset css without property
                         Y.Bewype.Utils.setCssDict( v, _cssDict );
@@ -457,7 +453,7 @@
             _node.setStyle( Y.Bewype.Utils.camelize( name ), _value );
         },
         
-        _clearSelection : function ( selection, range ) {
+        _clearSelection : function ( selection, range, removeSelectionNode ) {
             if ( selection.clear ) {
                 selection.clear();
             } else if ( selection.removeAllRanges ) {
@@ -465,6 +461,13 @@
                 selection.removeAllRanges();
             } else {
                 return;
+            }
+
+            if ( removeSelectionNode !== false ) {
+                var _inst = this._editor.getInstance(),
+                    _main = _inst.one( 'body' ).one( '.main' );
+
+                this._removeTag(_main, '.selection');
             }
         },
 
@@ -516,9 +519,7 @@
                     }
                     range.setStartBefore( firstNode );
                 } catch ( err ) {
-                    this._clearSelection( selection, range );
-                    this._removeTag( _main, '.selection' );
-                    return false;
+                    return this._clearSelection( selection, range );
                 }
             } else if ( selection.anchorOffset === 0 && !selection.anchorNode.previousSibling ) {
                 range.setStart( _mainNode, 0 );
@@ -545,88 +546,10 @@
                     }
                     range.setEndAfter( lastNode );
                 } catch ( err ) {
-                    this._clearSelection( selection, range );
-                    this._removeTag( _main, '.selection' );
-                    return false;
+                    return this._clearSelection( selection, range );
                 }
             }
             return true;
-        },
-
-        _onEditorChange : function ( e ) {
-
-            var _host             = this.get( 'host' ),
-                _inst             = this._editor.getInstance(),
-                _body             = _inst.one( 'body'  ),
-                _main             = _body.one( '.main' ),
-                _selectionNode    = _main.one( '.selection' ),
-                _selection        = null,
-                _range            = null,
-                _firstNode        = null,
-                _lastNode         = null;
-
-            //
-            if ( e.changedEvent.type == 'dblclick' ) {
-
-            } else if ( e.changedEvent.type == 'mouseup' ) {
-
-                _selection        = Y.Bewype.Utils.getSelection( _host );
-                _range            = Y.Bewype.Utils.getRange( _selection );
-
-                // little check
-                if ( !_selection.anchorNode || !_selection.focusNode ) {
-                    this._clearSelection( _selection, _range );
-                    return this._removeTag(_main, '.selection');
-                }                        
-
-                // remove previous surrounding node
-                if ( _selectionNode ) {
-                    _selectionNode.replace( this._getInnerHTML( _selectionNode ) );
-                }
-                
-                if ( _selection.anchorNode != _selection.focusNode || _selection.anchorOffset != _selection.focusOffset ) {
-
-                    if ( this._isFocusNodeFisrt( _selection ) ) {
-                        _firstNode = _selection.focusNode;
-                        _lastNode  = _selection.anchorNode;
-                    } else {
-                        _firstNode = _selection.anchorNode;
-                        _lastNode  = _selection.focusNode;
-                    }
-
-                    // ensure valid range
-                    if ( !this._ensureRangeFirstNode( _selection, _range, _firstNode ) ) {
-                        return;
-                    }
-                    if ( !this._ensureRangeLastNode(  _selection, _range, _lastNode ) ) {
-                        return;
-                    }
-
-                    try {
-                        // create new surrounding node                             
-                        _selectionNode = Y.Node.create( '<span class="selection"></span>' );
-                        _main.append( _selectionNode );
-                        // set range surrounding node
-                        _range.surroundContents( _main.one( '.selection' )._node );
-                    } catch ( err ) {
-                        // Oops! clear all
-                        this._clearSelection( _selection, _range );
-                        return this._removeTag(_main, '.selection');
-                    }
-
-                    // can clear native selection now
-                    this._clearSelection( _selection, _range );
-
-                } else {
-                    this._removeTag(_main, '.selection');
-                }
-
-                // update button status
-                this._refreshButtons();
-
-                // custom rendering
-                this._refreshSelectionNode();
-            }
         },
 
         _refreshSelectionNode : function () {
@@ -643,7 +566,93 @@
             _selectionNode.setStyle( 'display',         'inline-block'  );
         },
 
-        _resetNode : function ( main ) {
+        _updateSelection : function () {
+
+            var _host             = this.get( 'host' ),
+                _inst             = this._editor.getInstance(),
+                _body             = _inst.one( 'body'  ),
+                _main             = _body.one( '.main' ),
+                _selectionNode    = _main.one( '.selection' ),
+                _selection        = Y.Bewype.Utils.getSelection( _host ),
+                _range            = Y.Bewype.Utils.getRange( _selection ),
+                _firstNode        = null,
+                _lastNode         = null;
+
+            // little check
+            if ( !_selection.anchorNode || !_selection.focusNode ) {
+                return this._clearSelection( _selection, _range );
+            }                        
+
+            // remove previous surrounding node
+            if ( _selectionNode ) {
+                _selectionNode.replace( this._getInnerHTML( _selectionNode ) );
+            }
+            
+            if ( _selection.anchorNode != _selection.focusNode || _selection.anchorOffset != _selection.focusOffset ) {
+
+                if ( this._isFocusNodeFisrt( _selection ) ) {
+                    _firstNode = _selection.focusNode;
+                    _lastNode  = _selection.anchorNode;
+                } else {
+                    _firstNode = _selection.anchorNode;
+                    _lastNode  = _selection.focusNode;
+                }
+
+                // ensure valid range
+                if ( !this._ensureRangeFirstNode( _selection, _range, _firstNode ) ) {
+                    return;
+                }
+                if ( !this._ensureRangeLastNode(  _selection, _range, _lastNode ) ) {
+                    return;
+                }
+
+                try {
+                    // create new surrounding node                             
+                    _selectionNode = Y.Node.create( '<span class="selection"></span>' );
+                    _main.append( _selectionNode );
+                    // set range surrounding node
+                    _range.surroundContents( _main.one( '.selection' )._node );
+                } catch ( err ) {
+                    // Oops! clear all
+                    return this._clearSelection( _selection, _range );
+                }
+
+                // can clear native selection now
+                this._clearSelection( _selection, _range, false );
+
+            } else {
+                this._removeTag(_main, '.selection');
+            }
+
+            // update button status
+            this._refreshButtons();
+
+            // custom rendering
+            this._refreshSelectionNode();
+        },
+
+        _onEditorChange : function ( e ) {
+            //
+            if ( e.changedEvent.type == 'dblclick' ) {
+
+            } else if ( e.changedEvent.type == 'mouseup' ) {
+                this._updateSelection();
+            }
+        },
+
+        _getAncestor : function ( node ) {
+            var _ancestor = node;
+
+            Y.each( [ 'span', 'a', 'b', 'i', 'u' ], function ( v, k ) {
+                var _anc = node.ancestor( 'v' );
+                if ( _anc && _anc.get( 'textContent' ) === node.get( 'ancestor' ) ) {
+                    _ancestor = _anc;
+                }
+            } );
+            return _ancestor;
+        },
+
+        _resetSelection : function ( main ) {
 
             var _inst = this._editor.getInstance(),
                 _body = _inst.one( 'body' ),
@@ -652,6 +661,9 @@
             if ( !_node ) {
                 return;
             }
+
+            // find top node
+            _node = this._getAncestor( _node );
 
             // do reset
             this._removeTag( _node, 'span' );
@@ -666,7 +678,7 @@
                 _selectionNode = _inst.one( 'body' ).one( '.selection' );
 
             if ( !_selectionNode ) {
-                return;
+                reset = true;
             }
 
             Y.Object.each( this.get( 'activeButtons' ) , function( v, k ) {
@@ -675,17 +687,14 @@
 
                 switch( v ) {
                     case 'bold':
-                        _value = reset ? false : _selectionNode && _selectionNode.one( 'b' ) !== null;
-                        this._buttonDict[ v ].setValue( _value );
-                        break;
+                        _value = reset ? false : ( _selectionNode && _selectionNode.one( 'b' ) !== null );
+                        return this._buttonDict[ v ].setValue( _value );
                     case 'italic':
-                        _value = reset ? false : _selectionNode && _selectionNode.one( 'i' ) !== null;
-                        this._buttonDict[ v ].setValue( _value );
-                        break;
+                        _value = reset ? false : ( _selectionNode && _selectionNode.one( 'i' ) !== null );
+                        return this._buttonDict[ v ].setValue( _value );
                     case 'underline':
-                        _value = reset ? false : _selectionNode && _selectionNode.one( 'u' ) !== null;
-                        this._buttonDict[ v ].setValue( _value );
-                        break;
+                        _value = reset ? false : ( _selectionNode && _selectionNode.one( 'u' ) !== null );
+                        return this._buttonDict[ v ].setValue( _value );
                 }
 
             }, this );
@@ -706,10 +715,8 @@
                 if ( this._cssButtons.indexOf( name ) != -1 ) {
                     return this._updateMainStyle( name );
                 } else if ( name === 'reset') {
-
                     // reset main node
-                    this._resetNode( true );
-
+                    this._resetSelection( true );
                     // restore original values and quit
                     return Y.Bewype.Utils.setCssDict( _main, this._oMainCssdict );
                 }
@@ -730,6 +737,9 @@
                     // update with css property
                     if ( this._cssButtons.indexOf( name ) != -1 ) {
                         _tagNode.setStyle( Y.Bewype.Utils.camelize( name ), _value);
+                        if ( name === 'background-color' ) {
+                            _tagNode.setStyle( 'display', 'inline-block' );
+                        }
                     }
 
                     // create surrounding node
@@ -744,7 +754,7 @@
                 } else if ( name === 'reset' ) {
                     
                     // do reset
-                    this._resetNode();
+                    this._resetSelection();
 
                     // refresh buttons
                     this._refreshButtons( true );
