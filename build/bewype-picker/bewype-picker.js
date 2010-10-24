@@ -156,12 +156,20 @@ YUI.add('bewype-picker-base', function(Y) {
         /**
          *
          */
-        append : function ( name, text, style ) {
+        setValue : function( value ) {
+            this._currentName = value;
+        },
+
+        /**
+         *
+         */
+        append : function ( name, text, style, active ) {
 
             // vars
             var _contentBox  = this.get( 'contentBox'  ),
-                _pickerClass = this.get( 'pickerClass' ),
-                _pickerNode  = _contentBox.one( '.' + _pickerClass ),
+                _pClass      = this.get( 'pickerClass' ),
+                _pickerClass = _pClass + '-row',
+                _pickerNode  = _contentBox.one( '.' + _pClass ),
                 _itemNode    = null; 
 
             // little check
@@ -170,7 +178,7 @@ YUI.add('bewype-picker-base', function(Y) {
                 _itemNode = new Y.Node.create(
                     Y.substitute( ITEM_TMPL, {
                         itemId    : _pickerClass + '-' + name,
-                        itemClass : _pickerClass + '-row',
+                        itemClass : active ? _pickerClass + '-active' : _pickerClass,
                         text      : text,
                         style     : style ? 'style="' + style + '"' : ''
                     } )
@@ -401,6 +409,10 @@ YUI.add('bewype-picker-color', function(Y) {
             }
         },
 
+        setValue : function( value ) {
+            this._hexvalue = value;
+        },
+
         getValue : function() {
             return this._hexvalue ? '#' + this._hexvalue.toLowerCase() : '#000000';
         },
@@ -444,6 +456,7 @@ YUI.add('bewype-picker-color', function(Y) {
                 _v            = 0,
                 _rgb          = [],
                 _bgVal        = '',
+                _offsetParent = _contentBox.get( 'offsetParent' ),
                 _previewNode  = _contentBox.one( '.' + _pickerClass + '-preview' ),
                 _rNode        = _contentBox.one( '.' + _pickerClass + '-r' ),
                 _gNode        = _contentBox.one( '.' + _pickerClass + '-g' ),
@@ -451,8 +464,8 @@ YUI.add('bewype-picker-color', function(Y) {
 
             if ( _targetNode && _targetNode.get( 'className' ) === _pickerClass + '-selector-bg' ) {
                 // get picker position
-                _x = evt.pageX - _targetNode.get( 'x' ) - _contentBox.get( 'offsetParent' ).get( 'offsetLeft' );
-                _y = evt.pageY - _targetNode.get( 'y' ) - _contentBox.get( 'offsetParent' ).get( 'offsetTop' );
+                _x = evt.pageX - _targetNode.get( 'x' ) - _offsetParent.get( 'offsetLeft' );
+                _y = evt.pageY - _targetNode.get( 'y' ) - _offsetParent.get( 'offsetTop' );
                 // manage small picker
                 _x = ( _pickerSize == 180 ) ? _x : _x * 2;
                 _y = ( _pickerSize == 180 ) ? _y : _y * 2;
@@ -473,7 +486,9 @@ YUI.add('bewype-picker-color', function(Y) {
                 _rgb = Y.Bewype.Color.hsv2rgb( ( _h == 180 ) ? 0 : _h, _s, _v );   /* compute rgb       */
 
                 // get hex value
-                this._hexvalue = Y.Bewype.Color.rgb2hex( _rgb[0], _rgb[1], _rgb[2] );
+                if ( evt || !this._hexvalue ) {
+                    this._hexvalue = Y.Bewype.Color.rgb2hex( _rgb[0], _rgb[1], _rgb[2] );
+                }
 
                 //
                 _bgVal += 'rgb(';
@@ -589,8 +604,18 @@ YUI.add('bewype-picker-font-size', function(Y) {
          */
         getValue : function() {
             return this._currentName + 'px';
-        }
+        },
 
+        /**
+         *
+         */
+        setValue : function( value ) {
+            try {
+                this._currentName = value.replace( /px/i, '' );
+            } catch (err) {
+                this._currentName = null;
+            }
+        }
     } );
 
     Y.namespace('Bewype');
@@ -645,6 +670,8 @@ YUI.add('bewype-picker-font-family', function(Y) {
 
     Y.extend( PickerFontFamily, Y.Bewype.Picker, {
 
+        _currentFamily : null,
+
         /**
          *
          */
@@ -675,17 +702,19 @@ YUI.add('bewype-picker-font-family', function(Y) {
          */
         getValue : function() {
 
-            var _currentFamily = null;
-
             // get family
             Y.Object.each( this.get( 'fontFamilies' ), function ( v, k ) {
                 if ( v[ 0 ] == this._currentName ) {
-                    _currentFamily = v[ 1 ];
+                    this._currentFamily = v[ 1 ];
                 }
             }, this );
 
             // return current or none
-            return _currentFamily;
+            return this._currentFamily;
+        },
+
+        setValue : function( value ) {
+            this._currentFamily = value;                       
         }
 
     } );
@@ -769,6 +798,11 @@ YUI.add('bewype-picker-url', function(Y) {
 
             // set event callback
             _inputNode = _contentBox.one( '.' + _pickerClass + '-input' );
+            // set value
+            if ( this._url ) {
+                _inputNode.set( 'value', this._url );
+            }
+            //
             _inputNode.on( 'yui3-picker-event|blur', Y.bind( this._onInputChange, this ) );
         },
 
@@ -800,6 +834,10 @@ YUI.add('bewype-picker-url', function(Y) {
 
         getValue : function() {
             return this._url;
+        },
+
+        setValue : function( url ) {
+            this._url = url;
         },
 
         _onInputChange : function ( evt ) {

@@ -15,7 +15,7 @@
     /**
      *
      */
-    BUTTON_TMPL += '<div class="{editorClass}">';
+    BUTTON_TMPL += '<div class="{editorClass} {buttonClass}">';
     BUTTON_TMPL += '</div>';
 
     /**
@@ -47,7 +47,7 @@
             }
         },
         activeButtons : {
-            value : [ 'reset', 'bold', 'italic', 'underline', 'font-family', 'font-size', 'color', 'background-color' ],
+            value : [ 'bold', 'italic', 'underline', 'font-family', 'font-size', 'color', 'background-color', 'url', 'reset' ],
             writeOnce : true
         },
         panelNode : {
@@ -74,16 +74,17 @@
 
         _toggleButtons  : [ 'bold', 'italic', 'underline' ],
 
-        _pickerButtons  : [ 'font-family', 'font-size', 'color', 'background-color' ],
+        _pickerButtons  : [ 'font-family', 'font-size', 'color', 'background-color', 'url' ],
 
         _pickerObjDict : {
             'font-family'      : Y.Bewype.PickerFontFamily,
             'font-size'        : Y.Bewype.PickerFontSize,
-            'color' : Y.Bewype.PickerColor,
-            'background-color' : Y.Bewype.PickerColor
+            'color'            : Y.Bewype.PickerColor,
+            'background-color' : Y.Bewype.PickerColor,
+            'url'              : Y.Bewype.PickerUrl
         },
 
-        _tagButtons  : [ 'bold', 'italic', 'underline' ],
+        _tagButtons  : [ 'bold', 'italic', 'underline', 'url' ],
 
         _cssButtons  : [ 'font-family', 'font-size', 'color', 'background-color' ],
 
@@ -185,12 +186,14 @@
             var _panelNode   = this.get( 'panelNode'   ),
                 _editorClass = this.get( 'editorClass' ),
                 _buttonNode  = null,
-                _customEvent = null;
+                _customEventChange = null,
+                _customEventClick  = null;
 
             // create node
             _buttonNode = new Y.Node.create(
                 Y.substitute( BUTTON_TMPL, {
-                    editorClass : _editorClass + '-' + buttonClass + '-' + name
+                    editorClass : _editorClass + '-button',
+                    buttonClass : _editorClass + '-' + buttonClass + '-' + name
                 } )
             );
             // add new node for the panel
@@ -199,13 +202,18 @@
             // render button after add
             button.render( _buttonNode );
 
-                // add custom event listener
+            // add custom event listener
             if ( buttonClass === 'button') {
-                _customEvent = 'button:onClick';
+                _customEventChange = 'button:onClick';
             } else {
-                _customEvent = 'button:onChange';
+                _customEventChange = 'button:onChange';
             }
-            button.on( _customEvent, Y.bind( this._onButtonEvent, this, name ) );
+            button.on( _customEventChange, Y.bind( this._onButtonEventChange, this, name ) );
+
+            if ( this._pickerButtons.indexOf( name ) != -1 ) {
+                _customEventClick = 'button:onClick';
+                button.before( _customEventClick, Y.bind( this._onButtonEventClick, this, name ) );
+            }
 
             // update button dict
             this._buttonDict[ name ] = button;
@@ -247,8 +255,6 @@
 
         _initPanel : function () {
 
-            this._addButton( 'reset' );
-
             var _activeButtons = this.get( 'activeButtons' );
 
             Y.Object.each( this._toggleButtons , function( v, k ) {
@@ -266,6 +272,8 @@
                     this._addPickerButton( v, this._pickerObjDict[ v ] );
                 }
             }, this );
+
+            this._addButton( 'reset' );
         },
 
         /**
@@ -386,6 +394,9 @@
 
                 case 'underline':
                     return 'u';
+
+                case 'url':
+                    return 'a';
 
                 default:
                     return 'span';
@@ -640,18 +651,6 @@
             }
         },
 
-        _getAncestor : function ( node ) {
-            var _ancestor = node;
-
-            Y.each( [ 'span', 'a', 'b', 'i', 'u' ], function ( v, k ) {
-                var _anc = node.ancestor( 'v' );
-                if ( _anc && _anc.get( 'textContent' ) === node.get( 'ancestor' ) ) {
-                    _ancestor = _anc;
-                }
-            } );
-            return _ancestor;
-        },
-
         _resetSelection : function ( main ) {
 
             var _inst = this._editor.getInstance(),
@@ -662,26 +661,48 @@
                 return;
             }
 
-            // find top node
-            _node = this._getAncestor( _node );
-
             // do reset
             this._removeTag( _node, 'span' );
+            this._removeTag( _node, 'a' );
             this._removeTag( _node, 'b' );
             this._removeTag( _node, 'i' );
             this._removeTag( _node, 'u' );
         },
 
-        _refreshButtons : function ( reset ) {
+        _getValueFromNode : function ( parentNode, tagName, name ) {
+
+            var _node    = parentNode ? parentNode.one( tagName ) : null,
+                _cssDict = null;
+
+            if ( _node ) {
+                if ( name === 'url' ) {
+                    return _node.get( 'href' );
+                } else {
+                    _cssDict = Y.Bewype.Utils.getCssDict( _node );
+                    return _cssDict[ name ];
+                }
+            }
+
+            return null;
+        },
+
+        _refreshButtons : function ( reset, name ) {
 
             var _inst          = this._editor.getInstance(),
-                _selectionNode = _inst.one( 'body' ).one( '.selection' );
+                _selectionNode = _inst.one( 'body' ).one( '.selection' ),
+                _buttonNames   = name ? [ name ] : this._toggleButtons;
+                
 
             if ( !_selectionNode ) {
                 reset = true;
             }
 
-            Y.Object.each( this.get( 'activeButtons' ) , function( v, k ) {
+            Y.Object.each( _buttonNames, function( v, k ) {
+
+                // no update for inactive button
+                if ( this.get( 'activeButtons' ).indexOf(v) === -1) {
+                    return;
+                }
 
                 var _value = null;
 
@@ -689,18 +710,31 @@
                     case 'bold':
                         _value = reset ? false : ( _selectionNode && _selectionNode.one( 'b' ) !== null );
                         return this._buttonDict[ v ].setValue( _value );
+
                     case 'italic':
                         _value = reset ? false : ( _selectionNode && _selectionNode.one( 'i' ) !== null );
                         return this._buttonDict[ v ].setValue( _value );
+
                     case 'underline':
                         _value = reset ? false : ( _selectionNode && _selectionNode.one( 'u' ) !== null );
+                        return this._buttonDict[ v ].setValue( _value );
+
+                    case 'font-family':
+                    case 'font-size':
+                    case 'color':
+                    case 'background-color':
+                        _value = reset ? false : this._getValueFromNode( _selectionNode, 'span', v );
+                        return this._buttonDict[ v ].setValue( _value );
+
+                    case 'url':
+                        _value = reset ? false : this._getValueFromNode( _selectionNode, 'a', v );
                         return this._buttonDict[ v ].setValue( _value );
                 }
 
             }, this );
         },
 
-        _onButtonEvent : function ( name, e ) {
+        _onButtonEventChange : function ( name, e ) {
 
             var _inst             = this._editor.getInstance(),
                 _body             = _inst.one( 'body'  ),
@@ -729,10 +763,14 @@
                 // do some cleaning
                 this._removeTag( _selectionNode, _tag, name );
 
-                if ( _value ) {
+                if ( _value && ( _value === true || _value.trim() !== '' ) ) {
 
                     // create tag node
-                    _tagNode = Y.Node.create( '<' + _tag + '></' + _tag + '>' );
+                    if ( name === 'url' ) {
+                        _tagNode = Y.Node.create( '<a href="' + _value + '"></a>' );
+                    } else {
+                        _tagNode = Y.Node.create( '<' + _tag + '></' + _tag + '>' );
+                    }
 
                     // update with css property
                     if ( this._cssButtons.indexOf( name ) != -1 ) {
@@ -763,7 +801,14 @@
                 // custom rendering
                 this._refreshSelectionNode();
             }
+        },
+
+        _onButtonEventClick : function ( name, e ) {
+
+            // simple refresh
+            this._refreshButtons( false, name );
         }
+
     } );
 
     Y.namespace('Bewype');

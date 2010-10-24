@@ -44,6 +44,8 @@ YUI.add('bewype-picker-font-family', function(Y) {
 
     Y.extend( PickerFontFamily, Y.Bewype.Picker, {
 
+        _currentFamily : null,
+
         /**
          *
          */
@@ -74,17 +76,19 @@ YUI.add('bewype-picker-font-family', function(Y) {
          */
         getValue : function() {
 
-            var _currentFamily = null;
-
             // get family
             Y.Object.each( this.get( 'fontFamilies' ), function ( v, k ) {
                 if ( v[ 0 ] == this._currentName ) {
-                    _currentFamily = v[ 1 ];
+                    this._currentFamily = v[ 1 ];
                 }
             }, this );
 
             // return current or none
-            return _currentFamily;
+            return this._currentFamily;
+        },
+
+        setValue : function( value ) {
+            this._currentFamily = value;                       
         }
 
     } );

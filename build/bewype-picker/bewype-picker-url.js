@@ -71,6 +71,11 @@ YUI.add('bewype-picker-url', function(Y) {
 
             // set event callback
             _inputNode = _contentBox.one( '.' + _pickerClass + '-input' );
+            // set value
+            if ( this._url ) {
+                _inputNode.set( 'value', this._url );
+            }
+            //
             _inputNode.on( 'yui3-picker-event|blur', Y.bind( this._onInputChange, this ) );
         },
 
@@ -102,6 +107,10 @@ YUI.add('bewype-picker-url', function(Y) {
 
         getValue : function() {
             return this._url;
+        },
+
+        setValue : function( url ) {
+            this._url = url;
         },
 
         _onInputChange : function ( evt ) {

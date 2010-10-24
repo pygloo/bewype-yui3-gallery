@@ -180,6 +180,10 @@
             }
         },
 
+        setValue : function( value ) {
+            this._hexvalue = value;
+        },
+
         getValue : function() {
             return this._hexvalue ? '#' + this._hexvalue.toLowerCase() : '#000000';
         },
@@ -223,7 +227,7 @@
                 _v            = 0,
                 _rgb          = [],
                 _bgVal        = '',
-                _offsetParent = _contentBox.get( 'offsetParent' )
+                _offsetParent = _contentBox.get( 'offsetParent' ),
                 _previewNode  = _contentBox.one( '.' + _pickerClass + '-preview' ),
                 _rNode        = _contentBox.one( '.' + _pickerClass + '-r' ),
                 _gNode        = _contentBox.one( '.' + _pickerClass + '-g' ),
@@ -253,7 +257,9 @@
                 _rgb = Y.Bewype.Color.hsv2rgb( ( _h == 180 ) ? 0 : _h, _s, _v );   /* compute rgb       */
 
                 // get hex value
-                this._hexvalue = Y.Bewype.Color.rgb2hex( _rgb[0], _rgb[1], _rgb[2] );
+                if ( evt || !this._hexvalue ) {
+                    this._hexvalue = Y.Bewype.Color.rgb2hex( _rgb[0], _rgb[1], _rgb[2] );
+                }
 
                 //
                 _bgVal += 'rgb(';

@@ -156,12 +156,20 @@ YUI.add('bewype-picker-base', function(Y) {
         /**
          *
          */
-        append : function ( name, text, style ) {
+        setValue : function( value ) {
+            this._currentName = value;
+        },
+
+        /**
+         *
+         */
+        append : function ( name, text, style, active ) {
 
             // vars
             var _contentBox  = this.get( 'contentBox'  ),
-                _pickerClass = this.get( 'pickerClass' ),
-                _pickerNode  = _contentBox.one( '.' + _pickerClass ),
+                _pClass      = this.get( 'pickerClass' ),
+                _pickerClass = _pClass + '-row',
+                _pickerNode  = _contentBox.one( '.' + _pClass ),
                 _itemNode    = null; 
 
             // little check
@@ -170,7 +178,7 @@ YUI.add('bewype-picker-base', function(Y) {
                 _itemNode = new Y.Node.create(
                     Y.substitute( ITEM_TMPL, {
                         itemId    : _pickerClass + '-' + name,
-                        itemClass : _pickerClass + '-row',
+                        itemClass : active ? _pickerClass + '-active' : _pickerClass,
                         text      : text,
                         style     : style ? 'style="' + style + '"' : ''
                     } )

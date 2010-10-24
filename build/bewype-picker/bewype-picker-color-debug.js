@@ -182,6 +182,10 @@ YUI.add('bewype-picker-color', function(Y) {
             }
         },
 
+        setValue : function( value ) {
+            this._hexvalue = value;
+        },
+
         getValue : function() {
             return this._hexvalue ? '#' + this._hexvalue.toLowerCase() : '#000000';
         },
@@ -225,6 +229,7 @@ YUI.add('bewype-picker-color', function(Y) {
                 _v            = 0,
                 _rgb          = [],
                 _bgVal        = '',
+                _offsetParent = _contentBox.get( 'offsetParent' ),
                 _previewNode  = _contentBox.one( '.' + _pickerClass + '-preview' ),
                 _rNode        = _contentBox.one( '.' + _pickerClass + '-r' ),
                 _gNode        = _contentBox.one( '.' + _pickerClass + '-g' ),
@@ -232,8 +237,8 @@ YUI.add('bewype-picker-color', function(Y) {
 
             if ( _targetNode && _targetNode.get( 'className' ) === _pickerClass + '-selector-bg' ) {
                 // get picker position
-                _x = evt.pageX - _targetNode.get( 'x' ) - _contentBox.get( 'offsetParent' ).get( 'offsetLeft' );
-                _y = evt.pageY - _targetNode.get( 'y' ) - _contentBox.get( 'offsetParent' ).get( 'offsetTop' );
+                _x = evt.pageX - _targetNode.get( 'x' ) - _offsetParent.get( 'offsetLeft' );
+                _y = evt.pageY - _targetNode.get( 'y' ) - _offsetParent.get( 'offsetTop' );
                 // manage small picker
                 _x = ( _pickerSize == 180 ) ? _x : _x * 2;
                 _y = ( _pickerSize == 180 ) ? _y : _y * 2;
@@ -254,7 +259,9 @@ YUI.add('bewype-picker-color', function(Y) {
                 _rgb = Y.Bewype.Color.hsv2rgb( ( _h == 180 ) ? 0 : _h, _s, _v );   /* compute rgb       */
 
                 // get hex value
-                this._hexvalue = Y.Bewype.Color.rgb2hex( _rgb[0], _rgb[1], _rgb[2] );
+                if ( evt || !this._hexvalue ) {
+                    this._hexvalue = Y.Bewype.Color.rgb2hex( _rgb[0], _rgb[1], _rgb[2] );
+                }
 
                 //
                 _bgVal += 'rgb(';

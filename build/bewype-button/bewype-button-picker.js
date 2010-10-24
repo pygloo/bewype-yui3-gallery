@@ -170,15 +170,15 @@ YUI.add('bewype-button-picker', function(Y) {
             // little check
             if ( _contentBox && _pickerObj ) {
 
+                // fire custom event
+                this.fire("button:onClick");
+
                 if ( this._picker ) {
 
                     // remove picker
                     this._removePicker();
 
                 } else {
-
-                    // get value
-                    this._value = null;
 
                     // add picker node
                     _pickerHost = new Y.Node.create(
@@ -197,15 +197,15 @@ YUI.add('bewype-button-picker', function(Y) {
                         this._picker = new _pickerObj();
                     }
 
+                    // set value
+                    this._picker.setValue( this._value );
+
                     // do render
                     this._picker.render( _pickerHost );
 
                     // add custom event listener
                     this._picker.on( 'picker:onChange', Y.bind( this._onPickerChange, this ) );
                 }
-
-                // fire custom event
-                this.fire("button:onClick");
             }
 
             // stop event
@@ -225,6 +225,13 @@ YUI.add('bewype-button-picker', function(Y) {
                 // fire custom event
                 this.fire("button:onChange");
             }
+        },
+
+        /**
+         *
+         */
+        setValue : function (value) {
+            this._value = value;
         },
 
         /**

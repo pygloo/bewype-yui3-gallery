@@ -58,8 +58,18 @@ YUI.add('bewype-picker-font-size', function(Y) {
          */
         getValue : function() {
             return this._currentName + 'px';
-        }
+        },
 
+        /**
+         *
+         */
+        setValue : function( value ) {
+            try {
+                this._currentName = value.replace( /px/i, '' );
+            } catch (err) {
+                this._currentName = null;
+            }
+        }
     } );
 
     Y.namespace('Bewype');
