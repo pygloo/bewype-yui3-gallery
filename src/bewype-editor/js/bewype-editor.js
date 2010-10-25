@@ -59,6 +59,8 @@
             value : [
                     'height',
                     'width',
+                    'padding-left',
+                    'padding-top',
                     'bold',
                     'italic',
                     'underline',
@@ -96,6 +98,20 @@
                 return Y.Lang.isString( val );
             }
         },
+        spinnerLabelPaddingLeft: {
+            value : 'padding-left',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },
+        spinnerLabelPaddingTop: {
+            value : 'padding-top',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },
         spinnerMaxHeight: {
             value : 480,
             writeOnce : true,
@@ -121,7 +137,7 @@
 
         _buttonDict : {},
 
-        _spinnerButtons : [ 'height', 'width' ],
+        _spinnerButtons : [ 'height', 'width', 'padding-left', 'padding-top' ],
 
         _spinnerValues  : {},
 
