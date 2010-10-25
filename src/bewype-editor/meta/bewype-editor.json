@@ -2,6 +2,7 @@
     "bewype-editor": {
         "requires": [
             "bewype-button",
+            "bewype-entry-spinner",
             "bewype-utils",
             "dataschema",
             "editor",

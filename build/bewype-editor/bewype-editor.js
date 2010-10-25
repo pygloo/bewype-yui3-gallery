@@ -4,9 +4,10 @@ YUI.add('bewype-editor', function(Y) {
     /**
      *
      */
-    var PLACE_TMPL  = '',
-        BUTTON_TMPL = '',
-        Editor      = null;
+    var PLACE_TMPL   = '',
+        BUTTON_TMPL  = '',
+        SPINNER_TMPL = '',
+        Editor       = null;
 
     /**
      *
@@ -23,6 +24,14 @@ YUI.add('bewype-editor', function(Y) {
     /**
      *
      */
+    SPINNER_TMPL += '<div class="{editorClass}">';
+    SPINNER_TMPL += '{label}';
+    SPINNER_TMPL += '<div class="{spinnerClass}"></div>';
+    SPINNER_TMPL += '</div>';
+
+    /**
+     *
+     */
     Editor = function(config) {
         Editor.superclass.constructor.apply( this, arguments );
     };
@@ -30,7 +39,7 @@ YUI.add('bewype-editor', function(Y) {
     /**
      *
      */
-    Editor.NAME = "bewypeEditor";
+    Editor.NAME = "bewype-editor";
 
     /**
      *
@@ -49,7 +58,19 @@ YUI.add('bewype-editor', function(Y) {
             }
         },
         activeButtons : {
-            value : [ 'bold', 'italic', 'underline', 'font-family', 'font-size', 'color', 'background-color', 'url', 'reset' ],
+            value : [
+                    'height',
+                    'width',
+                    'bold',
+                    'italic',
+                    'underline',
+                    'font-family',
+                    'font-size',
+                    'color',
+                    'background-color',
+                    'url',
+                    'reset'
+                    ],
             writeOnce : true
         },
         panelNode : {
@@ -61,6 +82,34 @@ YUI.add('bewype-editor', function(Y) {
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
+            }
+        },
+        spinnerLabelHeight: {
+            value : 'height',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },
+        spinnerLabelWidth: {
+            value : 'width',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },
+        spinnerMaxHeight: {
+            value : 480,
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
+        },
+        spinnerMaxWidth: {
+            value : 640,
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
             }
         }
     };
@@ -74,11 +123,15 @@ YUI.add('bewype-editor', function(Y) {
 
         _buttonDict : {},
 
+        _spinnerButtons : [ 'height', 'width' ],
+
+        _spinnerValues  : {},
+
         _toggleButtons  : [ 'bold', 'italic', 'underline' ],
 
         _pickerButtons  : [ 'font-family', 'font-size', 'color', 'background-color', 'url' ],
 
-        _pickerObjDict : {
+        _pickerObjDict  : {
             'font-family'      : Y.Bewype.PickerFontFamily,
             'font-size'        : Y.Bewype.PickerFontSize,
             'color'            : Y.Bewype.PickerColor,
@@ -120,12 +173,12 @@ YUI.add('bewype-editor', function(Y) {
             // add new node for the editor
             _host.append( _placeNode );
 
-            //Create the Base Editor
+            // Create the Base Editor
             this._editor = new Y.EditorBase( {
                 content : _main.get( 'innerHTML' )
             } );
 
-            //Rendering the Editor
+            // Rendering the Editor
             this._editor.render( _placeNode );
 
             // add custom event listener
@@ -157,10 +210,10 @@ YUI.add('bewype-editor', function(Y) {
 
                 // place or content style factory
                 if ( _isHeightOrWidth || _hasBorder || _hasPadding ) {
-
                     // style for the edited place
                     _placeNode.setStyle( Y.Bewype.Utils.camelize( key ), val );
-
+                    // update spinner dict
+                    this._spinnerValues[ key ] = val;
                 } else if ( key ) {
                     // style for the edited content
                     _main.setStyle( Y.Bewype.Utils.camelize( key ), val );
@@ -183,6 +236,53 @@ YUI.add('bewype-editor', function(Y) {
             _host.setStyle( 'cssText',  '');
         },
 
+        _addSpinnerButton : function ( name ) {
+
+            var _panelNode         = this.get( 'panelNode'   ),
+                _editorClass       = this.get( 'editorClass' ) + '-button',
+                _spinnerClass      = this.get( 'editorClass' ) + '-spinner-' + name,
+                _spinnerNode       = null,
+                _spinner           = null,
+                _value             = this._spinnerValues[ name ];
+
+            // create node
+            _spinnerNode = new Y.Node.create(
+                Y.substitute( SPINNER_TMPL, {
+                    editorClass  : _editorClass,
+                    label        : this.get( Y.Bewype.Utils.camelize( 'spinner-label-' + name ) ),
+                    spinnerClass : _spinnerClass
+                } )
+            );
+            // add new node for the panel
+            _panelNode.append( _spinnerNode );
+            
+            // attach spinner
+            _spinner = new Y.Bewype.EntrySpinner({
+                srcNode : _spinnerNode.one( '.' + _spinnerClass ),
+                max     : this.get( Y.Bewype.Utils.camelize( 'spinner-max-' + name ) ),
+                min     : 0,
+                value   : ( _value ) ? parseInt( _value.replace( /px/i, '' ), 10 ) : 0
+            });
+            _spinner.render();
+
+           // connect
+           _spinner.on( 'entry:onChange', Y.bind( this._onSpinnerEventChange, this, name ) );
+
+            // update button dict
+            this._buttonDict[ name ] = _spinner;
+        },
+
+        _onSpinnerEventChange : function ( name, evt ) {
+            // get host
+            var _host       = this.get( 'host' ),
+                _placeClass = this.get( 'editorClass' ) + '-place',
+                _placeNode  = _host.one( '.' + _placeClass ),
+                _value      = this._buttonDict[ name ].getValue();
+
+            // style for the edited place
+            _placeNode.setStyle( Y.Bewype.Utils.camelize( name ), _value + 'px' );
+        },
+
         __buttonFactory : function ( name, buttonClass, button ) {
 
             var _panelNode   = this.get( 'panelNode'   ),
@@ -195,7 +295,7 @@ YUI.add('bewype-editor', function(Y) {
             _buttonNode = new Y.Node.create(
                 Y.substitute( BUTTON_TMPL, {
                     editorClass : _editorClass + '-button',
-                    buttonClass : _editorClass + '-' + buttonClass + '-' + name
+                    buttonClass : _editorClass + '-button-' + name
                 } )
             );
             // add new node for the panel
@@ -259,6 +359,14 @@ YUI.add('bewype-editor', function(Y) {
 
             var _activeButtons = this.get( 'activeButtons' );
 
+            Y.Object.each( this._spinnerButtons , function( v, k ) {
+                // check active
+                if ( _activeButtons.indexOf( v ) != -1 ) { 
+                    // do add
+                    this._addSpinnerButton( v );
+                }
+            }, this );
+
             Y.Object.each( this._toggleButtons , function( v, k ) {
                 // check active
                 if ( _activeButtons.indexOf( v ) != -1 ) { 
@@ -304,9 +412,10 @@ YUI.add('bewype-editor', function(Y) {
     
             // tmp vars
             var _host          = this.get( 'host'        ),
+                _panelNode     = this.get( 'panelNode'   ),
                 _editorClass   = this.get( 'editorClass' ),
                 _placeClass    = '.' + _editorClass + '-place',
-                _placeNode     = _host.one( _placeClass ),
+                _placeNode     = _host.one( _placeClass  ),
                 _body          = this._editor.getInstance().one( 'body' ),
                 _main          = _body.one( '.main' ),
                 _selectionNode = _main.one( '.selection' ),
@@ -344,14 +453,16 @@ YUI.add('bewype-editor', function(Y) {
             this._editor.destroy();
 
             Y.Object.each( this.get( 'activeButtons' ) , function( v, k ) {
-
                 // remove button
                 this._buttonDict[ v ].destroy();
                 delete( this._buttonDict[ v ] );
-
             }, this );
 
-            this._buttonDict = {};
+            // remove button nodes
+            _panelNode.all( '.' + _editorClass + '-button' ).each( function( v, k ) {
+                // remove node
+                v.remove();
+            } );
         },
 
         _hasLeftBlank : function (str){
@@ -818,4 +929,4 @@ YUI.add('bewype-editor', function(Y) {
 
 
 
-}, '@VERSION@' ,{requires:['bewype-button', 'bewype-utils', 'dataschema', 'editor', 'json-stringify', 'plugin', 'stylesheet']});
+}, '@VERSION@' ,{requires:['bewype-button', 'bewype-entry-spinner', 'bewype-utils', 'dataschema', 'editor', 'json-stringify', 'plugin', 'stylesheet']});
