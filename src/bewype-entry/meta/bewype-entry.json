@@ -1,0 +1,22 @@
+{
+    "bewype-entry": {
+        "submodules": {
+            "bewype-entry-base": {
+                "requires": [
+                    "stylesheet",
+                    "substitute",
+                    "widget",
+                    "yui-base"
+                ], 
+                "skinnable": true
+            },
+            "bewype-entry-spinner": {
+                "requires": [
+                    "event-key",
+                    "widget"
+                ], 
+                "skinnable": true
+            }
+        }
+    }
+}
