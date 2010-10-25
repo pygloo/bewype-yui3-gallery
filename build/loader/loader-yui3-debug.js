@@ -181,6 +181,7 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
     "bewype-editor": {
         "requires": [
             "bewype-button", 
+            "bewype-entry-spinner", 
             "bewype-utils", 
             "dataschema", 
             "editor", 
@@ -189,6 +190,26 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
             "stylesheet"
         ], 
         "skinnable": true
+    }, 
+    "bewype-entry": {
+        "submodules": {
+            "bewype-entry-base": {
+                "requires": [
+                    "stylesheet", 
+                    "substitute", 
+                    "widget", 
+                    "yui-base"
+                ], 
+                "skinnable": true
+            }, 
+            "bewype-entry-spinner": {
+                "requires": [
+                    "event-key", 
+                    "widget"
+                ], 
+                "skinnable": true
+            }
+        }
     }, 
     "bewype-picker": {
         "submodules": {
@@ -1533,7 +1554,7 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         }
     }
 };
-YUI.Env[Y.version].md5 = '19c2f912b26aa543de39bdc171664189';
+YUI.Env[Y.version].md5 = '6b428de424f8512738ca596aed65ff90';
 
 
 }, '@VERSION@' ,{requires:['loader-base']});

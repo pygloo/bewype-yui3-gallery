@@ -172,6 +172,7 @@
     "bewype-editor": {
         "requires": [
             "bewype-button", 
+            "bewype-entry-spinner", 
             "bewype-utils", 
             "dataschema", 
             "editor", 
@@ -180,6 +181,26 @@
             "stylesheet"
         ], 
         "skinnable": true
+    }, 
+    "bewype-entry": {
+        "submodules": {
+            "bewype-entry-base": {
+                "requires": [
+                    "stylesheet", 
+                    "substitute", 
+                    "widget", 
+                    "yui-base"
+                ], 
+                "skinnable": true
+            }, 
+            "bewype-entry-spinner": {
+                "requires": [
+                    "event-key", 
+                    "widget"
+                ], 
+                "skinnable": true
+            }
+        }
     }, 
     "bewype-picker": {
         "submodules": {
