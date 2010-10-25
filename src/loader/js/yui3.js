@@ -209,6 +209,46 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
             }
         }
     }, 
+    "bewype-layout-designer": {
+        "submodules": {
+            "bewype-layout-designer-base": {
+                "requires": [
+                    "bewype-layout-designer-sources", 
+                    "bewype-layout-designer-target"
+                ], 
+                "skinnable": true
+            }, 
+            "bewype-layout-designer-content": {
+                "requires": [
+                    "plugin", 
+                    "substitute", 
+                    "async-queue"
+                ], 
+                "skinnable": true
+            }, 
+            "bewype-layout-designer-places": {
+                "requires": [
+                    "sortable", 
+                    "bewype-layout-designer-content"
+                ], 
+                "skinnable": true
+            }, 
+            "bewype-layout-designer-sources": {
+                "requires": [
+                    "dd", 
+                    "plugin", 
+                    "substitute"
+                ], 
+                "skinnable": true
+            }, 
+            "bewype-layout-designer-target": {
+                "requires": [
+                    "bewype-layout-designer-places"
+                ], 
+                "skinnable": true
+            }
+        }
+    }, 
     "bewype-picker": {
         "submodules": {
             "bewype-picker-base": {
@@ -1552,4 +1592,4 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         }
     }
 };
-YUI.Env[Y.version].md5 = '6b428de424f8512738ca596aed65ff90';
+YUI.Env[Y.version].md5 = 'c2a317d3ab96db0a310e4ac9bf331a7b';
