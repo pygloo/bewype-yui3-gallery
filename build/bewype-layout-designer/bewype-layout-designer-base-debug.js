@@ -124,11 +124,12 @@ YUI.add('bewype-layout-designer-base', function(Y) {
         initializer: function( config ) {
 
             // tmp vars
-            _idSource = this.get( 'idSource' );
-            _idDest   = this.get( 'idDest' );
+            var _idSource = this.get( 'idSource' ),
+                _idDest   = this.get( 'idDest' ),
+                _nodeSrc  = null;
 
             // create source node
-            var _nodeSrc = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_SRC_TEMPLATE, {
+            _nodeSrc = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_SRC_TEMPLATE, {
                 idSource : _idSource
             } ) );
             // attach src parent to widget
@@ -145,7 +146,7 @@ YUI.add('bewype-layout-designer-base', function(Y) {
             // attach layout node to main node
             this.get( 'host' ).append( this.nodeLayout );
             //
-            this._setLayoutWidth( this.get( 'layoutWidth' ) );
+            this.nodeLayout.setStyle( 'width', this.get( 'layoutWidth' ) );
 
             // plug target
             this.nodeLayout.plug( Y.Bewype.LayoutDesignerTarget, {
@@ -165,15 +166,31 @@ YUI.add('bewype-layout-designer-base', function(Y) {
             } );
         },
 
+        /**
+         *
+         */
         destructor: function () {
         },
 
         /**
          *
          */
-        _setLayoutWidth : function ( width ) {
-            this.nodeLayout.setStyle( 'width' , width );
+        getContents : function () {
+            if (this.nodeLayout.layoutDesignerPlaces) {
+                return this.nodeLayout.layoutDesignerPlaces.getContents();
+            } else {
+                return [];
+            }
         }
+
+        /**
+         *
+        refreshAll : function () {
+            if (this.nodeLayout.layoutDesignerPlaces) {
+                return this.nodeLayout.layoutDesignerPlaces.refreshAll();
+            }
+        }
+         */
     } );
 
     Y.namespace('Bewype');

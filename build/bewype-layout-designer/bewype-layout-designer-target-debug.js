@@ -127,6 +127,11 @@ YUI.add('bewype-layout-designer-target', function(Y) {
         /**
          *
          */
+        _dd : null,
+
+        /**
+         *
+         */
         _groups : [ 'horizontal', 'vertical', 'content' ],
 
         /**
@@ -142,8 +147,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 _targetMaxWidth  = this.get( 'contentWidth'    ),
                 _targetMinHeight = this.get( 'targetMinHeight' ),
                 _targetMinWidth  = this.get( 'targetMinWidth'  ),
-                _width           = null,
-                _d               = null;
+                _width           = null;
 
             // add target
             this._targetNode = new Y.Node.create(
@@ -175,9 +179,8 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             // upper all
             this._targetNode.setStyle( 'z-index',  this.get( 'targetZIndex' ) );
 
-
             // init start drop
-            _d = new Y.DD.Drop( {
+            this._dd = new Y.DD.Drop( {
                 node    : this._targetNode,
                 groups  : this._groups,
                 target  : true,
@@ -203,6 +206,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             // get host
             var _host       = this.get( 'host'       ),
                 _parentNode = this.get( 'parentNode' ),
+                _removeNode = this._targetNode.one( 'div' ),
                 _destNode   = null;
 
             // destroy plugins
@@ -210,8 +214,18 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 _host.unplug( Y.Bewype.LayoutDesignerPlaces );
             }
             
+            // detatch dd events
+            this._dd.detachAll( 'drop:enter' );
+            this._dd.detachAll( 'drop:hit'   );
+            this._dd.detachAll( 'drop:exit'  );
+
+            if ( _removeNode ) {
+                _removeNode.detachAll( 'click' );
+            }
+
             // clean events
-            Y.Event.purgeElement( this._targetNode, true);
+            this._targetNode.detachAll( 'mouseenter' );
+            this._targetNode.detachAll( 'mouseleave' );
             this._targetNode.remove();
 
 
@@ -587,6 +601,8 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                         this._targetNode.setStyle( 'position', 'absolute');
                         this._targetNode.setStyle( 'bottom', 0 );
                     }
+                    // always set width
+                    this._targetNode.setStyle( 'width' , _pWidth );
                     break;
 
                 case 'horizontal':
@@ -612,12 +628,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             if ( _parentNode ) {
                 _parentNode.layoutDesignerTarget.refresh();
             }
-        },
-
-        _setLayoutWidth : function ( v ) {
-            // NOT USED YET
         }
-
     } );
 
     Y.namespace('Bewype');

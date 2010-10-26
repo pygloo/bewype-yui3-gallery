@@ -89,7 +89,7 @@
                     node    : _n,
                     groups  : [ v ],
                     dragMode: 'intersect'
-                } )
+                } );
                 // additionnal drag features
                 _drag.plug( Y.Plugin.DDProxy, {
                     moveOnEnd : false

@@ -71,6 +71,11 @@ YUI.add('bewype-layout-designer-content', function(Y) {
         /**
          *
          */
+        editing : false,
+
+        /**
+         *
+         */
         initializer : function( config ) {
             
             // temp var
@@ -133,6 +138,8 @@ YUI.add('bewype-layout-designer-content', function(Y) {
             
             // do call
             if ( _editCallback ) {
+                this.editing = true;
+                this.hideClone();
                 _editCallback( this.get( 'host' ) );
             }
         },
@@ -181,6 +188,7 @@ YUI.add('bewype-layout-designer-content', function(Y) {
                 _editCallback   = this.get( 'editCallback'   ),
                 _removeCallback = this.get( 'removeCallback' ),
                 _callbacksNode  = new Y.Node.create('<div class="' + _contentClass + '-clone-callbacks" />' ),
+                _cloneNode      = null,
                 _editNode       = null,
                 _removeNode     = null;
 
@@ -231,6 +239,9 @@ YUI.add('bewype-layout-designer-content', function(Y) {
          */
         _onMouseEnter : function ( evt ) {
             
+            // do nothing when editing
+            if ( this.editing ) { return; }
+
             // temp var
             var _host           = this.get( 'host'         ),
                 _parentNode     = this.get( 'parentNode'   ),
@@ -271,8 +282,7 @@ YUI.add('bewype-layout-designer-content', function(Y) {
             default_ = default_ ? default_ : 0;
 
             // return int height
-            return parseInt( node.getComputedStyle( 'height' )
-                    || node.getAttribute( 'height' ), default_ );
+            return parseInt( node.getComputedStyle( 'height' ) || node.getAttribute( 'height' ), default_ );
         },
 
         /**
@@ -284,8 +294,7 @@ YUI.add('bewype-layout-designer-content', function(Y) {
             default_ = default_ ? default_ : 0;
 
             // return int width
-            return parseInt( node.getComputedStyle( 'width' )
-                    || node.getAttribute( 'width' ), default_ );
+            return parseInt( node.getComputedStyle( 'width' ) || node.getAttribute( 'width' ), default_ );
         },
 
         getContentHeight : function () {
@@ -304,6 +313,35 @@ YUI.add('bewype-layout-designer-content', function(Y) {
 
             // return width
             return this._getWidth( _host );
+        },
+
+        refresh : function () {
+
+            // temp var
+            var _host           = this.get( 'host'         ),
+                _parentNode     = this.get( 'parentNode'   ),
+                _contentClass   = this.get( 'contentClass' ),
+                _parentDiv      = _host.ancestor( 'div' ),
+                _clone          = _parentDiv.one( 'div.' + _contentClass + '-clone' ), // get existing clone
+                _height         = this.getContentHeight(),
+                _width          = this.getContentWidth();
+
+            // update host height & width style
+            _host.setStyle( 'height', _height );
+            _host.setStyle( 'width' , _width  );
+            
+            // update host height & width conf
+            this.set( 'contentHeight', this._getHeight( _parentDiv ) );
+            this.set( 'contentWidth' , this._getWidth(  _parentDiv ) );
+            
+            // update clone height & width style
+            if ( _clone ) {
+                _clone.setStyle( 'height', this.get( 'contentHeight' ) );
+                _clone.setStyle( 'width' , this.get( 'contentWidth'  ) );
+            }
+
+            // refresh parent target
+            _parentNode.layoutDesignerTarget.refresh();
         }
     } );
 

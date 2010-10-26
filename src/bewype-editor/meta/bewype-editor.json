@@ -6,6 +6,7 @@
             "bewype-utils",
             "dataschema",
             "editor",
+            "event-custom",
             "json-stringify",
             "plugin",
             "stylesheet"

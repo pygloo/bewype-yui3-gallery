@@ -37,7 +37,7 @@
     /**
      *
      */
-    Editor.NAME = "bewype-editor";
+    Editor.NAME = 'bewype-editor';
 
     /**
      *
@@ -45,7 +45,7 @@
     Editor.NS   = 'bewypeEditor';
 
     /**
-     *
+     * disabled: 'color', 'background-color'
      */
     Editor.ATTRS = {
         editorClass : {
@@ -66,10 +66,9 @@
                     'underline',
                     'font-family',
                     'font-size',
-                    'color',
-                    'background-color',
                     'url',
-                    'reset'
+                    'reset',
+                    'apply'
                     ],
             writeOnce : true
         },
@@ -77,49 +76,49 @@
             value : null,
             writeOnce : true
         },
-        selectionColor: {
+        selectionColor : {
             value : '#ddd',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
         },
-        spinnerLabelHeight: {
+        spinnerLabelHeight : {
             value : 'height',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
         },
-        spinnerLabelWidth: {
+        spinnerLabelWidth : {
             value : 'width',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
         },
-        spinnerLabelPaddingLeft: {
+        spinnerLabelPaddingLeft : {
             value : 'padding-left',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
         },
-        spinnerLabelPaddingTop: {
+        spinnerLabelPaddingTop : {
             value : 'padding-top',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
         },
-        spinnerMaxHeight: {
+        spinnerMaxHeight : {
             value : 480,
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isNumber( val );
             }
         },
-        spinnerMaxWidth: {
+        spinnerMaxWidth : {
             value : 640,
             writeOnce : true,
             validator : function( val ) {
@@ -286,17 +285,6 @@
             this._buttonDict[ name ] = _spinner;
         },
 
-        _onSpinnerEventChange : function ( name, evt ) {
-            // get host
-            var _host       = this.get( 'host' ),
-                _placeClass = this.get( 'editorClass' ) + '-place',
-                _placeNode  = _host.one( '.' + _placeClass ),
-                _value      = this._buttonDict[ name ].getValue();
-
-            // style for the edited place
-            _placeNode.setStyle( Y.Bewype.Utils.camelize( name ), _value + 'px' );
-        },
-
         __buttonFactory : function ( name, buttonClass, button ) {
 
             var _panelNode   = this.get( 'panelNode'   ),
@@ -398,6 +386,8 @@
             }, this );
 
             this._addButton( 'reset' );
+
+            this._addButton( 'apply' );
         },
 
         /**
@@ -413,6 +403,10 @@
 
             // set panel
             this._initPanel();
+
+            // our custom events
+            Y.publish( 'bewype-editor:onClose'  );
+            Y.publish( 'bewype-editor:onChange' );
         },
 
         /**
@@ -857,11 +851,21 @@
                         _value = reset ? false : this._getValueFromNode( _selectionNode, 'a', v );
                         return this._buttonDict[ v ].setValue( _value );
                 }
-
             }, this );
         },
 
         _onButtonEventChange : function ( name, e ) {
+
+            switch( name ) {
+                case 'apply':
+                    this.get( 'host' ).unplug( Y.Bewype.Editor );
+                    // fire custom event
+                    return Y.fire( 'bewype-editor:onClose' );
+                case 'cancel':
+                    break;
+                default:
+                    break;
+            }
 
             var _inst             = this._editor.getInstance(),
                 _body             = _inst.one( 'body'  ),
@@ -874,12 +878,16 @@
 
             if ( !_selectionNode ) {
                 if ( this._cssButtons.indexOf( name ) != -1 ) {
-                    return this._updateMainStyle( name );
+                    this._updateMainStyle( name );
+                    // fire custom event
+                    return Y.fire( 'bewype-editor:onChange' );
                 } else if ( name === 'reset') {
                     // reset main node
                     this._resetSelection( true );
                     // restore original values and quit
-                    return Y.Bewype.Utils.setCssDict( _main, this._oMainCssdict );
+                    Y.Bewype.Utils.setCssDict( _main, this._oMainCssdict );
+                    // fire custom event
+                    return Y.fire( 'bewype-editor:onChange' );
                 }
             }
             
@@ -927,6 +935,9 @@
 
                 // custom rendering
                 this._refreshSelectionNode();
+
+                // fire custom event
+                Y.fire( 'bewype-editor:onChange' );
             }
         },
 
@@ -945,10 +956,28 @@
 
             // simple refresh
             this._refreshButtons( false, name );
+        },
+
+        _onSpinnerEventChange : function ( name, evt ) {
+            // get host
+            var _host       = this.get( 'host' ),
+                _placeClass = this.get( 'editorClass' ) + '-place',
+                _placeNode  = _host.one( '.' + _placeClass ),
+                _value      = this._buttonDict[ name ].getValue();
+
+            // style for the edited place
+            _host.setStyle( Y.Bewype.Utils.camelize( name ), _value + 'px' );
+            _placeNode.setStyle( Y.Bewype.Utils.camelize( name ), _value + 'px' );
+
+            // fire custom event
+            Y.fire( 'bewype-editor:onChange' );
         }
 
     } );
 
-    Y.namespace('Bewype');
+    // manage custom event
+    Y.augment( Editor, Y.EventTarget );
+
+    Y.namespace( 'Bewype' );
     Y.Bewype.Editor = Editor;
 

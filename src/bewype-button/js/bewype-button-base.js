@@ -194,7 +194,6 @@
 
             // little check
             if (_itemNode) {
-
                 // fire custom event
                 this.fire("button:onClick");
             }

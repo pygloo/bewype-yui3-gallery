@@ -183,6 +183,7 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
             "bewype-utils", 
             "dataschema", 
             "editor", 
+            "event-custom", 
             "json-stringify", 
             "plugin", 
             "stylesheet"
@@ -1592,4 +1593,4 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         }
     }
 };
-YUI.Env[Y.version].md5 = 'c2a317d3ab96db0a310e4ac9bf331a7b';
+YUI.Env[Y.version].md5 = 'fcf61201749e5121cc5b909d2a797911';

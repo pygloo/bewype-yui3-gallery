@@ -39,7 +39,7 @@ YUI.add('bewype-editor', function(Y) {
     /**
      *
      */
-    Editor.NAME = "bewype-editor";
+    Editor.NAME = 'bewype-editor';
 
     /**
      *
@@ -47,7 +47,7 @@ YUI.add('bewype-editor', function(Y) {
     Editor.NS   = 'bewypeEditor';
 
     /**
-     *
+     * disabled: 'color', 'background-color'
      */
     Editor.ATTRS = {
         editorClass : {
@@ -68,10 +68,9 @@ YUI.add('bewype-editor', function(Y) {
                     'underline',
                     'font-family',
                     'font-size',
-                    'color',
-                    'background-color',
                     'url',
-                    'reset'
+                    'reset',
+                    'apply'
                     ],
             writeOnce : true
         },
@@ -288,17 +287,6 @@ YUI.add('bewype-editor', function(Y) {
             this._buttonDict[ name ] = _spinner;
         },
 
-        _onSpinnerEventChange : function ( name, evt ) {
-            // get host
-            var _host       = this.get( 'host' ),
-                _placeClass = this.get( 'editorClass' ) + '-place',
-                _placeNode  = _host.one( '.' + _placeClass ),
-                _value      = this._buttonDict[ name ].getValue();
-
-            // style for the edited place
-            _placeNode.setStyle( Y.Bewype.Utils.camelize( name ), _value + 'px' );
-        },
-
         __buttonFactory : function ( name, buttonClass, button ) {
 
             var _panelNode   = this.get( 'panelNode'   ),
@@ -400,6 +388,8 @@ YUI.add('bewype-editor', function(Y) {
             }, this );
 
             this._addButton( 'reset' );
+
+            this._addButton( 'apply' );
         },
 
         /**
@@ -415,6 +405,10 @@ YUI.add('bewype-editor', function(Y) {
 
             // set panel
             this._initPanel();
+
+            // our custom events
+            Y.publish( 'bewype-editor:onClose'  );
+            Y.publish( 'bewype-editor:onChange' );
         },
 
         /**
@@ -859,11 +853,21 @@ YUI.add('bewype-editor', function(Y) {
                         _value = reset ? false : this._getValueFromNode( _selectionNode, 'a', v );
                         return this._buttonDict[ v ].setValue( _value );
                 }
-
             }, this );
         },
 
         _onButtonEventChange : function ( name, e ) {
+
+            switch( name ) {
+                case 'apply':
+                    this.get( 'host' ).unplug( Y.Bewype.Editor );
+                    // fire custom event
+                    return Y.fire( 'bewype-editor:onClose' );
+                case 'cancel':
+                    break;
+                default:
+                    break;
+            }
 
             var _inst             = this._editor.getInstance(),
                 _body             = _inst.one( 'body'  ),
@@ -876,12 +880,16 @@ YUI.add('bewype-editor', function(Y) {
 
             if ( !_selectionNode ) {
                 if ( this._cssButtons.indexOf( name ) != -1 ) {
-                    return this._updateMainStyle( name );
+                    this._updateMainStyle( name );
+                    // fire custom event
+                    return Y.fire( 'bewype-editor:onChange' );
                 } else if ( name === 'reset') {
                     // reset main node
                     this._resetSelection( true );
                     // restore original values and quit
-                    return Y.Bewype.Utils.setCssDict( _main, this._oMainCssdict );
+                    Y.Bewype.Utils.setCssDict( _main, this._oMainCssdict );
+                    // fire custom event
+                    return Y.fire( 'bewype-editor:onChange' );
                 }
             }
             
@@ -929,6 +937,9 @@ YUI.add('bewype-editor', function(Y) {
 
                 // custom rendering
                 this._refreshSelectionNode();
+
+                // fire custom event
+                Y.fire( 'bewype-editor:onChange' );
             }
         },
 
@@ -947,13 +958,31 @@ YUI.add('bewype-editor', function(Y) {
 
             // simple refresh
             this._refreshButtons( false, name );
+        },
+
+        _onSpinnerEventChange : function ( name, evt ) {
+            // get host
+            var _host       = this.get( 'host' ),
+                _placeClass = this.get( 'editorClass' ) + '-place',
+                _placeNode  = _host.one( '.' + _placeClass ),
+                _value      = this._buttonDict[ name ].getValue();
+
+            // style for the edited place
+            _host.setStyle( Y.Bewype.Utils.camelize( name ), _value + 'px' );
+            _placeNode.setStyle( Y.Bewype.Utils.camelize( name ), _value + 'px' );
+
+            // fire custom event
+            Y.fire( 'bewype-editor:onChange' );
         }
 
     } );
 
-    Y.namespace('Bewype');
+    // manage custom event
+    Y.augment( Editor, Y.EventTarget );
+
+    Y.namespace( 'Bewype' );
     Y.Bewype.Editor = Editor;
 
 
 
-}, '@VERSION@' ,{requires:['bewype-button', 'bewype-entry-spinner', 'bewype-utils', 'dataschema', 'editor', 'json-stringify', 'plugin', 'stylesheet']});
+}, '@VERSION@' ,{requires:['bewype-button', 'bewype-entry-spinner', 'bewype-utils', 'dataschema', 'editor', 'event-custom', 'json-stringify', 'plugin', 'stylesheet']});

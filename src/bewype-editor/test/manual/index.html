@@ -17,14 +17,14 @@
         <script type="text/javascript">
         <!--
             YUI( { filter: 'debug' } ).use( 'bewype-editor', function ( Y ) {
-    
-                var _editor = null;
+
+                var _content = Y.one( "#content" );
 
                 // attach event
                 Y.on( 'click',
-                    function(e) {
-                        if ( !Y.one( "#content" ).bewypeEditor ) {
-                            Y.one( "#content" ).plug( Y.Bewype.Editor, {
+                    function( e ) {
+                        if ( !_content.bewypeEditor ) {
+                            _content.plug( Y.Bewype.Editor, {
                                 panelNode : Y.one( "#panel" )
                             } )
                         }
@@ -34,13 +34,22 @@
 
                 // detach event
                 Y.on( 'click',
-                    function(e) {
-                        if ( Y.one( "#content" ).bewypeEditor ) {
-                            Y.one( "#content" ).unplug( Y.Bewype.Editor )
+                    function( e ) {
+                        if ( _content.bewypeEditor ) {
+                            _content.unplug( Y.Bewype.Editor )
                         }
                     },
                     Y.one( "#detach" )
                 );
+
+                // add custom events
+                Y.on( 'bewype-editor:onChange', function () {
+                    alert( 'Editor changed!' );
+                } );
+
+                Y.on( 'bewype-editor:onClose', function () {
+                    alert( 'Editor closed!' );
+                } );
             } );
         -->
         </script>

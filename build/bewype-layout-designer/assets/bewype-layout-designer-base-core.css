@@ -39,6 +39,10 @@ table.vertical-places td {
     background-color    : #ddd;
 }
 
+#layout-dest td {
+    vertical-align      : top;
+}
+
 .container-dest {
     position            : relative;
 }
