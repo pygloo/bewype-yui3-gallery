@@ -934,6 +934,17 @@ YUI.add('bewype-editor', function(Y) {
 
         _onButtonEventClick : function ( name, e ) {
 
+            var _activeButtons = this.get( 'activeButtons' );
+
+            // close all pickers first
+            Y.Object.each( this._pickerButtons , function( v, k ) {
+                // check active
+                if ( _activeButtons.indexOf( v ) != -1 && v != name ) { 
+                    // hide
+                    this._buttonDict[ v ].hidePicker();
+                }
+            }, this );
+
             // simple refresh
             this._refreshButtons( false, name );
         }

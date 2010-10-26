@@ -62,11 +62,7 @@
          *
          */
         setValue : function( value ) {
-            try {
-                this._currentName = value.replace( /px/i, '' );
-            } catch (err) {
-                this._currentName = null;
-            }
+            this._currentName = value ? value.replace( /px/i, '' ) : null;
         }
     } );
 

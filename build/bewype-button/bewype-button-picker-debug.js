@@ -4,21 +4,15 @@ YUI.add('bewype-button-picker', function(Y) {
     /**
      *
      */
-    var PICKER_TMPL  = '',
-        ButtonPicker = null;
+    var ButtonPicker = function(config) {
+        ButtonPicker.superclass.constructor.apply( this, arguments );
+    };
     
     /**
      *
      */
-    PICKER_TMPL += '<div class="{buttonClass}-host">';
-    PICKER_TMPL += '</div>';
-
-    /**
-     *
-     */
-    ButtonPicker = function(config) {
-        ButtonPicker.superclass.constructor.apply( this, arguments );
-    };
+    ButtonPicker.PICKER_TMPL =  '<div class="{buttonClass}-host">';
+    ButtonPicker.PICKER_TMPL += '</div>';
 
     /**
      */
@@ -104,7 +98,7 @@ YUI.add('bewype-button-picker', function(Y) {
         destructor : function () {
 
             // destroy picker first
-            this._removePicker();
+            this.hidePicker();
 
             // common destroy
             this._destroyBase();
@@ -119,13 +113,13 @@ YUI.add('bewype-button-picker', function(Y) {
             this._renderBaseUI();
 
             // set handler
-            Y.after( 'yui3-button-event|click' , Y.bind( this._removePicker, this ) );
+            Y.after( 'yui3-button-event|click' , Y.bind( this.hidePicker, this ) );
         },
 
         /**
          *
          */
-        _removePicker : function ( evt ) {
+        hidePicker : function ( evt ) {
 
             if ( this._picker ) {
                 
@@ -158,9 +152,8 @@ YUI.add('bewype-button-picker', function(Y) {
         /**
          *
          */
-        _onClick : function ( evt ) {
-
-            // vars
+        showPicker : function () {
+            // temp vars
             var _contentBox  = this.get( 'contentBox'  ),
                 _buttonClass = this.get( 'buttonClass' ),
                 _pickerObj   = this.get( 'pickerObj'   ),
@@ -170,41 +163,55 @@ YUI.add('bewype-button-picker', function(Y) {
             // little check
             if ( _contentBox && _pickerObj ) {
 
+                // add picker node
+                _pickerHost = new Y.Node.create(
+                    Y.substitute( ButtonPicker.PICKER_TMPL, {
+                        buttonClass : _buttonClass
+                    } )
+                );
+                _contentBox.append( _pickerHost );
+
+                // create a picker
+                if ( _pickerClass ) {
+                    this._picker = new _pickerObj( {
+                        pickerClass : this.get( 'pickerClass' )
+                    } );
+                } else {
+                    this._picker = new _pickerObj();
+                }
+
+                // set value
+                this._picker.setValue( this._value );
+
+                // do render
+                this._picker.render( _pickerHost );
+
+                // add custom event listener
+                this._picker.on( 'picker:onChange', Y.bind( this._onPickerChange, this ) );
+            }
+        },
+
+        /**
+         *
+         */
+        _onClick : function ( evt ) {
+
+            // vars
+            var _contentBox  = this.get( 'contentBox'  ),
+                _pickerObj   = this.get( 'pickerObj'   );
+
+            // little check
+            if ( _contentBox && _pickerObj ) {
+
                 // fire custom event
                 this.fire("button:onClick");
 
                 if ( this._picker ) {
-
                     // remove picker
-                    this._removePicker();
-
+                    this.hidePicker();
                 } else {
-
-                    // add picker node
-                    _pickerHost = new Y.Node.create(
-                        Y.substitute( PICKER_TMPL, {
-                            buttonClass : _buttonClass
-                        } )
-                    );
-                    _contentBox.append( _pickerHost );
-                    
-                    // create a picker
-                    if ( _pickerClass ) {
-                        this._picker = new _pickerObj( {
-                            pickerClass : this.get( 'pickerClass' )
-                        } );
-                    } else {
-                        this._picker = new _pickerObj();
-                    }
-
-                    // set value
-                    this._picker.setValue( this._value );
-
-                    // do render
-                    this._picker.render( _pickerHost );
-
-                    // add custom event listener
-                    this._picker.on( 'picker:onChange', Y.bind( this._onPickerChange, this ) );
+                    // render picker
+                    this.showPicker();
                 }
             }
 
@@ -219,8 +226,8 @@ YUI.add('bewype-button-picker', function(Y) {
                 // get value
                 this._value = this._picker.getValue();
 
-                //
-                this._removePicker();
+                // remove picker
+                this.hidePicker();
 
                 // fire custom event
                 this.fire("button:onChange");
