@@ -48,8 +48,7 @@ YUI.add('bewype-layout-designer-content', function(Y) {
             }
         },
         parentNode : {
-            value : null,
-            writeOnce : true
+            value : null
         },
         editPanelNode : {
             value : null,
@@ -89,7 +88,7 @@ YUI.add('bewype-layout-designer-content', function(Y) {
             Y.on( 'mouseenter', Y.bind( this._onMouseEnter, this ) , _host );
                     
             // register it
-            _parentNode.layoutDesignerPlaces.registerContent(_host);
+            _parentNode.layoutDesignerPlaces.registerContent( _host );
 
             this._q = new Y.AsyncQueue();
         },
@@ -141,6 +140,9 @@ YUI.add('bewype-layout-designer-content', function(Y) {
 
             // set editing flag to false
             this.editing = false;
+
+            // just in case
+            this.refresh();
 
             if ( _host.bewypeEditor ) {
                 // diconnect
@@ -381,4 +383,4 @@ YUI.add('bewype-layout-designer-content', function(Y) {
 
 
 
-}, '@VERSION@' ,{requires:['async-queue', 'plugin', 'substitute']});
+}, '@VERSION@' ,{requires:['async-queue', 'plugin', 'substitute', 'bewype-editor']});

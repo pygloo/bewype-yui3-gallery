@@ -15,11 +15,11 @@ YUI.add('bewype-layout-designer-places', function(Y) {
     /**
      *
      */
-    LayoutDesignerPlaces.H_PLACES_TEMPLATE  =  '<table class="{placesClass}-horizontal">';
+    LayoutDesignerPlaces.H_PLACES_TEMPLATE  =  '<table class="{placesClass} {placesClass}-horizontal">';
     LayoutDesignerPlaces.H_PLACES_TEMPLATE  += '<tr />';
     LayoutDesignerPlaces.H_PLACES_TEMPLATE  += '</table>';
 
-    LayoutDesignerPlaces.V_PLACES_TEMPLATE  = '<table class="{placesClass}-vertical"></table>';
+    LayoutDesignerPlaces.V_PLACES_TEMPLATE  = '<table class="{placesClass} {placesClass}-vertical"></table>';
 
     LayoutDesignerPlaces.C_TEMPLATE         = '<div class="{contentClass}">{defaultContent}</div>';
 
@@ -82,8 +82,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             }
         },
         parentNode : {
-            value : null,
-            writeOnce : true
+            value : null
         },
         editPanelNode : {
             value : null,
@@ -129,9 +128,9 @@ YUI.add('bewype-layout-designer-places', function(Y) {
 
             // register it
             if ( _parentNode ) {
-                _parentNode.layoutDesignerPlaces.registerContent(_host);
+                _parentNode.layoutDesignerPlaces.registerContent( _host );
             } else {
-                Y.DD.DDM.on( 'drag:enter', this._onEnterGotcha );
+                Y.DD.DDM.on( 'drag:enter', Y.bind( this._onEnterGotcha, this ) );
             }
             this.contents = [];
         },
@@ -155,56 +154,55 @@ YUI.add('bewype-layout-designer-places', function(Y) {
 
         _onEnterGotcha: function ( evt ) {
 
+            /*
             // get drag
-            var _drag           = evt.drag,
-                _dragNode       = evt.drag.get( 'node' ),
-                _dragChild      = _dragNode.one( 'div.content' ),
+            var _dragNode       = evt.drag.get( 'node' ),
+                _destNode       = _dragNode.one( 'div.container-' + this.get( 'destClass' ) ),                
+                _id             = _destNode ? _destNode.get( 'id' ) : null,
+
+                _contentNode    = _dragNode.one( '.places' ) ? _destNode : _dragNode.one( '.content' ),
+                _contentHost    = _contentNode ? _contentNode.get( 'host' ) : null,
+
+                _dragTable      = _dragNode.ancestor( 'table' ),
+                _dragPlaces     = _dragTable.ancestor( 'div' ).layoutDesignerPlaces,
+
                 _dropNode       = evt.drop.get( 'node' ),
-                _dropParent     = _dropNode.ancestor( 'div' ),
-                _c              = _dragChild ? _dragChild.layoutDesignerContent : null,
-                _p              = _dropParent.layoutDesignerPlaces,
-                _parentPlaces   = null,
+                _dropPlaces     = _dropNode.ancestor( 'div' ).layoutDesignerPlaces,
+
+                _dropChild      = _dropPlaces ? _dropNode.one( '#' + _id ) : null,
+
                 _innerHtml      = null,
+                
                 _cssText        = null,
-                _td             = null,
                 _newContent     = null;
 
-            if ( _c && _p.get( 'placesType' ) === 'vertical' && _p.contents.indexOf( _dragChild ) == -1 ) {
+            if ( !_dropChild && _contentHost && _dragPlaces ) {
 
-                // get parent
-                _parentPlaces = _dragChild.layoutDesignerContent.get( 'parentNode' );
+                // unregister from previous places
+                _dragPlaces.unRegisterContent( _contentHost );
 
                 // copy value
-                _innerHtml = _dragChild.get( 'innerHTML' );
-                _cssText   = _dragChild.getStyle( 'cssText' );
+                _innerHtml = _contentHost.get( 'innerHTML' );
+                _cssText   = _contentHost.getStyle( 'cssText' );
 
-                // get td
-                _td = _dragChild.ancestor( 'td' );
+                // restore content
+                _newContent = _dropPlaces.layoutDesignerPlaces.addContent();
+                _newContent.set( 'innerHTML', _innerHtml);
+                _newContent.setStyle( 'cssText', _cssText );
+                _dropPlaces.layoutDesignerTarget.refresh();
 
-                if ( _td.drop ) {
+                // register to the new places
+                _dropPlaces.registerContent( _newContent.get( 'host' ) );
 
-                    // unplug
-                    _dragChild.unplug( Y.Bewype.LayoutDesignerContent );
+                evt.drag.removeFromGroup(_dragPlaces.layoutDesignerPlaces.sortable);
+                evt.drag.stopDrag();
+                evt.drag.end();
+                evt.drag.destroy();
 
-                    // remove td
-                    _td.drop.removeFromGroup(_parentPlaces.layoutDesignerPlaces.sortable);
-                    _td.remove();
-
-                    // restore content
-                    _newContent = _parentPlaces.layoutDesignerPlaces.addContent();
-                    _newContent.set( 'innerHTML', _innerHtml);
-                    _newContent.setStyle( 'cssText', _cssText );
-                    _parentPlaces.layoutDesignerTarget.refresh();
-
-                    _drag.removeFromGroup(_parentPlaces.layoutDesignerPlaces.sortable);
-                    _drag.stopDrag();
-                    _drag.end();
-                    _drag.destroy();
-
-                    // and stop
-                    evt.stopPropagation();
-                }
+                // and stop
+                evt.stopPropagation();
             }
+            */
         },
 
         /**
@@ -507,7 +505,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                 } ) ); // create content node
 
             // dom add
-            _destNode.append(_contentNode);
+            _destNode.append( _contentNode );
 
             // plug node
             _contentNode.plug( Y.Bewype.LayoutDesignerContent, {

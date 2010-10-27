@@ -46,8 +46,7 @@
             }
         },
         parentNode : {
-            value : null,
-            writeOnce : true
+            value : null
         },
         editPanelNode : {
             value : null,
@@ -87,7 +86,7 @@
             Y.on( 'mouseenter', Y.bind( this._onMouseEnter, this ) , _host );
                     
             // register it
-            _parentNode.layoutDesignerPlaces.registerContent(_host);
+            _parentNode.layoutDesignerPlaces.registerContent( _host );
 
             this._q = new Y.AsyncQueue();
         },
@@ -139,6 +138,9 @@
 
             // set editing flag to false
             this.editing = false;
+
+            // just in case
+            this.refresh();
 
             if ( _host.bewypeEditor ) {
                 // diconnect
