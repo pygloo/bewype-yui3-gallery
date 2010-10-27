@@ -39,31 +39,32 @@
         /**
          *
          */
-        getHeight : function( node, default_ ) {
+        getStyleValue : function( node, name, default_ ) {
 
             // ensure default
             default_ = default_ ? default_ : 0;
 
-            var _aVal = node.getAttribute( 'height' ),
-                _cVal = node.getComputedStyle( 'height' );
+            var _aVal = node.getAttribute( name ),
+                _cVal = node.getComputedStyle( name );
 
-            // return int height
+            // return int value - TODO see if useful for non int value :s
             return parseInt( _aVal || _cVal, default_ );
         },
 
         /**
          *
          */
+        getHeight : function( node, default_ ) {
+            // return int height
+            return this.getStyleValue( node, 'height', default_ );
+        },
+
+        /**
+         *
+         */
         getWidth : function( node, default_ ) {
-
-            // ensure default
-            default_ = default_ ? default_ : 0;
-
-            var _aVal = node.getAttribute( 'width' ),
-                _cVal = node.getComputedStyle( 'width' );
-
             // return int width
-            return parseInt( _aVal || _cVal, default_ );
+            return this.getStyleValue( node, 'width', default_ );
         },
 
         getCssDict : function ( node, camelize ) {

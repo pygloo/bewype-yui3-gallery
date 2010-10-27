@@ -157,20 +157,15 @@
                 _dragChild      = _dragNode.one( 'div.content' ),
                 _dropNode       = evt.drop.get( 'node' ),
                 _dropParent     = _dropNode.ancestor( 'div' ),
-                _gotcha           = true,
+                _c              = _dragChild ? _dragChild.layoutDesignerContent : null,
+                _p              = _dropParent.layoutDesignerPlaces,
                 _parentPlaces   = null,
                 _innerHtml      = null,
                 _cssText        = null,
                 _td             = null,
                 _newContent     = null;
 
-            // here the gotcha test
-            _gotcha &= _dragChild  && _dragChild.layoutDesignerContent;
-            _gotcha &= _dropParent && _dropParent.layoutDesignerPlaces;
-            _gotcha &= _gotcha     && _dropParent.layoutDesignerPlaces.get( 'placesType' ) === 'vertical';
-            _gotcha &= _gotcha     && _dropParent.layoutDesignerPlaces.contents.indexOf( _dragChild ) == -1;
-
-            if ( _gotcha ) {
+            if ( _c && _p.get( 'placesType' ) === 'vertical' && _p.contents.indexOf( _dragChild ) == -1 ) {
 
                 // get parent
                 _parentPlaces = _dragChild.layoutDesignerContent.get( 'parentNode' );
@@ -197,16 +192,13 @@
                     _newContent.setStyle( 'cssText', _cssText );
                     _parentPlaces.layoutDesignerTarget.refresh();
 
-                    //
                     _drag.removeFromGroup(_parentPlaces.layoutDesignerPlaces.sortable);
                     _drag.stopDrag();
                     _drag.end();
+                    _drag.destroy();
 
-                    try {
-                        // ??? buggy
-                        evt.stopImmediatePropagation();
-                        evt.halt();
-                    } catch( err ) { }
+                    // and stop
+                    evt.stopPropagation();
                 }
             }
         },

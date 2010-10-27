@@ -78,49 +78,49 @@ YUI.add('bewype-editor', function(Y) {
             value : null,
             writeOnce : true
         },
-        selectionColor: {
+        selectionColor : {
             value : '#ddd',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
         },
-        spinnerLabelHeight: {
+        spinnerLabelHeight : {
             value : 'height',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
         },
-        spinnerLabelWidth: {
+        spinnerLabelWidth : {
             value : 'width',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
         },
-        spinnerLabelPaddingLeft: {
+        spinnerLabelPaddingLeft : {
             value : 'padding-left',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
         },
-        spinnerLabelPaddingTop: {
+        spinnerLabelPaddingTop : {
             value : 'padding-top',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
         },
-        spinnerMaxHeight: {
+        spinnerMaxHeight : {
             value : 480,
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isNumber( val );
             }
         },
-        spinnerMaxWidth: {
+        spinnerMaxWidth : {
             value : 640,
             writeOnce : true,
             validator : function( val ) {
@@ -258,7 +258,8 @@ YUI.add('bewype-editor', function(Y) {
                 _spinnerClass      = this.get( 'editorClass' ) + '-spinner-' + name,
                 _spinnerNode       = null,
                 _spinner           = null,
-                _value             = this._spinnerValues[ name ];
+                _valueTxt          = this._spinnerValues[ name ],
+                _value             = _valueTxt ? parseInt( _valueTxt.replace( /px/i, '' ), 10 ) : 0;
 
             // create node
             _spinnerNode = new Y.Node.create(
@@ -276,7 +277,7 @@ YUI.add('bewype-editor', function(Y) {
                 srcNode : _spinnerNode.one( '.' + _spinnerClass ),
                 max     : this.get( Y.Bewype.Utils.camelize( 'spinner-max-' + name ) ),
                 min     : 0,
-                value   : ( _value ) ? parseInt( _value.replace( /px/i, '' ), 10 ) : 0
+                value   : _value
             });
             _spinner.render();
 
@@ -363,13 +364,15 @@ YUI.add('bewype-editor', function(Y) {
 
             var _activeButtons = this.get( 'activeButtons' );
 
-            Y.Object.each( this._spinnerButtons , function( v, k ) {
+            Y.Object.each( this._spinnerButtons, function( v, k ) {
                 // check active
                 if ( _activeButtons.indexOf( v ) != -1 ) { 
                     // do add
                     this._addSpinnerButton( v );
                 }
             }, this );
+            // set max value
+            this._updateSpinnerMaxWidth();
 
             Y.Object.each( this._toggleButtons , function( v, k ) {
                 // check active
@@ -960,19 +963,51 @@ YUI.add('bewype-editor', function(Y) {
             this._refreshButtons( false, name );
         },
 
+        _updateSpinnerMaxWidth : function () {
+
+            var _spinnerMaxWidth = this.get( 'spinnerMaxWidth' ),
+                _spinnerLeft     = this._buttonDict[ 'padding-left' ],
+                _spinnerWidth    = this._buttonDict[ 'width' ],
+                _valueLeft       = _spinnerLeft  ? _spinnerLeft.getValue()  : 0,
+                _valueWidth      = _spinnerWidth ? _spinnerWidth.getValue() : 0,
+                _maxLeft         = _spinnerWidth ? _spinnerMaxWidth - _valueWidth  : _spinnerMaxWidth,
+                _maxWidth        = _spinnerLeft  ? _spinnerMaxWidth - _valueLeft   : _spinnerMaxWidth;
+
+            if ( _spinnerLeft  ) { _spinnerLeft.set(  'max', _maxLeft  ); }
+            if ( _spinnerWidth ) { _spinnerWidth.set( 'max', _maxWidth ); }
+
+            return {
+                'padding-left' : _maxLeft,
+                'width'        : _maxWidth
+            };
+        },
+
         _onSpinnerEventChange : function ( name, evt ) {
             // get host
-            var _host       = this.get( 'host' ),
-                _placeClass = this.get( 'editorClass' ) + '-place',
-                _placeNode  = _host.one( '.' + _placeClass ),
-                _value      = this._buttonDict[ name ].getValue();
+            var _host        = this.get( 'host' ),
+                _placeClass  = this.get( 'editorClass' ) + '-place',
+                _placeNode   = _host.one( '.' + _placeClass ),
+                _spinner     = this._buttonDict[ name ],
+                _cssDict     = Y.Bewype.Utils.getCssDict( _host ),
+                _oldStrValue = _cssDict[ name ],
+                _oldValue    = _oldStrValue ? parseInt( _oldStrValue.replace( /px/i, '' ), 10 ) : 0,
+                _newValue    = _spinner.getValue(),
+                _cmpValue    = ( name == 'padding-left' ) ? _newValue / 2 : _newValue,
+                _maxDict     = this._updateSpinnerMaxWidth(); // update spinner max value
 
-            // style for the edited place
-            _host.setStyle( Y.Bewype.Utils.camelize( name ), _value + 'px' );
-            _placeNode.setStyle( Y.Bewype.Utils.camelize( name ), _value + 'px' );
+            if ( _maxDict[name] && _cmpValue > _maxDict[name] ) {
 
-            // fire custom event
-            Y.fire( 'bewype-editor:onChange' );
+                // restore old value
+                _spinner.setValue( _oldValue );                
+
+            } else {
+
+                // style for the edited place
+                _placeNode.setStyle( Y.Bewype.Utils.camelize( name ), _newValue + 'px' );
+
+                // fire custom event
+                Y.fire( 'bewype-editor:onChange' );
+            }
         }
 
     } );

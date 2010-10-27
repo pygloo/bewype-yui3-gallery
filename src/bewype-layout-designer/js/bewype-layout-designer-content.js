@@ -296,46 +296,37 @@
         },
 
         getContentHeight : function () {
-            
             // temp var
-            var _host = this.get( 'host' );
-
+            var _host    = this.get( 'host' ),
+                _cHeight = Y.Bewype.Utils.getHeight( _host ),
+                _pTop    = Y.Bewype.Utils.getStyleValue( _host, 'paddingTop' ) || 0;
             // return width
-            return this._getHeight( _host );
+            return _cHeight + _pTop;
+
         },
 
         getContentWidth : function () {
-            
             // temp var
-            var _host = this.get( 'host' );
-
+            var _host   = this.get( 'host' ),
+                _cWidth = Y.Bewype.Utils.getWidth( _host ),
+                _pLeft  = Y.Bewype.Utils.getStyleValue( _host, 'paddingLeft' ) || 0;
             // return width
-            return this._getWidth( _host );
+            return _cWidth + _pLeft;
         },
 
-        refresh : function () {
+        refresh : function ( height, width) {
 
             // temp var
             var _host           = this.get( 'host'         ),
                 _parentNode     = this.get( 'parentNode'   ),
                 _contentClass   = this.get( 'contentClass' ),
                 _parentDiv      = _host.ancestor( 'div' ),
-                _clone          = _parentDiv.one( 'div.' + _contentClass + '-clone' ), // get existing clone
-                _height         = this.getContentHeight(),
-                _width          = this.getContentWidth();
-
-            // update host height & width style
-            _host.setStyle( 'height', _height );
-            _host.setStyle( 'width' , _width  );
-            
-            // update host height & width conf
-            this.set( 'contentHeight', this._getHeight( _parentDiv ) );
-            this.set( 'contentWidth' , this._getWidth(  _parentDiv ) );
+                _clone          = _parentDiv.one( 'div.' + _contentClass + '-clone' );
             
             // update clone height & width style
             if ( _clone ) {
-                _clone.setStyle( 'height', this.get( 'contentHeight' ) );
-                _clone.setStyle( 'width' , this.get( 'contentWidth'  ) );
+                _clone.setStyle( 'height', this.getContentHeight() );
+                _clone.setStyle( 'width' , this.getContentWidth()  );
             }
 
             // refresh parent target

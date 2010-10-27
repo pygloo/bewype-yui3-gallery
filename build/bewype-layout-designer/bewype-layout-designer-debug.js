@@ -499,46 +499,37 @@ YUI.add('bewype-layout-designer-content', function(Y) {
         },
 
         getContentHeight : function () {
-            
             // temp var
-            var _host = this.get( 'host' );
-
+            var _host    = this.get( 'host' ),
+                _cHeight = Y.Bewype.Utils.getHeight( _host ),
+                _pTop    = Y.Bewype.Utils.getStyleValue( _host, 'paddingTop' ) || 0;
             // return width
-            return this._getHeight( _host );
+            return _cHeight + _pTop;
+
         },
 
         getContentWidth : function () {
-            
             // temp var
-            var _host = this.get( 'host' );
-
+            var _host   = this.get( 'host' ),
+                _cWidth = Y.Bewype.Utils.getWidth( _host ),
+                _pLeft  = Y.Bewype.Utils.getStyleValue( _host, 'paddingLeft' ) || 0;
             // return width
-            return this._getWidth( _host );
+            return _cWidth + _pLeft;
         },
 
-        refresh : function () {
+        refresh : function ( height, width) {
 
             // temp var
             var _host           = this.get( 'host'         ),
                 _parentNode     = this.get( 'parentNode'   ),
                 _contentClass   = this.get( 'contentClass' ),
                 _parentDiv      = _host.ancestor( 'div' ),
-                _clone          = _parentDiv.one( 'div.' + _contentClass + '-clone' ), // get existing clone
-                _height         = this.getContentHeight(),
-                _width          = this.getContentWidth();
-
-            // update host height & width style
-            _host.setStyle( 'height', _height );
-            _host.setStyle( 'width' , _width  );
-            
-            // update host height & width conf
-            this.set( 'contentHeight', this._getHeight( _parentDiv ) );
-            this.set( 'contentWidth' , this._getWidth(  _parentDiv ) );
+                _clone          = _parentDiv.one( 'div.' + _contentClass + '-clone' );
             
             // update clone height & width style
             if ( _clone ) {
-                _clone.setStyle( 'height', this.get( 'contentHeight' ) );
-                _clone.setStyle( 'width' , this.get( 'contentWidth'  ) );
+                _clone.setStyle( 'height', this.getContentHeight() );
+                _clone.setStyle( 'width' , this.getContentWidth()  );
             }
 
             // refresh parent target
@@ -713,20 +704,15 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                 _dragChild      = _dragNode.one( 'div.content' ),
                 _dropNode       = evt.drop.get( 'node' ),
                 _dropParent     = _dropNode.ancestor( 'div' ),
-                _gotcha           = true,
+                _c              = _dragChild ? _dragChild.layoutDesignerContent : null,
+                _p              = _dropParent.layoutDesignerPlaces,
                 _parentPlaces   = null,
                 _innerHtml      = null,
                 _cssText        = null,
                 _td             = null,
                 _newContent     = null;
 
-            // here the gotcha test
-            _gotcha &= _dragChild  && _dragChild.layoutDesignerContent;
-            _gotcha &= _dropParent && _dropParent.layoutDesignerPlaces;
-            _gotcha &= _gotcha     && _dropParent.layoutDesignerPlaces.get( 'placesType' ) === 'vertical';
-            _gotcha &= _gotcha     && _dropParent.layoutDesignerPlaces.contents.indexOf( _dragChild ) == -1;
-
-            if ( _gotcha ) {
+            if ( _c && _p.get( 'placesType' ) === 'vertical' && _p.contents.indexOf( _dragChild ) == -1 ) {
 
                 // get parent
                 _parentPlaces = _dragChild.layoutDesignerContent.get( 'parentNode' );
@@ -753,16 +739,13 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                     _newContent.setStyle( 'cssText', _cssText );
                     _parentPlaces.layoutDesignerTarget.refresh();
 
-                    //
                     _drag.removeFromGroup(_parentPlaces.layoutDesignerPlaces.sortable);
                     _drag.stopDrag();
                     _drag.end();
+                    _drag.destroy();
 
-                    try {
-                        // ??? buggy
-                        evt.stopImmediatePropagation();
-                        evt.halt();
-                    } catch( err ) { }
+                    // and stop
+                    evt.stopPropagation();
                 }
             }
         },
