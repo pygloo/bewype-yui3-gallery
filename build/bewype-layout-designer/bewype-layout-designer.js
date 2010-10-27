@@ -328,17 +328,16 @@ YUI.add('bewype-layout-designer-content', function(Y) {
             // temp var
             var _host = this.get( 'host' );
 
+            // detach events
+            _host.detachAll( 'bewype-editor:onClose'  );
+            _host.detachAll( 'bewype-editor:onChange' );
+
+            // set editing flag to false
+            this.editing = false;
+
             if ( _host.bewypeEditor ) {
-
-                // detach events
-                _host.detachAll( 'bewype-editor:onClose'  );
-                _host.detachAll( 'bewype-editor:onChange' );
-
                 // diconnect
                 _host.unplug( Y.Bewype.Editor );
-
-                // set editing flag to false
-                this.editing = false;
             }
         },
 
@@ -382,10 +381,10 @@ YUI.add('bewype-layout-designer-content', function(Y) {
                 this.editing = true;
                 
                 // set on close event
-                Y.on( 'bewype-editor:onClose',  Y.bind( this._detachEditor, this ) );
+                Y.on( 'bewype-editor:onClose',  Y.bind( this._detachEditor, this ), _host );
 
                 // set on change event
-                Y.on( 'bewype-editor:onChange', Y.bind( this.refresh, this ) );
+                Y.on( 'bewype-editor:onChange', Y.bind( this.refresh, this ), _host );
             }
         },
 
@@ -395,8 +394,7 @@ YUI.add('bewype-layout-designer-content', function(Y) {
         _onClickEdit : function ( evt ) {
 
             // get callback
-            var _host          = this.get( 'host'          ),
-                _pNode         = this.get( 'parentNode'    ),
+            var _pNode         = this.get( 'parentNode'    ),
                 _editPanelNode = this.get( 'editPanelNode' );
             
             // do call
@@ -404,20 +402,12 @@ YUI.add('bewype-layout-designer-content', function(Y) {
 
                 // stop editing all
                 Y.each( _pNode.layoutDesignerPlaces.getContents(), function( v, k ) {
-                    if ( v != _host ) {
-                        // update editing flag
-                        v.layoutDesignerContent._detachEditor();
-                    }
+                    // update editing flag
+                    v.layoutDesignerContent._detachEditor();
                 } );
 
-                // start/stop editing clicked node
-                if ( _host.bewypeEditor ) {
-                    // detach
-                    this._detachEditor();
-                } else {
-                    // attach
-                    this._attachEditor();
-                }
+                // attach
+                this._attachEditor();
             }
         },
 
