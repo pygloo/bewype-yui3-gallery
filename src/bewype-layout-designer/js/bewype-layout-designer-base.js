@@ -98,14 +98,15 @@
                 return Y.Lang.isString( val );
             }
         },
-        editCallback : {
-            value : null
-        },
         layoutWidth : {
             value : 600,
             validator : function( val ) {
                 return Y.Lang.isNumber( val );
             }
+        },
+        editPanelNode : {
+            value : null,
+            writeOnce : true
         }
     };
 
@@ -159,7 +160,7 @@
                 contentZIndex    : this.get( 'contentZIndex'    ),
                 contentClass     : this.get( 'contentClass'     ),
                 defaultContent   : this.get( 'defaultContent'   ),
-                editCallback     : this.get( 'editCallback'     ),
+                editPanelNode    : this.get( 'editPanelNode'    ),
                 idDest           : _idDest
             } );
         },
@@ -180,15 +181,6 @@
                 return [];
             }
         }
-
-        /**
-         *
-        refreshAll : function () {
-            if (this.nodeLayout.layoutDesignerPlaces) {
-                return this.nodeLayout.layoutDesignerPlaces.refreshAll();
-            }
-        }
-         */
     } );
 
     Y.namespace('Bewype');

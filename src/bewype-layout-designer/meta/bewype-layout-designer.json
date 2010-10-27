@@ -14,7 +14,8 @@
                     "plugin",
                     "substitute",
                     "async-queue",
-                    "bewype-utils"
+                    "bewype-utils",
+                    "bewype-editor"
                 ], 
                 "skinnable": true
             },

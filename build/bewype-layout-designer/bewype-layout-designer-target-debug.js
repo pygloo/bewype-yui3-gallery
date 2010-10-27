@@ -98,9 +98,6 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 return Y.Lang.isString( val );
             }
         },
-        editCallback : {
-            value : null
-        },
         idDest : {
             value : 'layout-dest',
             writeOnce : true,
@@ -114,6 +111,10 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             validator : function( val ) {
                 return Y.Lang.isNumber( val );
             }
+        },
+        editPanelNode : {
+            value : null,
+            writeOnce : true
         }
     };
 
@@ -248,30 +249,6 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             }
         },
 
-        /**
-         *
-         */
-        _getHeight : function( node, default_ ) {
-
-            // ensure default
-            default_ = default_ ? default_ : 0;
-
-            // return int height
-            return parseInt( node.getComputedStyle( 'height' ) || node.getAttribute( 'height' ), default_ );
-        },
-
-        /**
-         *
-         */
-        _getWidth : function( node, default_ ) {
-
-            // ensure default
-            default_ = default_ ? default_ : 0;
-
-            // return int width
-            return parseInt( node.getComputedStyle( 'width' ) || node.getAttribute( 'width' ), default_ );
-        },
-
         _onDropEnter : function ( evt ) {
 
             // update target style
@@ -403,7 +380,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 contentZIndex   : this.get( 'contentZIndex'   ),
                 contentClass    : this.get( 'contentClass'    ),
                 defaultContent  : this.get( 'defaultContent'  ),
-                editCallback    : this.get( 'editCallback'    ),
+                editPanelNode   : this.get( 'editPanelNode'   ),
                 placesClass     : this.get( 'placesClass'     ),
                 placesType      : type,
                 parentNode      : _parentNode
@@ -427,7 +404,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 contentZIndex    : this.get( 'contentZIndex'    ),
                 contentClass     : this.get( 'contentClass'     ),
                 defaultContent   : this.get( 'defaultContent'   ),
-                editCallback     : this.get( 'editCallback'     ),
+                editPanelNode    : this.get( 'editPanelNode'   ),
                 targetType       : type,
                 parentNode       : _parentNode
             } );
@@ -581,8 +558,8 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             _pWidth  = _HW[ 1 ];
 
             // get host size
-            _hHeight = this._getHeight( this._targetNode );
-            _hWidth  = this._getWidth(  this._targetNode );
+            _hHeight = Y.Bewype.Utils.getHeight( this._targetNode );
+            _hWidth  = Y.Bewype.Utils.getWidth(  this._targetNode );
 
             // update position
             _parentNode = this._targetNode.ancestor( 'td' ) || this._targetNode.ancestor( 'div' );
@@ -591,7 +568,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
 
                 case 'vertical':
                     // set host position
-                    _pHeight  = this._getHeight( _parentNode );
+                    _pHeight  = Y.Bewype.Utils.getHeight( _parentNode );
                     // this._targetNode.setY( _parentNode.getY() + _pHeight - _hHeight );
 
                     // set host position
@@ -609,7 +586,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                     // etbi way
                     // _host.setX( _parentNode.getX() + _pWidth );
                     // magic way
-                    _pWidth  = this._getWidth( _parentNode );
+                    _pWidth  = Y.Bewype.Utils.getWidth( _parentNode );
                     this._targetNode.setX( _parentNode.getX() + _pWidth - _hWidth );
 
                     // set host position

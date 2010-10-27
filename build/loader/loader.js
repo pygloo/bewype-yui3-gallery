@@ -2513,7 +2513,9 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
                 "requires": [
                     "plugin", 
                     "substitute", 
-                    "async-queue"
+                    "async-queue", 
+                    "bewype-utils", 
+                    "bewype-editor"
                 ], 
                 "skinnable": true
             }, 
@@ -3883,7 +3885,7 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         }
     }
 };
-YUI.Env[Y.version].md5 = 'fcf61201749e5121cc5b909d2a797911';
+YUI.Env[Y.version].md5 = 'c7a150002d1934d7e9646e78cdb4b036';
 
 
 }, '@VERSION@' ,{requires:['loader-base']});

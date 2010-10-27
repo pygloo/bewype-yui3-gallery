@@ -4,7 +4,9 @@
     <title>Simple YUI3 Layout Designer</title> 
     <script type="text/javascript" src="../../../../build/yui/yui.js"></script>
 </head> 
-<body> 
+<body>
+    
+    <div id="panel"></div>
 
     <div id="demo"></div>
 
@@ -13,8 +15,9 @@
         YUI( { filter: 'debug' } ).use( 'bewype-layout-designer', function ( Y ) {
 
             // get demo node and plug
-            Y.one( "#demo" ).plug( Y.Bewype.LayoutDesigner );
-
+            Y.one( "#demo" ).plug( Y.Bewype.LayoutDesigner, {
+                editPanelNode : Y.one( "#panel" )
+            } );
         } );
     -->
     </script>

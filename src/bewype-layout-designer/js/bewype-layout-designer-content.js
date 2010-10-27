@@ -45,17 +45,13 @@
                 return Y.Lang.isString( val );
             }
         },
-        defaultStyle : {
-            value : null
-        },
         parentNode : {
-            value : null
+            value : null,
+            writeOnce : true
         },
-        removeCallback : {
-            value : null
-        },
-        editCallback : {
-            value : null
+        editPanelNode : {
+            value : null,
+            writeOnce : true
         }
     };
 
@@ -107,6 +103,9 @@
                 _contentClass   = this.get( 'contentClass' ),
                 _parentDiv      = _host.ancestor( 'div' ), // get parent
                 _clone          = _parentDiv.one( 'div.' + _contentClass + '-clone' ); // get existing clone
+            
+            // detach editor
+            this._detachEditor();
                     
             // unregister it
             _parentNode.layoutDesignerPlaces.unRegisterContent( _host );
@@ -129,16 +128,101 @@
         /**
          *
          */
+        _detachEditor : function () {
+
+            // temp var
+            var _host = this.get( 'host' );
+
+            if ( _host.bewypeEditor ) {
+
+                // detach events
+                _host.detachAll( 'bewype-editor:onClose'  );
+                _host.detachAll( 'bewype-editor:onChange' );
+
+                // diconnect
+                _host.unplug( Y.Bewype.Editor );
+
+                // set editing flag to false
+                this.editing = false;
+            }
+        },
+
+        /**
+         *
+         */
+        _attachEditor : function () {
+
+            //
+            var _host           = this.get( 'host'          ),
+                _pNode          = this.get( 'parentNode'    ),
+                _editPanelNode  = this.get( 'editPanelNode' ),
+                _availableWidth = _pNode.layoutDesignerPlaces.getAvailablePlace(),
+                _conf           = null,
+                _maxWidth       = null;
+
+            if ( _editPanelNode ) {
+                // set max width or not
+                if ( _availableWidth ) {
+
+                    // compute max width
+                    _maxWidth =  _availableWidth;
+                    _maxWidth += this.getContentWidth();
+
+                    // update conf
+                    _conf = {
+                        panelNode       : _editPanelNode,
+                        spinnerMaxWidth : _maxWidth
+                        };
+
+                } else {
+
+                    // no max
+                    _conf = { panelNode : _editPanelNode };
+                }
+
+                // plug
+                _host.plug( Y.Bewype.Editor, _conf );
+
+                // set editing flag to false
+                this.editing = true;
+                
+                // set on close event
+                Y.on( 'bewype-editor:onClose',  Y.bind( this._detachEditor, this ) );
+
+                // set on change event
+                Y.on( 'bewype-editor:onChange', Y.bind( this.refresh, this ) );
+            }
+        },
+
+        /**
+         *
+         */
         _onClickEdit : function ( evt ) {
 
             // get callback
-            var _editCallback   = this.get( 'editCallback'   );
+            var _host          = this.get( 'host'          ),
+                _pNode         = this.get( 'parentNode'    ),
+                _editPanelNode = this.get( 'editPanelNode' );
             
             // do call
-            if ( _editCallback ) {
-                this.editing = true;
-                this.hideClone();
-                _editCallback( this.get( 'host' ) );
+            if ( _editPanelNode ) {
+
+                // stop editing all
+                Y.each( _pNode.layoutDesignerPlaces.getContents(), function( v, k ) {
+                    if ( v != _host ) {
+                        // update editing flag
+                        v.layoutDesignerContent._detachEditor();
+                    }
+                } );
+
+                // start/stop editing clicked node
+                if ( _host.bewypeEditor ) {
+                    // detach
+                    this._detachEditor();
+                } else {
+                    // attach
+                    this._attachEditor();
+                }
             }
         },
 
@@ -146,14 +230,12 @@
          *
          */
         _onClickRemove : function ( evt ) {
+            // temp var
+            var _host       = this.get( 'host'       ),
+                _parentNode = this.get( 'parentNode' );
 
-            // get callback
-            var _removeCallback = this.get( 'removeCallback' );
-
-            // do call
-            if ( _removeCallback ) {
-                _removeCallback( this.get( 'host' ) );
-            }
+            // call parent remove content
+            _parentNode.layoutDesignerPlaces.removeContent( _host );
         },
 
         hideClone : function ( cloneNode ) {
@@ -183,8 +265,6 @@
             // temp var
             var _host           = this.get( 'host'           ),
                 _contentClass   = this.get( 'contentClass'   ),
-                _editCallback   = this.get( 'editCallback'   ),
-                _removeCallback = this.get( 'removeCallback' ),
                 _callbacksNode  = new Y.Node.create('<div class="' + _contentClass + '-clone-callbacks" />' ),
                 _cloneNode      = null,
                 _editNode       = null,
@@ -206,27 +286,21 @@
             // add to clone
             _cloneNode.append( _callbacksNode );
 
-            // add edit div
-            if ( _editCallback ) {
-                // add cb div
-                _editNode = new Y.Node.create(
-                        '<div class="' + _contentClass + '-clone-edit" />' );
-                // add to clone
-                _callbacksNode.append( _editNode );
-                // manage callback on click
-                Y.on( 'click', Y.bind( this._onClickEdit, this ), _editNode );
-            }
+            // add cb div
+            _editNode = new Y.Node.create(
+                    '<div class="' + _contentClass + '-clone-edit" />' );
+            // add to clone
+            _callbacksNode.append( _editNode );
+            // manage callback on click
+            Y.on( 'click', Y.bind( this._onClickEdit, this ), _editNode );
 
-            // add remove div
-            if ( _removeCallback ) { 
-                // add cb div
-                _removeNode = new Y.Node.create(
-                        '<div class="' + _contentClass + '-clone-remove" />' );
-                // add to clone
-                _callbacksNode.append( _removeNode );
-                // manage callback on click
-                Y.on( 'click', Y.bind( this._onClickRemove, this ), _removeNode );
-            }
+            // add cb div
+            _removeNode = new Y.Node.create(
+                    '<div class="' + _contentClass + '-clone-remove" />' );
+            // add to clone
+            _callbacksNode.append( _removeNode );
+            // manage callback on click
+            Y.on( 'click', Y.bind( this._onClickRemove, this ), _removeNode );
 
             //
             return _cloneNode;
@@ -269,30 +343,6 @@
                     { fn: this.hideClone, args: [ _clone ] } );
             // restart
             this._q.run();
-        },
-
-        /**
-         *
-         */
-        _getHeight : function( node, default_ ) {
-
-            // ensure default
-            default_ = default_ ? default_ : 0;
-
-            // return int height
-            return parseInt( node.getComputedStyle( 'height' ) || node.getAttribute( 'height' ), default_ );
-        },
-
-        /**
-         *
-         */
-        _getWidth : function( node, default_ ) {
-
-            // ensure default
-            default_ = default_ ? default_ : 0;
-
-            // return int width
-            return parseInt( node.getComputedStyle( 'width' ) || node.getAttribute( 'width' ), default_ );
         },
 
         getContentHeight : function () {

@@ -80,10 +80,12 @@
             }
         },
         parentNode : {
-            value : null
+            value : null,
+            writeOnce : true
         },
-        editCallback : {
-            value : null
+        editPanelNode : {
+            value : null,
+            writeOnce : true
         }
     };
 
@@ -233,30 +235,6 @@
         /**
          *
          */
-        _getHeight : function ( node, default_ ) {
-
-            // ensure default
-            default_ = default_ ? default_ : 0;
-
-            // return int height
-            return parseInt( node.getComputedStyle( 'height' ) || node.getAttribute( 'height' ), default_ );
-        },
-
-        /**
-         *
-         */
-        _getWidth : function( node, default_ ) {
-
-            // ensure default
-            default_ = default_ ? default_ : 0;
-
-            // return int width
-            return parseInt( node.getComputedStyle( 'width' ) || node.getAttribute( 'width' ), default_ );
-        },
-
-        /**
-         *
-         */
         hasSubPlaces : function () {
             var _has = false;
             Y.each( this.contents, function( v, k ) {
@@ -283,7 +261,7 @@
 
                 case 'horizontal':
                     // get parent width
-                    _pWidth = this._getWidth(_parentNode);
+                    _pWidth = Y.Bewype.Utils.getWidth( _parentNode );
                     // get contents width
                     _cWidth = this.getPlacesWidth();
                     return _pWidth - _cWidth;
@@ -308,7 +286,7 @@
 
                 case 'horizontal':
                     // get parent width
-                    _pWidth = this._getWidth(_parentNode);
+                    _pWidth = Y.Bewype.Utils.getWidth( _parentNode );
                     // get contents width
                     _cWidth = this.getPlacesWidth();
                     return _pWidth >= ( _cWidth + this.get( 'contentWidth' ) );
@@ -537,8 +515,7 @@
                 contentClass   : this.get( 'contentClass'   ),
                 defaultContent : this.get( 'defaultContent' ),
                 parentNode     : this.get( 'host'           ),
-                editCallback   : this.get( 'editCallback'   ),
-                removeCallback : Y.bind( this.removeContent, this )
+                editPanelNode  : this.get( 'editPanelNode'  )
             } );
 
             // 
@@ -594,22 +571,6 @@
             // return all
             return _contents;
         }
-
-        /**
-         *
-        refreshAll : function () {
-            // get all contents
-            Y.each( this.contents, function( v, k ) {
-                if ( v.layoutDesignerPlaces ) {
-                    v.layoutDesignerPlaces.refreshAll();
-                } else {
-                    v.layoutDesignerContent.refresh();
-                }
-            } );
-            // and refresh current
-            this.get( 'host' ).layoutDesignerTarget.refresh( false );
-        }
-         */
     } );
 
     Y.namespace('Bewype');
