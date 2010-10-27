@@ -48,7 +48,8 @@ YUI.add('bewype-layout-designer-content', function(Y) {
             }
         },
         parentNode : {
-            value : null
+            value : null,
+            writeOnce : false
         },
         editPanelNode : {
             value : null,
@@ -358,19 +359,21 @@ YUI.add('bewype-layout-designer-content', function(Y) {
             return _cWidth + _pLeft;
         },
 
-        refresh : function ( height, width) {
+        refresh : function () {
 
             // temp var
             var _host           = this.get( 'host'         ),
                 _parentNode     = this.get( 'parentNode'   ),
                 _contentClass   = this.get( 'contentClass' ),
-                _parentDiv      = _host.ancestor( 'div' ),
-                _clone          = _parentDiv.one( 'div.' + _contentClass + '-clone' );
+                _contentNode    = _host.ancestor( 'div.container-dest' ),
+                _clone          = _contentNode.one( 'div.' + _contentClass + '-clone' ),
+                _h              = this.getContentHeight(),
+                _w              = this.getContentWidth();
             
             // update clone height & width style
             if ( _clone ) {
-                _clone.setStyle( 'height', this.getContentHeight() );
-                _clone.setStyle( 'width' , this.getContentWidth()  );
+                _clone.setStyle( 'height', _h );
+                _clone.setStyle( 'width',  _w );
             }
 
             // refresh parent target
