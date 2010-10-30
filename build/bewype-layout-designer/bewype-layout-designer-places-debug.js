@@ -243,16 +243,17 @@ YUI.add('bewype-layout-designer-places', function(Y) {
         getAvailablePlace : function () {
 
             // get the target node
-            var _parentNode = this.get( 'parentNode' ) || this.placesNode.ancestor( 'div' ),
+            var _parentNode = this.get( 'parentNode' ) || this.placesNode.ancestor( 'div' ),                
                 _pWidth     = null,
                 _cWidth     = null;
             
             // update target style
             switch( this.get( 'placesType' ) ) {
 
+                // must use an vertical parent
                 case 'vertical':
-                    return null;
-
+                    _parentNode = this.get( 'parentNode' ) || this.placesNode.ancestor( 'div' );
+                // no break - no we can compute remaining width
                 case 'horizontal':
                     // get parent width
                     _pWidth = Y.Bewype.Utils.getWidth( _parentNode );
