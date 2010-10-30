@@ -1,107 +1,22 @@
 
-#layout-source table,
-#layout-dest table,
-table.horizontal-places,
-table.vertical-places {
+.layout-designer-base {
+    margin              : 0 auto;
+    background-color    : #ddd;
+}
+
+.layout-designer-base table {
     border-collapse     : collapse;
     border-spacing      : 0;
 }
 
-#layout-source table,
-#layout-source td,
-#layout-dest table,
-#layout-dest td,
-table.horizontal-places,
-table.vertical-places,
-table.horizontal-places td,
-table.vertical-places td {
+.layout-designer-base table,
+.layout-designer-base td {
     margin              : 0;
     padding             : 0;
     border              : none;
 }
 
-#layout-source div {
-    padding             : 0;
-    height              : 40px;
-    width               : 100px;
-}
-
-#layout-source,
-#layout-dest {
-    margin              : 0 auto;
-}
-
-#layout-source {
-    width               : 300px;
-}
-
-#layout-dest {
-    background-color    : #ddd;
-}
-
-#layout-dest td {
+.layout-designer-base td {
     vertical-align      : top;
 }
 
-.container-dest {
-    position            : relative;
-}
-
-.target-start,
-.target-horizontal,
-.target-vertical {
-    display             : block;
-}
-
-.target-start {
-    background-color    :  #eea;
-}
-
-.target-horizontal {
-    background-color    :  #eae;
-}
-
-.target-vertical {
-    width               : 100%;
-    background-color    : #aee;
-}
-
-.target-horizontal-remove,
-.target-vertical-remove {
-    background-color    : red;
-    height              : 20px;
-    width               : 20px;
-    float               : right;
-    opacity             : 0.4;
-}
-
-.content-clone {
-    background-color    : grey;
-    opacity             : 0.4;
-}
-
-.content-clone:hover {
-    background-color    : grey;
-    opacity             : 0.4;
-}
-
-.content-clone-callbacks {
-    margin              : auto;
-    height              : 20px;
-    width               : 40px;
-    float               : right;
-}
-
-.content-clone-remove {
-    background-color    : red;
-    height              : 20px;
-    width               : 20px;
-    float               : right;
-}
-
-.content-clone-edit {
-    background-color    : blue;
-    height              : 20px;
-    width               : 20px;
-    float               : left;
-}

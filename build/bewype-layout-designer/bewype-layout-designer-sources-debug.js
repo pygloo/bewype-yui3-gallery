@@ -15,12 +15,19 @@ YUI.add('bewype-layout-designer-sources', function(Y) {
     /**
      *
      */
-    LayoutDesignerSources.ITEM_SRC_TEMPLATE = '<div id="src-{itemType}" class="{itemClass}">{itemLabel}</div>';
+    LayoutDesignerSources.ITEM_SRC_TEMPLATE = '<div class="{designerClass}-src {designerClass}-src-{itemType}">{itemLabel}</div>';
 
     /**
      *
      */
     LayoutDesignerSources.ATTRS = {
+        designerClass : {
+            value : 'layout-designer',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },
         sourceHeight : {
             value : 40,
             validator : function( val ) {
@@ -31,13 +38,6 @@ YUI.add('bewype-layout-designer-sources', function(Y) {
             value : 140,
             validator : function( val ) {
                 return Y.Lang.isNumber( val );
-            }
-        },
-        sourceClass : {
-            value : 'source-item',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
             }
         }
     };
@@ -71,9 +71,9 @@ YUI.add('bewype-layout-designer-sources', function(Y) {
 
                 // create source components & attach
                 _n = new Y.Node.create( Y.substitute( LayoutDesignerSources.ITEM_SRC_TEMPLATE, {
-                    itemType    : v,
-                    itemClass   : this.get( 'sourceClass' ),
-                    itemLabel   : this._labels[ k ]
+                    itemType      : v,
+                    designerClass : this.get( 'designerClass' ),
+                    itemLabel     : this._labels[ k ]
                 } ) );
 
                 // prepare td for the source item

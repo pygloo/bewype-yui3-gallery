@@ -10,12 +10,12 @@
     /**
      *
      */
-    LayoutDesigner.NODE_SRC_TEMPLATE = '<div id="{idSource}"></div>';
+    LayoutDesigner.NODE_SRC_TEMPLATE = '<div class="{designerClass}-sources"></div>';
 
     /**
      *
      */
-    LayoutDesigner.NODE_DST_TEMPLATE = '<div id="{idDest}"></div>';
+    LayoutDesigner.NODE_DST_TEMPLATE = '<div class="{designerClass}-base"></div>';
 
 
     LayoutDesigner.NAME = 'layout-designer';
@@ -23,15 +23,8 @@
     LayoutDesigner.NS = 'layoutDesigner';
 
     LayoutDesigner.ATTRS = {
-        idSource : {
-            value : 'layout-source',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        idDest : {
-            value : 'layout-dest',
+        designerClass : {
+            value : 'layout-designer',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -85,13 +78,6 @@
                 return Y.Lang.isNumber( val );
             }
         },
-        contentClass : {
-            value : 'content',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
         defaultContent : {
             value : 'Click to change your content..',
             validator : function( val ) {
@@ -123,13 +109,11 @@
         initializer: function( config ) {
 
             // tmp vars
-            var _idSource = this.get( 'idSource' ),
-                _idDest   = this.get( 'idDest' ),
-                _nodeSrc  = null;
+            var _nodeSrc  = null;
 
             // create source node
             _nodeSrc = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_SRC_TEMPLATE, {
-                idSource : _idSource
+                designerClass : this.get( 'designerClass' )
             } ) );
             // attach src parent to widget
             this.get( 'host' ).append( _nodeSrc );
@@ -140,7 +124,7 @@
 
             // create dest layout
             this.nodeLayout = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_DST_TEMPLATE, {
-                idDest : _idDest
+                designerClass : this.get( 'designerClass' )
             } ) );
             // attach layout node to main node
             this.get( 'host' ).append( this.nodeLayout );
@@ -158,10 +142,9 @@
                 contentHeight    : this.get( 'contentHeight'    ),
                 contentWidth     : this.get( 'contentWidth'     ),
                 contentZIndex    : this.get( 'contentZIndex'    ),
-                contentClass     : this.get( 'contentClass'     ),
                 defaultContent   : this.get( 'defaultContent'   ),
+                designerClass    : this.get( 'designerClass'    ),
                 editPanelNode    : this.get( 'editPanelNode'    ),
-                idDest           : _idDest
             } );
         },
 
