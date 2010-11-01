@@ -56,9 +56,12 @@
                 return Y.Lang.isString( val );
             }
         },
-        parentNode : {
+        baseNode : {
             value : null,
-            writeOnce : false
+            writeOnce : true
+        },
+        parentNode : {
+            value : null
         },
         editPanelNode : {
             value : null,
@@ -151,8 +154,11 @@
 
             // temp var
             var _host           = this.get( 'host' ),
+                _bNode          = this.get( 'baseNode'      ),
+                _sourcesClass   = this.get( 'designerClass' ) + '-sources',
                 _contentClass   = this.get( 'designerClass' ) + '-content',
-                _contentNode    = _host.one( 'div.' + _contentClass );
+                _sourcesNode    = _bNode.one( 'div.' + _sourcesClass ),
+                _contentNode    = _host.one( 'div.' + _contentClass );                
 
             // detach events
             _host.detachAll( 'bewype-editor:onClose'  );
@@ -165,9 +171,13 @@
             this.refresh();
 
             if ( _contentNode.bewypeEditor ) {
+
                 // diconnect
                 _contentNode.unplug( Y.Bewype.Editor );
             }
+                
+            // show sources
+            _sourcesNode.setStyle( 'display', 'block' );
         },
 
         /**
@@ -177,15 +187,22 @@
 
             //
             var _host           = this.get( 'host'          ),
+                _bNode          = this.get( 'baseNode'      ),
                 _pNode          = this.get( 'parentNode'    ),
                 _editPanelNode  = this.get( 'editPanelNode' ),
-                _availableWidth = _pNode.layoutDesignerPlaces.getAvailablePlace(),
+                _sourcesClass   = this.get( 'designerClass' ) + '-sources',
                 _contentClass   = this.get( 'designerClass' ) + '-content',
+                _sourcesNode    = _bNode.one( 'div.' + _sourcesClass ),
+                _availableWidth = _pNode.layoutDesignerPlaces.getAvailablePlace(),
                 _contentNode    = _host.one( 'div.' + _contentClass ),
                 _conf           = null,
                 _maxWidth       = null;
 
             if ( _editPanelNode ) {
+
+                // hide sources
+                _sourcesNode.setStyle( 'display', 'none' );
+
                 // set max width or not
                 if ( _availableWidth ) {
 

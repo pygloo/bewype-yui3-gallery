@@ -55,9 +55,6 @@
                 return Y.Lang.isNumber( val );
             }
         },
-        parentNode : {
-            value : null
-        },
         contentHeight : {
             value : 40,
             validator : function( val ) {
@@ -88,6 +85,13 @@
             validator : function( val ) {
                 return Y.Lang.isNumber( val );
             }
+        },
+        baseNode : {
+            value : null,
+            writeOnce : true
+        },
+        parentNode : {
+            value : null
         },
         editPanelNode : {
             value : null,
@@ -352,6 +356,7 @@
                 designerClass   : this.get( 'designerClass'   ),
                 editPanelNode   : this.get( 'editPanelNode'   ),
                 placesType      : type,
+                baseNode        : this.get( 'baseNode'        ),
                 parentNode      : _parentNode
             } );
         },
@@ -375,6 +380,7 @@
                 designerClass    : this.get( 'designerClass'    ),
                 editPanelNode    : this.get( 'editPanelNode'    ),
                 targetType       : type,
+                baseNode         : this.get( 'baseNode'         ),
                 parentNode       : _parentNode
             } );
         },

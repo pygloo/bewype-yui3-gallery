@@ -143,6 +143,7 @@
                 contentZIndex    : this.get( 'contentZIndex'    ),
                 defaultContent   : this.get( 'defaultContent'   ),
                 designerClass    : this.get( 'designerClass'    ),
+                baseNode         : this.get( 'host'             ),
                 editPanelNode    : this.get( 'editPanelNode'    ),
             } );
         },

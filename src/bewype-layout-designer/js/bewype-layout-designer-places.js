@@ -66,6 +66,10 @@
                 return Y.Lang.isString( val );
             }
         },
+        baseNode : {
+            value : null,
+            writeOnce : true
+        },
         parentNode : {
             value : null,
             writeOnce : false
@@ -501,6 +505,7 @@
                 contentWidth   : this.get( 'contentWidth'   ),
                 contentZIndex  : this.get( 'contentZIndex'  ),
                 defaultContent : this.get( 'defaultContent' ),
+                baseNode       : this.get( 'baseNode'       ),
                 parentNode     : this.get( 'host'           ),
                 editPanelNode  : this.get( 'editPanelNode'  )
             } );
