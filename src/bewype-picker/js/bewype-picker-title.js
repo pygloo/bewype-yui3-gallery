@@ -35,8 +35,6 @@
 
     Y.extend( PickerTitle, Y.Bewype.Picker, {
 
-        _currentTitle : null,
-
         /**
          *
          */

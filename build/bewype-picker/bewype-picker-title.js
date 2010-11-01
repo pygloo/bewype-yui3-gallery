@@ -37,8 +37,6 @@ YUI.add('bewype-picker-title', function(Y) {
 
     Y.extend( PickerTitle, Y.Bewype.Picker, {
 
-        _currentTitle : null,
-
         /**
          *
          */

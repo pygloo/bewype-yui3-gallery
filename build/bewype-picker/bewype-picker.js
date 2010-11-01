@@ -55,11 +55,20 @@ YUI.add('bewype-picker-base', function(Y) {
          *
          */
         _currentName : null,
+        
+        /**
+         *
+         */
+        _previousName : null,
 
+        /**
+         *
+         */
         _init : function ( config ) {
 
             // var init
             this._currentName = null;
+            this._previousName = null;
 
             // our custom event
             this.publish( 'picker:onChange' );
@@ -140,10 +149,17 @@ YUI.add('bewype-picker-base', function(Y) {
             // little check
             if ( _itemNode ) {
                 // update name
-                this._currentName = name;
+                this.setValue( name );
                 // fire custom event
                 this.fire("picker:onChange");
             }
+        },
+
+        /**
+         *
+         */
+        getPrevious : function() {
+            return this._previousName;
         },
 
         /**
@@ -157,6 +173,7 @@ YUI.add('bewype-picker-base', function(Y) {
          *
          */
         setValue : function( value ) {
+            this._previousName = this._currentName;
             this._currentName = value;
         },
 
@@ -759,8 +776,6 @@ YUI.add('bewype-picker-title', function(Y) {
     };
 
     Y.extend( PickerTitle, Y.Bewype.Picker, {
-
-        _currentTitle : null,
 
         /**
          *

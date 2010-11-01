@@ -64,9 +64,9 @@
                     'bold',
                     'italic',
                     'underline',
+                    'title',
                     'font-family',
                     'font-size',
-                    'url',
                     'reset',
                     'apply'
                     ],
@@ -142,17 +142,18 @@
 
         _toggleButtons  : [ 'bold', 'italic', 'underline' ],
 
-        _pickerButtons  : [ 'font-family', 'font-size', 'color', 'background-color', 'url' ],
+        _pickerButtons  : [ 'title', 'font-family', 'font-size', 'color', 'background-color', 'url' ],
 
         _pickerObjDict  : {
+            'background-color' : Y.Bewype.PickerColor,
+            'color'            : Y.Bewype.PickerColor,
             'font-family'      : Y.Bewype.PickerFontFamily,
             'font-size'        : Y.Bewype.PickerFontSize,
-            'color'            : Y.Bewype.PickerColor,
-            'background-color' : Y.Bewype.PickerColor,
+            'title'            : Y.Bewype.PickerTitle,
             'url'              : Y.Bewype.PickerUrl
         },
 
-        _tagButtons  : [ 'bold', 'italic', 'underline', 'url' ],
+        _tagButtons  : [ 'bold', 'italic', 'title', 'underline', 'url' ],
 
         _cssButtons  : [ 'font-family', 'font-size', 'color', 'background-color' ],
 
@@ -507,7 +508,7 @@
             return raw ? _t : _t.trim() === '' ? null : new Y.Node.create( _t );
         },
 
-        _getWorkingTagName : function ( name ) {
+        _getWorkingTagName : function ( name, previous ) {
 
             switch( name ) {
                 case 'bold':
@@ -515,6 +516,10 @@
 
                 case 'italic':
                     return 'i';
+
+                case 'title':
+                    var _button = this._buttonDict[ name ];
+                    return previous ? _button.getPrevious() : _button.getValue();
 
                 case 'underline':
                     return 'u';
@@ -786,11 +791,9 @@
             }
 
             // do reset
-            this._removeTag( _node, 'span' );
-            this._removeTag( _node, 'a' );
-            this._removeTag( _node, 'b' );
-            this._removeTag( _node, 'i' );
-            this._removeTag( _node, 'u' );
+            Y.Object.each( [ 'h1', 'h2', 'h3', 'h4', 'span', 'a', 'b', 'i', 'u' ], function( v, k ) {
+                this._removeTag( _node, v );
+            }, this );
         },
 
         _getValueFromNode : function ( parentNode, tagName, name ) {
@@ -880,26 +883,40 @@
                 _newNode          = null;             
 
             if ( !_selectionNode ) {
+
                 if ( this._cssButtons.indexOf( name ) != -1 ) {
+
+                    // style update
                     this._updateMainStyle( name );
+
                     // fire custom event
                     return Y.fire( 'bewype-editor:onChange' );
+
                 } else if ( name === 'reset') {
+
                     // reset main node
                     this._resetSelection( true );
+
                     // restore original values and quit
                     Y.Bewype.Utils.setCssDict( _main, this._oMainCssdict );
+
                     // fire custom event
                     return Y.fire( 'bewype-editor:onChange' );
+
                 }
             }
             
             if ( _selectionNode ) {
-                // get new tag
-                _tag = this._getWorkingTagName( name );
+                // get previous tag
+                _tag = this._getWorkingTagName( name, true );
 
                 // do some cleaning
-                this._removeTag( _selectionNode, _tag, name );
+                if ( _tag ) {
+                    this._removeTag( _selectionNode, _tag, name );
+                }
+                
+                // current tag
+                _tag = this._getWorkingTagName( name );
 
                 if ( _value && ( _value === true || _value.trim() !== '' ) ) {
 

@@ -196,7 +196,6 @@ YUI.add('bewype-button-base', function(Y) {
 
             // little check
             if (_itemNode) {
-
                 // fire custom event
                 this.fire("button:onClick");
             }

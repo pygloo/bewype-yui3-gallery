@@ -21,6 +21,7 @@
             // add custom event listener
             _pickerTitle.on( 'picker:onChange', function ( e ) {
                 alert( 'Picker Title has changed to: ' + e.target.getValue() );
+                alert( 'Picker Title has previous  : ' + e.target.getPrevious() );
             } );
 
         } );

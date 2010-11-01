@@ -75,9 +75,11 @@
 
     Y.extend( ButtonPicker, Y.Bewype.Button, {
 
-        _picker : null,
+        _picker   : null,
 
-        _value  : null,
+        _previous : null,
+
+        _value    : null,
 
         /**
          *
@@ -86,8 +88,9 @@
             this._init( config );
 
             //
-            this._picker = null;
-            this._value = null;
+            this._picker   = null;
+            this._previous = null;
+            this._value    = null;
         },
 
         /**
@@ -222,7 +225,7 @@
             if ( this._picker ) {
 
                 // get value
-                this._value = this._picker.getValue();
+                this.setValue( this._picker.getValue() );
 
                 // remove picker
                 this.hidePicker();
@@ -235,8 +238,8 @@
         /**
          *
          */
-        setValue : function (value) {
-            this._value = value;
+        getPrevious : function () {
+            return this._previous;
         },
 
         /**
@@ -244,6 +247,14 @@
          */
         getValue : function () {
             return this._value;
+        },
+
+        /**
+         *
+         */
+        setValue : function ( value ) {
+            this._previous = this._value;
+            this._value    = value;
         }
 
     } );
