@@ -22,6 +22,10 @@
 
     <div id="button-picker-font-size"></div>
 
+    <h2>Button Title</h2>
+
+    <div id="button-picker-title"></div>
+
     <h2>Button Picker Url</h2>
 
     <div id="button-picker-url"></div>
@@ -78,6 +82,18 @@
             // add custom event listener
             _buttonFontSize.on( 'button:onChange', function ( e ) {
                 alert( 'Button Picker Font Size Changed: ' + _buttonFontSize.getValue() );
+            } );
+
+            // button manual
+            var _buttonTitle = new Y.Bewype.ButtonPicker( {
+                label     : 'Title',
+                pickerObj :  Y.Bewype.PickerTitle
+            } );
+            _buttonTitle.render( '#button-picker-title' );
+
+            // add custom event listener
+            _buttonTitle.on( 'button:onChange', function ( e ) {
+                alert( 'Button Picker Title Changed: ' + _buttonTitle.getValue() );
             } );
 
             // button manual
