@@ -73,10 +73,6 @@
         parentNode : {
             value : null,
             writeOnce : false
-        },
-        editPanelNode : {
-            value : null,
-            writeOnce : true
         }
     };
 
@@ -506,8 +502,7 @@
                 contentZIndex  : this.get( 'contentZIndex'  ),
                 defaultContent : this.get( 'defaultContent' ),
                 baseNode       : this.get( 'baseNode'       ),
-                parentNode     : this.get( 'host'           ),
-                editPanelNode  : this.get( 'editPanelNode'  )
+                parentNode     : this.get( 'host'           )
             } );
         },
 

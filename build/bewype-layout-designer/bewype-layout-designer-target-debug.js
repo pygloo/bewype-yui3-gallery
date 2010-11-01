@@ -57,9 +57,6 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 return Y.Lang.isNumber( val );
             }
         },
-        parentNode : {
-            value : null
-        },
         contentHeight : {
             value : 40,
             validator : function( val ) {
@@ -91,9 +88,12 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 return Y.Lang.isNumber( val );
             }
         },
-        editPanelNode : {
+        baseNode : {
             value : null,
             writeOnce : true
+        },
+        parentNode : {
+            value : null
         }
     };
 
@@ -352,8 +352,8 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 contentZIndex   : this.get( 'contentZIndex'   ),
                 defaultContent  : this.get( 'defaultContent'  ),
                 designerClass   : this.get( 'designerClass'   ),
-                editPanelNode   : this.get( 'editPanelNode'   ),
                 placesType      : type,
+                baseNode        : this.get( 'baseNode'        ),
                 parentNode      : _parentNode
             } );
         },
@@ -375,8 +375,8 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 contentZIndex    : this.get( 'contentZIndex'    ),
                 defaultContent   : this.get( 'defaultContent'   ),
                 designerClass    : this.get( 'designerClass'    ),
-                editPanelNode    : this.get( 'editPanelNode'    ),
                 targetType       : type,
+                baseNode         : this.get( 'baseNode'         ),
                 parentNode       : _parentNode
             } );
         },

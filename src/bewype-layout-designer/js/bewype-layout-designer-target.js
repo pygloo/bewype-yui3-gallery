@@ -92,10 +92,6 @@
         },
         parentNode : {
             value : null
-        },
-        editPanelNode : {
-            value : null,
-            writeOnce : true
         }
     };
 
@@ -354,7 +350,6 @@
                 contentZIndex   : this.get( 'contentZIndex'   ),
                 defaultContent  : this.get( 'defaultContent'  ),
                 designerClass   : this.get( 'designerClass'   ),
-                editPanelNode   : this.get( 'editPanelNode'   ),
                 placesType      : type,
                 baseNode        : this.get( 'baseNode'        ),
                 parentNode      : _parentNode
@@ -378,7 +373,6 @@
                 contentZIndex    : this.get( 'contentZIndex'    ),
                 defaultContent   : this.get( 'defaultContent'   ),
                 designerClass    : this.get( 'designerClass'    ),
-                editPanelNode    : this.get( 'editPanelNode'    ),
                 targetType       : type,
                 baseNode         : this.get( 'baseNode'         ),
                 parentNode       : _parentNode

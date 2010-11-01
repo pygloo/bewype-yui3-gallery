@@ -68,13 +68,13 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                 return Y.Lang.isString( val );
             }
         },
+        baseNode : {
+            value : null,
+            writeOnce : true
+        },
         parentNode : {
             value : null,
             writeOnce : false
-        },
-        editPanelNode : {
-            value : null,
-            writeOnce : true
         }
     };
 
@@ -503,8 +503,8 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                 contentWidth   : this.get( 'contentWidth'   ),
                 contentZIndex  : this.get( 'contentZIndex'  ),
                 defaultContent : this.get( 'defaultContent' ),
-                parentNode     : this.get( 'host'           ),
-                editPanelNode  : this.get( 'editPanelNode'  )
+                baseNode       : this.get( 'baseNode'       ),
+                parentNode     : this.get( 'host'           )
             } );
         },
 

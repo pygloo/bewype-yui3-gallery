@@ -62,10 +62,6 @@
         },
         parentNode : {
             value : null
-        },
-        editPanelNode : {
-            value : null,
-            writeOnce : true
         }
     };
 
@@ -156,8 +152,10 @@
             var _host           = this.get( 'host' ),
                 _bNode          = this.get( 'baseNode'      ),
                 _sourcesClass   = this.get( 'designerClass' ) + '-sources',
+                _editPanClass   = this.get( 'designerClass' ) + '-edit-panel',
                 _contentClass   = this.get( 'designerClass' ) + '-content',
                 _sourcesNode    = _bNode.one( 'div.' + _sourcesClass ),
+                _editPanNode    = _bNode.one( 'div.' + _editPanClass ),
                 _contentNode    = _host.one( 'div.' + _contentClass );                
 
             // detach events
@@ -177,6 +175,7 @@
             }
                 
             // show sources
+            _editPanNode.setStyle( 'display', 'none'  );
             _sourcesNode.setStyle( 'display', 'block' );
         },
 
@@ -189,51 +188,50 @@
             var _host           = this.get( 'host'          ),
                 _bNode          = this.get( 'baseNode'      ),
                 _pNode          = this.get( 'parentNode'    ),
-                _editPanelNode  = this.get( 'editPanelNode' ),
                 _sourcesClass   = this.get( 'designerClass' ) + '-sources',
+                _editPanClass   = this.get( 'designerClass' ) + '-edit-panel',
                 _contentClass   = this.get( 'designerClass' ) + '-content',
                 _sourcesNode    = _bNode.one( 'div.' + _sourcesClass ),
+                _editPanNode    = _bNode.one( 'div.' + _editPanClass ),
                 _availableWidth = _pNode.layoutDesignerPlaces.getAvailablePlace(),
                 _contentNode    = _host.one( 'div.' + _contentClass ),
                 _conf           = null,
                 _maxWidth       = null;
 
-            if ( _editPanelNode ) {
+            // hide sources
+            _sourcesNode.setStyle( 'display', 'none'  );
+            _editPanNode.setStyle( 'display', 'block' );
 
-                // hide sources
-                _sourcesNode.setStyle( 'display', 'none' );
+            // set max width or not
+            if ( _availableWidth ) {
 
-                // set max width or not
-                if ( _availableWidth ) {
+                // compute max width
+                _maxWidth =  _availableWidth;
+                _maxWidth += this.getContentWidth();
 
-                    // compute max width
-                    _maxWidth =  _availableWidth;
-                    _maxWidth += this.getContentWidth();
+                // update conf
+                _conf = {
+                    panelNode       : _editPanNode,
+                    spinnerMaxWidth : _maxWidth
+                    };
 
-                    // update conf
-                    _conf = {
-                        panelNode       : _editPanelNode,
-                        spinnerMaxWidth : _maxWidth
-                        };
+            } else {
 
-                } else {
-
-                    // no max
-                    _conf = { panelNode : _editPanelNode };
-                }
-
-                // plug
-                _contentNode.plug( Y.Bewype.Editor, _conf );
-
-                // set editing flag to false
-                this.editing = true;
-                
-                // set on close event
-                Y.on( 'bewype-editor:onClose',  Y.bind( this._detachEditor, this ), _contentNode );
-
-                // set on change event
-                Y.on( 'bewype-editor:onChange', Y.bind( this.refresh, this ), _contentNode );
+                // no max
+                _conf = { panelNode : _editPanNode };
             }
+
+            // plug
+            _contentNode.plug( Y.Bewype.Editor, _conf );
+
+            // set editing flag to false
+            this.editing = true;
+            
+            // set on close event
+            Y.on( 'bewype-editor:onClose',  Y.bind( this._detachEditor, this ), _contentNode );
+
+            // set on change event
+            Y.on( 'bewype-editor:onChange', Y.bind( this.refresh, this ), _contentNode );
         },
 
         /**
@@ -242,21 +240,16 @@
         _onClickEdit : function ( evt ) {
 
             // get callback
-            var _pNode         = this.get( 'parentNode'    ),
-                _editPanelNode = this.get( 'editPanelNode' );
+            var _pNode         = this.get( 'parentNode' );
             
-            // do call
-            if ( _editPanelNode ) {
+            // stop editing all
+            Y.each( _pNode.layoutDesignerPlaces.getContents(), function( v, k ) {
+                // update editing flag
+                v.layoutDesignerContent._detachEditor();
+            } );
 
-                // stop editing all
-                Y.each( _pNode.layoutDesignerPlaces.getContents(), function( v, k ) {
-                    // update editing flag
-                    v.layoutDesignerContent._detachEditor();
-                } );
-
-                // attach
-                this._attachEditor();
-            }
+            // attach
+            this._attachEditor();
         },
 
         /**

@@ -6,8 +6,6 @@
 </head> 
 <body>
     
-    <div id="panel"></div>
-
     <div id="demo"></div>
 
     <script type="text/javascript">
@@ -15,9 +13,7 @@
         YUI( { filter: 'debug' } ).use( 'bewype-layout-designer', function ( Y ) {
 
             // get demo node and plug
-            Y.one( "#demo" ).plug( Y.Bewype.LayoutDesigner, {
-                editPanelNode : Y.one( "#panel" )
-            } );
+            Y.one( "#demo" ).plug( Y.Bewype.LayoutDesigner );
         } );
     -->
     </script>

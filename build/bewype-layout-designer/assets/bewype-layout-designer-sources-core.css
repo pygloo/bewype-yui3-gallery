@@ -22,3 +22,9 @@
     border              : none;
 }
 
+.layout-designer-edit-panel {
+    display             : none;
+    margin              : 0 auto;
+    height              : 40px;
+}
+

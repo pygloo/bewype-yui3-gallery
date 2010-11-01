@@ -8,11 +8,15 @@ YUI.add('bewype-layout-designer-base', function(Y) {
         LayoutDesigner.superclass.constructor.apply( this, arguments );
     };
 
-
     /**
      *
      */
     LayoutDesigner.NODE_SRC_TEMPLATE = '<div class="{designerClass}-sources"></div>';
+
+    /**
+     *
+     */
+    LayoutDesigner.NODE_PAN_TEMPLATE = '<div class="{designerClass}-edit-panel"></div>';
 
     /**
      *
@@ -91,10 +95,6 @@ YUI.add('bewype-layout-designer-base', function(Y) {
             validator : function( val ) {
                 return Y.Lang.isNumber( val );
             }
-        },
-        editPanelNode : {
-            value : null,
-            writeOnce : true
         }
     };
 
@@ -111,25 +111,34 @@ YUI.add('bewype-layout-designer-base', function(Y) {
         initializer: function( config ) {
 
             // tmp vars
-            var _nodeSrc  = null;
+            var _host     = this.get( 'host' ),
+                _nodeSrc  = null,
+                _nodePan  = null;
 
             // create source node
             _nodeSrc = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_SRC_TEMPLATE, {
                 designerClass : this.get( 'designerClass' )
             } ) );
             // attach src parent to widget
-            this.get( 'host' ).append( _nodeSrc );
+            _host.append( _nodeSrc );
             // plug source bar
             _nodeSrc.plug( Y.Bewype.LayoutDesignerSources, {
                 layoutWidth : this.get( 'layoutWidth' )
             } );
+
+            // create edit panel node
+            _nodePan = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_PAN_TEMPLATE, {
+                designerClass : this.get( 'designerClass' )
+            } ) );
+            // attach src parent to widget
+            _host.append( _nodePan );
 
             // create dest layout
             this.nodeLayout = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_DST_TEMPLATE, {
                 designerClass : this.get( 'designerClass' )
             } ) );
             // attach layout node to main node
-            this.get( 'host' ).append( this.nodeLayout );
+            _host.append( this.nodeLayout );
             //
             this.nodeLayout.setStyle( 'width', this.get( 'layoutWidth' ) );
 
@@ -146,7 +155,7 @@ YUI.add('bewype-layout-designer-base', function(Y) {
                 contentZIndex    : this.get( 'contentZIndex'    ),
                 defaultContent   : this.get( 'defaultContent'   ),
                 designerClass    : this.get( 'designerClass'    ),
-                editPanelNode    : this.get( 'editPanelNode'    ),
+                baseNode         : _host
             } );
         },
 

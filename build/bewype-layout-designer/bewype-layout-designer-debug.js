@@ -8,11 +8,15 @@ YUI.add('bewype-layout-designer-base', function(Y) {
         LayoutDesigner.superclass.constructor.apply( this, arguments );
     };
 
-
     /**
      *
      */
     LayoutDesigner.NODE_SRC_TEMPLATE = '<div class="{designerClass}-sources"></div>';
+
+    /**
+     *
+     */
+    LayoutDesigner.NODE_PAN_TEMPLATE = '<div class="{designerClass}-edit-panel"></div>';
 
     /**
      *
@@ -91,10 +95,6 @@ YUI.add('bewype-layout-designer-base', function(Y) {
             validator : function( val ) {
                 return Y.Lang.isNumber( val );
             }
-        },
-        editPanelNode : {
-            value : null,
-            writeOnce : true
         }
     };
 
@@ -111,25 +111,34 @@ YUI.add('bewype-layout-designer-base', function(Y) {
         initializer: function( config ) {
 
             // tmp vars
-            var _nodeSrc  = null;
+            var _host     = this.get( 'host' ),
+                _nodeSrc  = null,
+                _nodePan  = null;
 
             // create source node
             _nodeSrc = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_SRC_TEMPLATE, {
                 designerClass : this.get( 'designerClass' )
             } ) );
             // attach src parent to widget
-            this.get( 'host' ).append( _nodeSrc );
+            _host.append( _nodeSrc );
             // plug source bar
             _nodeSrc.plug( Y.Bewype.LayoutDesignerSources, {
                 layoutWidth : this.get( 'layoutWidth' )
             } );
+
+            // create edit panel node
+            _nodePan = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_PAN_TEMPLATE, {
+                designerClass : this.get( 'designerClass' )
+            } ) );
+            // attach src parent to widget
+            _host.append( _nodePan );
 
             // create dest layout
             this.nodeLayout = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_DST_TEMPLATE, {
                 designerClass : this.get( 'designerClass' )
             } ) );
             // attach layout node to main node
-            this.get( 'host' ).append( this.nodeLayout );
+            _host.append( this.nodeLayout );
             //
             this.nodeLayout.setStyle( 'width', this.get( 'layoutWidth' ) );
 
@@ -146,7 +155,7 @@ YUI.add('bewype-layout-designer-base', function(Y) {
                 contentZIndex    : this.get( 'contentZIndex'    ),
                 defaultContent   : this.get( 'defaultContent'   ),
                 designerClass    : this.get( 'designerClass'    ),
-                editPanelNode    : this.get( 'editPanelNode'    ),
+                baseNode         : _host
             } );
         },
 
@@ -234,13 +243,12 @@ YUI.add('bewype-layout-designer-content', function(Y) {
                 return Y.Lang.isString( val );
             }
         },
-        parentNode : {
-            value : null,
-            writeOnce : false
-        },
-        editPanelNode : {
+        baseNode : {
             value : null,
             writeOnce : true
+        },
+        parentNode : {
+            value : null
         }
     };
 
@@ -329,8 +337,13 @@ YUI.add('bewype-layout-designer-content', function(Y) {
 
             // temp var
             var _host           = this.get( 'host' ),
+                _bNode          = this.get( 'baseNode'      ),
+                _sourcesClass   = this.get( 'designerClass' ) + '-sources',
+                _editPanClass   = this.get( 'designerClass' ) + '-edit-panel',
                 _contentClass   = this.get( 'designerClass' ) + '-content',
-                _contentNode    = _host.one( 'div.' + _contentClass );
+                _sourcesNode    = _bNode.one( 'div.' + _sourcesClass ),
+                _editPanNode    = _bNode.one( 'div.' + _editPanClass ),
+                _contentNode    = _host.one( 'div.' + _contentClass );                
 
             // detach events
             _host.detachAll( 'bewype-editor:onClose'  );
@@ -343,9 +356,14 @@ YUI.add('bewype-layout-designer-content', function(Y) {
             this.refresh();
 
             if ( _contentNode.bewypeEditor ) {
+
                 // diconnect
                 _contentNode.unplug( Y.Bewype.Editor );
             }
+                
+            // show sources
+            _editPanNode.setStyle( 'display', 'none'  );
+            _sourcesNode.setStyle( 'display', 'block' );
         },
 
         /**
@@ -355,46 +373,52 @@ YUI.add('bewype-layout-designer-content', function(Y) {
 
             //
             var _host           = this.get( 'host'          ),
+                _bNode          = this.get( 'baseNode'      ),
                 _pNode          = this.get( 'parentNode'    ),
-                _editPanelNode  = this.get( 'editPanelNode' ),
-                _availableWidth = _pNode.layoutDesignerPlaces.getAvailablePlace(),
+                _sourcesClass   = this.get( 'designerClass' ) + '-sources',
+                _editPanClass   = this.get( 'designerClass' ) + '-edit-panel',
                 _contentClass   = this.get( 'designerClass' ) + '-content',
+                _sourcesNode    = _bNode.one( 'div.' + _sourcesClass ),
+                _editPanNode    = _bNode.one( 'div.' + _editPanClass ),
+                _availableWidth = _pNode.layoutDesignerPlaces.getAvailablePlace(),
                 _contentNode    = _host.one( 'div.' + _contentClass ),
                 _conf           = null,
                 _maxWidth       = null;
 
-            if ( _editPanelNode ) {
-                // set max width or not
-                if ( _availableWidth ) {
+            // hide sources
+            _sourcesNode.setStyle( 'display', 'none'  );
+            _editPanNode.setStyle( 'display', 'block' );
 
-                    // compute max width
-                    _maxWidth =  _availableWidth;
-                    _maxWidth += this.getContentWidth();
+            // set max width or not
+            if ( _availableWidth ) {
 
-                    // update conf
-                    _conf = {
-                        panelNode       : _editPanelNode,
-                        spinnerMaxWidth : _maxWidth
-                        };
+                // compute max width
+                _maxWidth =  _availableWidth;
+                _maxWidth += this.getContentWidth();
 
-                } else {
+                // update conf
+                _conf = {
+                    panelNode       : _editPanNode,
+                    spinnerMaxWidth : _maxWidth
+                    };
 
-                    // no max
-                    _conf = { panelNode : _editPanelNode };
-                }
+            } else {
 
-                // plug
-                _contentNode.plug( Y.Bewype.Editor, _conf );
-
-                // set editing flag to false
-                this.editing = true;
-                
-                // set on close event
-                Y.on( 'bewype-editor:onClose',  Y.bind( this._detachEditor, this ), _contentNode );
-
-                // set on change event
-                Y.on( 'bewype-editor:onChange', Y.bind( this.refresh, this ), _contentNode );
+                // no max
+                _conf = { panelNode : _editPanNode };
             }
+
+            // plug
+            _contentNode.plug( Y.Bewype.Editor, _conf );
+
+            // set editing flag to false
+            this.editing = true;
+            
+            // set on close event
+            Y.on( 'bewype-editor:onClose',  Y.bind( this._detachEditor, this ), _contentNode );
+
+            // set on change event
+            Y.on( 'bewype-editor:onChange', Y.bind( this.refresh, this ), _contentNode );
         },
 
         /**
@@ -403,21 +427,16 @@ YUI.add('bewype-layout-designer-content', function(Y) {
         _onClickEdit : function ( evt ) {
 
             // get callback
-            var _pNode         = this.get( 'parentNode'    ),
-                _editPanelNode = this.get( 'editPanelNode' );
+            var _pNode         = this.get( 'parentNode' );
             
-            // do call
-            if ( _editPanelNode ) {
+            // stop editing all
+            Y.each( _pNode.layoutDesignerPlaces.getContents(), function( v, k ) {
+                // update editing flag
+                v.layoutDesignerContent._detachEditor();
+            } );
 
-                // stop editing all
-                Y.each( _pNode.layoutDesignerPlaces.getContents(), function( v, k ) {
-                    // update editing flag
-                    v.layoutDesignerContent._detachEditor();
-                } );
-
-                // attach
-                this._attachEditor();
-            }
+            // attach
+            this._attachEditor();
         },
 
         /**
@@ -666,13 +685,13 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                 return Y.Lang.isString( val );
             }
         },
+        baseNode : {
+            value : null,
+            writeOnce : true
+        },
         parentNode : {
             value : null,
             writeOnce : false
-        },
-        editPanelNode : {
-            value : null,
-            writeOnce : true
         }
     };
 
@@ -1101,8 +1120,8 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                 contentWidth   : this.get( 'contentWidth'   ),
                 contentZIndex  : this.get( 'contentZIndex'  ),
                 defaultContent : this.get( 'defaultContent' ),
-                parentNode     : this.get( 'host'           ),
-                editPanelNode  : this.get( 'editPanelNode'  )
+                baseNode       : this.get( 'baseNode'       ),
+                parentNode     : this.get( 'host'           )
             } );
         },
 
@@ -1365,9 +1384,6 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 return Y.Lang.isNumber( val );
             }
         },
-        parentNode : {
-            value : null
-        },
         contentHeight : {
             value : 40,
             validator : function( val ) {
@@ -1399,9 +1415,12 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 return Y.Lang.isNumber( val );
             }
         },
-        editPanelNode : {
+        baseNode : {
             value : null,
             writeOnce : true
+        },
+        parentNode : {
+            value : null
         }
     };
 
@@ -1660,8 +1679,8 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 contentZIndex   : this.get( 'contentZIndex'   ),
                 defaultContent  : this.get( 'defaultContent'  ),
                 designerClass   : this.get( 'designerClass'   ),
-                editPanelNode   : this.get( 'editPanelNode'   ),
                 placesType      : type,
+                baseNode        : this.get( 'baseNode'        ),
                 parentNode      : _parentNode
             } );
         },
@@ -1683,8 +1702,8 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 contentZIndex    : this.get( 'contentZIndex'    ),
                 defaultContent   : this.get( 'defaultContent'   ),
                 designerClass    : this.get( 'designerClass'    ),
-                editPanelNode    : this.get( 'editPanelNode'    ),
                 targetType       : type,
+                baseNode         : this.get( 'baseNode'         ),
                 parentNode       : _parentNode
             } );
         },
