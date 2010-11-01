@@ -79,7 +79,7 @@
             }
         },
         defaultContent : {
-            value : 'Click to change your content..',
+            value : 'Text..',
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }

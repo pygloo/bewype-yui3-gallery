@@ -19,8 +19,6 @@
 
     LayoutDesignerPlaces.V_PLACES_TEMPLATE  = '<table class="{designerClass}-places {designerClass}-places-vertical"></table>';
 
-    LayoutDesignerPlaces.C_TEMPLATE         = '<div class="{designerClass}-content">{defaultContent}</div>';
-
     LayoutDesignerPlaces.H_DEST_TEMPLATE    =  '<td class="{designerClass}-cell {designerClass}-cell-horizontal">';
     LayoutDesignerPlaces.H_DEST_TEMPLATE    += '<div class="{designerClass}-container">';
     LayoutDesignerPlaces.H_DEST_TEMPLATE    += '</div>';
@@ -63,7 +61,7 @@
             }
         },
         defaultContent : {
-            value : 'Click to change your content..',
+            value : 'Text..',
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
@@ -144,11 +142,10 @@
         _dropHitGotcha : function ( evt ) {
             //
             var _dragNode           = evt.drag.get( 'node' ),
+                _placesClass        = '.' + this.get( 'designerClass' ) + '-places',
                 _containerClass     = '.' + this.get( 'designerClass' ) + '-container',
                 _destNode           = _dragNode.one( _containerClass ),
-                _placesClass        = '.' + this.get( 'designerClass' ) + '-places',
-                _contentClass       = '.' + this.get( 'designerClass' ) + '-content',
-                _contentNode        = _dragNode.one( _placesClass ) ? _destNode : _dragNode.one( _contentClass ),
+                _contentNode        = _dragNode.one( _placesClass ) ? _destNode : _dragNode.one( _containerClass ),
                 _contentWidth       = null,
                 _parentHost         = null,
                 _dropTable          = _destNode  ? _destNode.ancestor(  'table' ) : null,
@@ -217,7 +214,7 @@
 
             // unregister it
             if ( _parentNode ) {
-                _parentNode.layoutDesignerPlaces.unRegisterContent(_host);
+                _parentNode.layoutDesignerPlaces.unRegisterContent( _host );
             }
 
             // and remove host
@@ -495,16 +492,10 @@
             if ( !this.hasPlace() ) { return null; }
 
             // add dest node
-            var _destNode       = this.addDestNode(),
-                _contentNode    = new Y.Node.create( Y.substitute( LayoutDesignerPlaces.C_TEMPLATE, {
-                    designerClass : this.get( 'designerClass' )
-                } ) ); // create content node
-
-            // dom add
-            _destNode.append( _contentNode );
+            var _destNode = this.addDestNode();
 
             // plug node
-            _contentNode.plug( Y.Bewype.LayoutDesignerContent, {
+            _destNode.plug( Y.Bewype.LayoutDesignerContent, {
                 designerClass  : this.get( 'designerClass'  ),
                 contentHeight  : this.get( 'contentHeight'  ),
                 contentWidth   : this.get( 'contentWidth'   ),
@@ -513,9 +504,6 @@
                 parentNode     : this.get( 'host'           ),
                 editPanelNode  : this.get( 'editPanelNode'  )
             } );
-
-            // 
-            return _contentNode;
         },
 
         /**

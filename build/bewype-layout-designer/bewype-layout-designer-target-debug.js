@@ -79,7 +79,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             }
         },
         defaultContent : {
-            value : 'Click to change your content..',
+            value : 'Text..',
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
@@ -187,8 +187,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             // get host
             var _host       = this.get( 'host'       ),
                 _parentNode = this.get( 'parentNode' ),
-                _removeNode = this._targetNode.one( 'div' ),
-                _destNode   = null;
+                _removeNode = this._targetNode.one( 'div' );
 
             // destroy plugins
             if ( _host.layoutDesignerPlaces ) {
@@ -268,8 +267,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
         _onClickRemove: function ( evt ) {
 
             // temp vars
-            var _host     = this.get( 'host' ),
-                _destNode = null;
+            var _host     = this.get( 'host' );
             
             // and destroy itself
             _host.unplug( Y.Bewype.LayoutDesignerTarget );
