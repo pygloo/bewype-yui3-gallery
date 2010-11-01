@@ -1,34 +1,34 @@
 
-.yui3-picker-font-family {
+.bewype-picker-font-family {
     border      : 1px solid #888;
     font-family : Arial, Helvetica, sans-serif;
     font-size   : 0.875em;
     width       : 144px;
 }
 
-.yui3-picker-font-family table {
+.bewype-picker-font-family table {
     border-collapse: collapse;
 }
 
-.yui3-picker-font-family table,
-.yui3-picker-font-family td {
+.bewype-picker-font-family table,
+.bewype-picker-font-family td {
     margin  : 0;
     padding : 0;
     width   : 100%;
 }
 
-.yui3-picker-font-family td {
+.bewype-picker-font-family td {
     padding        : 2px 4px;
     text-align     : left;
     vertical-align : middle;
 }
 
-.yui3-picker-font-family td:hover {
+.bewype-picker-font-family td:hover {
     background-color : #ddd;
     cursor           : pointer;
 }
 
-.yui3-picker-font-family-row {
+.bewype-picker-font-family-row {
 }
 
 

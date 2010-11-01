@@ -33,6 +33,12 @@
                 ], 
                 "skinnable": true
             },
+            "bewype-picker-title": {
+                "requires": [
+                    "bewype-picker-base"
+                ], 
+                "skinnable": true
+            },
             "bewype-picker-url": {
                 "requires": [
                     "stylesheet",

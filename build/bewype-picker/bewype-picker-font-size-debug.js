@@ -14,7 +14,7 @@ YUI.add('bewype-picker-font-size', function(Y) {
      */
     PickerFontSize.ATTRS = {
         pickerClass : {
-            value : 'yui3-picker-font-size',
+            value : 'bewype-picker-font-size',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -57,7 +57,7 @@ YUI.add('bewype-picker-font-size', function(Y) {
          *
          */
         getValue : function() {
-            return this._currentName + 'px';
+            return this._currentName ? this._currentName + 'px' : null;
         },
 
         /**

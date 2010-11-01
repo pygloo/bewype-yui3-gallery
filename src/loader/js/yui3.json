@@ -217,7 +217,6 @@
                     "plugin", 
                     "substitute", 
                     "async-queue", 
-                    "bewype-utils", 
                     "bewype-editor"
                 ], 
                 "skinnable": true
@@ -274,6 +273,12 @@
                 "skinnable": true
             }, 
             "bewype-picker-font-size": {
+                "requires": [
+                    "bewype-picker-base"
+                ], 
+                "skinnable": true
+            }, 
+            "bewype-picker-title": {
                 "requires": [
                     "bewype-picker-base"
                 ], 

@@ -30,7 +30,7 @@
      */
     PickerUrl.ATTRS = {
         pickerClass : {
-            value : 'yui3-picker-url',
+            value : 'bewype-picker-url',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );

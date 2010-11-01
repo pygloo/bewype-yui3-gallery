@@ -39,7 +39,7 @@
      */
     Picker.ATTRS = {
         pickerClass : {
-            value : 'yui3-picker-base',
+            value : 'bewype-picker-base',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -196,7 +196,7 @@
 
             // vars
             var _contentBox = this.get( 'contentBox'  ),
-                _itemId     = '#' + this.get( 'pickerClass' ) + '-' + name,
+                _itemId     = '#' + this.get( 'pickerClass' ) + '-row-' + name,
                 _itemNode   = _contentBox.one( _itemId );
 
             // little check

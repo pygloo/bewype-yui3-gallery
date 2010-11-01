@@ -41,7 +41,7 @@ YUI.add('bewype-picker-base', function(Y) {
      */
     Picker.ATTRS = {
         pickerClass : {
-            value : 'yui3-picker-base',
+            value : 'bewype-picker-base',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -198,7 +198,7 @@ YUI.add('bewype-picker-base', function(Y) {
 
             // vars
             var _contentBox = this.get( 'contentBox'  ),
-                _itemId     = '#' + this.get( 'pickerClass' ) + '-' + name,
+                _itemId     = '#' + this.get( 'pickerClass' ) + '-row-' + name,
                 _itemNode   = _contentBox.one( _itemId );
 
             // little check
@@ -280,7 +280,7 @@ YUI.add('bewype-picker-color', function(Y) {
      */
     PickerColor.ATTRS = {
         pickerClass : {
-            value : 'yui3-picker-color',
+            value : 'bewype-picker-color',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -560,7 +560,7 @@ YUI.add('bewype-picker-font-size', function(Y) {
      */
     PickerFontSize.ATTRS = {
         pickerClass : {
-            value : 'yui3-picker-font-size',
+            value : 'bewype-picker-font-size',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -603,7 +603,7 @@ YUI.add('bewype-picker-font-size', function(Y) {
          *
          */
         getValue : function() {
-            return this._currentName + 'px';
+            return this._currentName ? this._currentName + 'px' : null;
         },
 
         /**
@@ -636,7 +636,7 @@ YUI.add('bewype-picker-font-family', function(Y) {
      */
     PickerFontFamily.ATTRS = {
         pickerClass : {
-            value : 'yui3-picker-font-family',
+            value : 'bewype-picker-font-family',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -721,6 +721,79 @@ YUI.add('bewype-picker-font-family', function(Y) {
 
 
 }, '@VERSION@' ,{requires:['bewype-picker-base']});
+YUI.add('bewype-picker-title', function(Y) {
+
+
+    var PickerTitle = function(config) {
+        PickerTitle.superclass.constructor.apply(this, arguments);
+    };
+
+    /**
+     */
+    PickerTitle.NAME = "pickerTitle";
+
+    /**
+     *
+     */
+    PickerTitle.ATTRS = {
+        pickerClass : {
+            value : 'bewype-picker-title',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },
+        titles : {
+            value : [
+                [ null, 'Normal' ],
+                [ 'h1', 'Title 1' ],
+                [ 'h2', 'Title 2' ],
+                [ 'h3', 'Title 3' ],
+                [ 'h4', 'Title 4' ]
+            ],
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang. isArray( val );
+            }
+        }
+    };
+
+    Y.extend( PickerTitle, Y.Bewype.Picker, {
+
+        _currentTitle : null,
+
+        /**
+         *
+         */
+        initializer : function( config ) {
+            this._init( config );
+        },
+
+        /**
+         *
+         */
+        renderUI : function () {
+
+            // render default
+            this._renderBaseUI();
+
+            // add familys
+            Y.Object.each( this.get( 'titles' ), function (v, k) {
+                // prepare values
+                var _text = '<' + v[ 0 ] + '>' + v[ 1 ] + '</' + v[ 0 ] + '>' ;
+                // do add
+                this.append( v[ 0 ], _text );
+            }, this );
+        }
+
+    } );
+
+    Y.namespace('Bewype');
+    Y.Bewype.PickerTitle = PickerTitle;
+
+
+
+}, '@VERSION@' ,{requires:['bewype-picker-base']});
 YUI.add('bewype-picker-url', function(Y) {
 
 
@@ -755,7 +828,7 @@ YUI.add('bewype-picker-url', function(Y) {
      */
     PickerUrl.ATTRS = {
         pickerClass : {
-            value : 'yui3-picker-url',
+            value : 'bewype-picker-url',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -861,5 +934,5 @@ YUI.add('bewype-picker-url', function(Y) {
 }, '@VERSION@' ,{requires:['stylesheet', 'substitute', 'widget', 'yui-base']});
 
 
-YUI.add('bewype-picker', function(Y){}, '@VERSION@' ,{use:['bewype-picker-base', 'bewype-picker-color', 'bewype-picker-font-size', 'bewype-picker-font-family', 'bewype-picker-url']});
+YUI.add('bewype-picker', function(Y){}, '@VERSION@' ,{use:['bewype-picker-base', 'bewype-picker-color', 'bewype-picker-font-size', 'bewype-picker-font-family', 'bewype-picker-title', 'bewype-picker-url']});
 

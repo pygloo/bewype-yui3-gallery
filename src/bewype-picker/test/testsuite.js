@@ -41,7 +41,7 @@ suite.add( new Y.Test.Case( {
         Y.Assert.isNull( this._picker.getValue(), 'Ooops!' );
 
         // select test2
-        _evtNode = Y.one( '#' + this._picker.get ( 'pickerClass' ) + '-test2' );
+        _evtNode = Y.one( '#' + this._picker.get ( 'pickerClass' ) + '-row-test2' );
         _evtNode.simulate( 'click' );
 
         // check current value again
@@ -56,7 +56,7 @@ suite.add( new Y.Test.Case( {
         Y.Assert.isNull( this._picker.getValue(), 'check getValue!' );
 
         // check item removal
-        _evtNode = Y.one( '#' + this._picker.get ( 'pickerClass' ) + '-test2' );
+        _evtNode = Y.one( '#' + this._picker.get ( 'pickerClass' ) + '-row-test2' );
         Y.Assert.isNull( _evtNode, 'check item after removal!' );
     },
 
@@ -79,7 +79,7 @@ suite.add( new Y.Test.Case( {
         this._picker.render( '#test' );
         //
         var _v = this._picker.getValue();
-        Y.Assert.areEqual( '#407e80', _v, 'Ooops!' );
+        Y.Assert.areEqual( '#407f80', _v, 'Ooops!' );
     },
 
     "test picker font size": function () {
@@ -101,11 +101,11 @@ suite.add( new Y.Test.Case( {
         Y.Assert.isNull( this._picker.getValue(), 'Ooops!' );
 
         // select test2
-        _evtNode = Y.one( '#' + this._picker.get ( 'pickerClass' ) + '-12' );
+        _evtNode = Y.one( '#' + this._picker.get ( 'pickerClass' ) + '-row-12' );
         _evtNode.simulate( 'click' );
 
         // check current value again
-        Y.Assert.areEqual( '12', this._picker.getValue(), 'Ooops!' );
+        Y.Assert.areEqual( '12px', this._picker.getValue(), 'Ooops!' );
     },
 
     "test picker font family": function () {
@@ -127,11 +127,37 @@ suite.add( new Y.Test.Case( {
         Y.Assert.isNull( this._picker.getValue(), 'Ooops!' );
 
         // select test2
-        _evtNode = Y.one( '#' + this._picker.get ( 'pickerClass' ) + '-comic' );
+        _evtNode = Y.one( '#' + this._picker.get ( 'pickerClass' ) + '-row-comic' );
         _evtNode.simulate( 'click' );
 
         // check current value again
         Y.Assert.areEqual( '\'Comic Sans MS\', cursive, sans-serif', this._picker.getValue(), 'Ooops!' );
+    },
+
+    "test picker title": function () {
+
+        // tmp vars
+        var _evtNode = null;
+
+        // init normal picker
+        this._picker = new Y.Bewype.PickerTitle();
+
+        // check exist
+        Y.Assert.isNotNull( this._picker, 'Ooops!' );
+        Y.Assert.isNotUndefined( this._picker, 'Ooops!' );
+
+        // render
+        this._picker.render( '#test' );
+
+        // check current value
+        Y.Assert.isNull( this._picker.getValue(), 'Ooops!' );
+
+        // select test2
+        _evtNode = Y.one( '#' + this._picker.get ( 'pickerClass' ) + '-row-h1' );
+        _evtNode.simulate( 'click' );
+
+        // check current value again
+        Y.Assert.areEqual( 'h1', this._picker.getValue(), 'Ooops!' );
     },
 
     "test picker url": function () {

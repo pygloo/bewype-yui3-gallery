@@ -14,7 +14,7 @@ YUI.add('bewype-picker-font-family', function(Y) {
      */
     PickerFontFamily.ATTRS = {
         pickerClass : {
-            value : 'yui3-picker-font-family',
+            value : 'bewype-picker-font-family',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );

@@ -53,7 +53,7 @@ YUI.add('bewype-picker-color', function(Y) {
      */
     PickerColor.ATTRS = {
         pickerClass : {
-            value : 'yui3-picker-color',
+            value : 'bewype-picker-color',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
