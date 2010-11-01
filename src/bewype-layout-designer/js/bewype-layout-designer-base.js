@@ -6,7 +6,6 @@
         LayoutDesigner.superclass.constructor.apply( this, arguments );
     };
 
-
     /**
      *
      */
