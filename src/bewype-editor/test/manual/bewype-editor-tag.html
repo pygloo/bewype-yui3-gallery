@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
+    <head> 
+        <title>Manual Test - Editor Tag</title>
+        <script type="text/javascript" src="../../../../build/yui/yui.js"></script>
+    </head> 
+    <body> 
+        <div id="panel"></div>
+
+        <br />
+        <br />
+        <br />
+
+        <div id="content">This is a test</div>
+        <a id="attach" href="#">Attach</a> | <a id="detach" href="#">Detach</a>
+
+        <script type="text/javascript">
+        <!--
+            YUI( { filter: 'debug' } ).use( 'bewype-editor-tag', function ( Y ) {
+
+                var _content = Y.one( "#content" );
+
+                // attach event
+                Y.on( 'click',
+                    function( e ) {
+                        if ( !_content.bewypeEditorTag ) {
+                            _content.plug( Y.Bewype.EditorTag, {
+                                panelNode : Y.one( "#panel" )
+                            } )
+                        }
+                    },
+                    Y.one( "#attach" )
+                );
+
+                // detach event
+                Y.on( 'click',
+                    function( e ) {
+                        if ( _content.bewypeEditorTag ) {
+                            _content.unplug( Y.Bewype.EditorTag )
+                        }
+                    },
+                    Y.one( "#detach" )
+                );
+
+                // add custom events
+                // Y.on( 'bewype-editor-tag:onChange', function () {
+                //     alert( 'Editor Tag Changed!' );
+                // } );
+
+                Y.on( 'bewype-editor-tag:onClose', function () {
+                    alert( 'Editor Tag Closed!' );
+                } );
+            } );
+        -->
+        </script>
+    </body> 
+</html> 
