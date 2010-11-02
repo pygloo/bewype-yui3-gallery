@@ -202,7 +202,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
         destructor: function () {
 
             // copy contents
-            var _host     = this.get( 'host' ),
+            var _host       = this.get( 'host' ),
                 _parentNode = this.get( 'parentNode' );
             
             // first remove all the children
@@ -246,18 +246,26 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             
             // update target style
             switch( this.get( 'placesType' ) ) {
-
                 // must use an vertical parent
                 case 'vertical':
                     _parentNode = this.get( 'parentNode' ) || this.placesNode.ancestor( 'div' );
+                    break;
                 // no break - no we can compute remaining width
                 case 'horizontal':
-                    // get parent width
-                    _pWidth = Y.Bewype.Utils.getWidth( _parentNode );
-                    // get contents width
-                    _cWidth = this.getPlacesWidth();
-                    return _pWidth - _cWidth;
+                    break;
+                // ??
+                default:
+                    return null;
             }
+            
+            // get parent width
+            _pWidth = Y.Bewype.Utils.getWidth( _parentNode );
+
+            // get contents width
+            _cWidth = this.getPlacesWidth();
+
+            // compute available place
+            return _pWidth - _cWidth;
         },
 
         /**
@@ -488,17 +496,31 @@ YUI.add('bewype-layout-designer-places', function(Y) {
         /**
          *
          */
-        addContent : function () {
+        addContent : function ( contentType ) {
 
             // little check
             if ( !this.hasPlace() ) { return null; }
 
             // add dest node
-            var _destNode = this.addDestNode();
+            var _destNode    = this.addDestNode(),
+                _pluginClass = null;
+
+            // content type factory
+            switch( contentType ) {
+                case 'text':
+                    _pluginClass = Y.Bewype.LayoutDesignerContentText;
+                    break;
+                case 'image':
+                    _pluginClass = Y.Bewype.LayoutDesignerContentImage;
+                    break;
+                default:
+                    return;
+            }
 
             // plug node
-            _destNode.plug( Y.Bewype.LayoutDesignerContent, {
+            _destNode.plug( _pluginClass, {
                 designerClass  : this.get( 'designerClass'  ),
+                contentType    : contentType,
                 contentHeight  : this.get( 'contentHeight'  ),
                 contentWidth   : this.get( 'contentWidth'   ),
                 contentZIndex  : this.get( 'contentZIndex'  ),
@@ -564,4 +586,4 @@ YUI.add('bewype-layout-designer-places', function(Y) {
 
 
 
-}, '@VERSION@' ,{requires:['sortable', 'bewype-layout-designer-content']});
+}, '@VERSION@' ,{requires:['sortable', 'bewype-layout-designer-content-text']});

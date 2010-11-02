@@ -9,11 +9,17 @@
                 ], 
                 "skinnable": true
             },
-            "bewype-layout-designer-content": {
+            "bewype-layout-designer-content-base": {
                 "requires": [
                     "plugin",
                     "substitute",
-                    "async-queue",
+                    "async-queue"
+                ], 
+                "skinnable": true
+            },
+            "bewype-layout-designer-content-text": {
+                "requires": [
+                    "bewype-layout-designer-content-base",
                     "bewype-editor"
                 ], 
                 "skinnable": true
@@ -21,7 +27,7 @@
             "bewype-layout-designer-places": {
                 "requires": [
                     "sortable",
-                    "bewype-layout-designer-content"
+                    "bewype-layout-designer-content-text"
                 ], 
                 "skinnable": true
             },

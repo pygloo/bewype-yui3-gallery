@@ -45,12 +45,12 @@
         /**
          *
          */
-        _groups : [ 'horizontal', 'vertical', 'content' ],
+        _groups : [ 'horizontal', 'vertical', 'text' ],
 
         /**
          *
          */
-        _labels: [ 'Layout Horizontal', 'Layout Vertical', 'Content' ],
+        _labels: [ 'Layout Horizontal', 'Layout Vertical', 'Text' ],
 
         /**
          *

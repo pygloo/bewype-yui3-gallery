@@ -2,31 +2,38 @@
     /**
      *
      */
-    var LayoutDesignerContent = function ( config ) {
-        LayoutDesignerContent.superclass.constructor.apply( this, arguments );
+    var LayoutDesignerContentBase = function ( config ) {
+        LayoutDesignerContentBase.superclass.constructor.apply( this, arguments );
     };
 
     /**
      *
      */
-    LayoutDesignerContent.C_TEMPLATE = '<div class="{designerClass}-content">{defaultContent}</div>';
+    LayoutDesignerContentBase.C_TEMPLATE = '<div class="{designerClass}-content {designerClass}-content-{contentType}"></div>';
 
     /**
      *
      */
-    LayoutDesignerContent.NAME       = 'layout-designer-content';
+    LayoutDesignerContentBase.NAME       = 'layout-designer-content';
 
     /**
      *
      */
-    LayoutDesignerContent.NS         = 'layoutDesignerContent';
+    LayoutDesignerContentBase.NS         = 'layoutDesignerContent';
 
     /**
      *
      */
-    LayoutDesignerContent.ATTRS = {
+    LayoutDesignerContentBase.ATTRS = {
         designerClass : {
             value : 'layout-designer',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },
+        contentType : {
+            value : 'base',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -39,7 +46,7 @@
             }
         },
         contentWidth : {
-            value : 140,
+            value : 40,
             validator : function( val ) {
                 return Y.Lang.isNumber( val );
             }
@@ -48,12 +55,6 @@
             value : 1,
             validator : function( val ) {
                 return Y.Lang.isNumber( val );
-            }
-        },
-        defaultContent : {
-            value : 'Text..',
-            validator : function( val ) {
-                return Y.Lang.isString( val );
             }
         },
         baseNode : {
@@ -65,7 +66,7 @@
         }
     };
 
-    Y.extend( LayoutDesignerContent, Y.Plugin.Base, {
+    Y.extend( LayoutDesignerContentBase, Y.Plugin.Base, {
 
         /**
          *
@@ -77,29 +78,24 @@
          */
         editing : false,
 
-        /**
-         *
-         */
-        initializer : function( config ) {
+        _init: function ( config ) {
             
             // temp var
-            var _host        = this.get( 'host'       ),
-                _parentNode  = this.get( 'parentNode' ),
+            var _host        = config.host,
+                _parentNode  = config.parentNode,
                 _contentNode = null;
 
             // add dest node
-            _contentNode = new Y.Node.create( Y.substitute( LayoutDesignerContent.C_TEMPLATE, {
-                designerClass : this.get( 'designerClass' )
+            _contentNode = new Y.Node.create( Y.substitute( LayoutDesignerContentBase.C_TEMPLATE, {
+                designerClass : config.designerClass,
+                contentType   : config.contentType
             } ) ); // create content node
             // dom add
             _host.append( _contentNode );
         
             // common default height
-            _contentNode.setStyle( 'height', this.get( 'contentHeight' ) );
-            _contentNode.setStyle( 'width',  this.get( 'contentWidth'  ) );
-
-            // set default content
-            _contentNode.set( 'innerHTML', this.get( 'defaultContent' ) );
+            _contentNode.setStyle( 'height', config.contentHeight );
+            _contentNode.setStyle( 'width',  config.contentWidth );
 
             // set event management
             Y.on( 'mouseenter', Y.bind( this._onMouseEnter, this ) , _host );
@@ -107,7 +103,17 @@
             // register it
             _parentNode.layoutDesignerPlaces.registerContent( _host );
 
+            //
             this._q = new Y.AsyncQueue();
+
+            // return the new content node
+            return _contentNode;
+        },
+
+        /**
+         *
+         */
+        initializer : function( config ) {
         },
 
         /**
@@ -120,7 +126,7 @@
                 _parentNode     = this.get( 'parentNode'    ),
                 _contentClass   = this.get( 'designerClass' ) + '-content',
                 _contentNode    = _host.one( 'div.' + _contentClass ),
-                _contentNode    = _host.one( 'div.' + _contentClass + '-clone' );
+                _cloneNode      = _host.one( 'div.' + _contentClass + '-clone' );
             
             // detach editor
             this._detachEditor();
@@ -131,12 +137,15 @@
             // clean events
             Y.detach( _host );
 
+            // remove content node
+            _contentNode.remove();
+
             // and remove the clone
-            if ( _contentNode ) {
+            if ( _cloneNode ) {
                 // clean events
-                Y.Event.purgeElement( _contentNode, true );
+                Y.Event.purgeElement( _cloneNode, true );
                 // remove
-                _contentNode.remove();
+                _cloneNode.remove();
             }
 
             // remove host
@@ -147,91 +156,12 @@
          *
          */
         _detachEditor : function () {
-
-            // temp var
-            var _host           = this.get( 'host' ),
-                _bNode          = this.get( 'baseNode'      ),
-                _sourcesClass   = this.get( 'designerClass' ) + '-sources',
-                _editPanClass   = this.get( 'designerClass' ) + '-edit-panel',
-                _contentClass   = this.get( 'designerClass' ) + '-content',
-                _sourcesNode    = _bNode.one( 'div.' + _sourcesClass ),
-                _editPanNode    = _bNode.one( 'div.' + _editPanClass ),
-                _contentNode    = _host.one( 'div.' + _contentClass );                
-
-            // detach events
-            _host.detachAll( 'bewype-editor:onClose'  );
-            _host.detachAll( 'bewype-editor:onChange' );
-
-            // set editing flag to false
-            this.editing = false;
-
-            // just in case
-            this.refresh();
-
-            if ( _contentNode.bewypeEditor ) {
-
-                // diconnect
-                _contentNode.unplug( Y.Bewype.Editor );
-            }
-                
-            // show sources
-            _editPanNode.setStyle( 'display', 'none'  );
-            _sourcesNode.setStyle( 'display', 'block' );
         },
 
         /**
          *
          */
         _attachEditor : function () {
-
-            //
-            var _host           = this.get( 'host'          ),
-                _bNode          = this.get( 'baseNode'      ),
-                _pNode          = this.get( 'parentNode'    ),
-                _sourcesClass   = this.get( 'designerClass' ) + '-sources',
-                _editPanClass   = this.get( 'designerClass' ) + '-edit-panel',
-                _contentClass   = this.get( 'designerClass' ) + '-content',
-                _sourcesNode    = _bNode.one( 'div.' + _sourcesClass ),
-                _editPanNode    = _bNode.one( 'div.' + _editPanClass ),
-                _availableWidth = _pNode.layoutDesignerPlaces.getAvailablePlace(),
-                _contentNode    = _host.one( 'div.' + _contentClass ),
-                _conf           = null,
-                _maxWidth       = null;
-
-            // hide sources
-            _sourcesNode.setStyle( 'display', 'none'  );
-            _editPanNode.setStyle( 'display', 'block' );
-
-            // set max width or not
-            if ( _availableWidth ) {
-
-                // compute max width
-                _maxWidth =  _availableWidth;
-                _maxWidth += this.getContentWidth();
-
-                // update conf
-                _conf = {
-                    panelNode       : _editPanNode,
-                    spinnerMaxWidth : _maxWidth
-                    };
-
-            } else {
-
-                // no max
-                _conf = { panelNode : _editPanNode };
-            }
-
-            // plug
-            _contentNode.plug( Y.Bewype.Editor, _conf );
-
-            // set editing flag to false
-            this.editing = true;
-            
-            // set on close event
-            Y.on( 'bewype-editor:onClose',  Y.bind( this._detachEditor, this ), _contentNode );
-
-            // set on change event
-            Y.on( 'bewype-editor:onChange', Y.bind( this.refresh, this ), _contentNode );
         },
 
         /**
@@ -423,5 +353,5 @@
     } );
 
     Y.namespace('Bewype');
-    Y.Bewype.LayoutDesignerContent = LayoutDesignerContent;
+    Y.Bewype.LayoutDesignerContentBase = LayoutDesignerContentBase;
 
