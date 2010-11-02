@@ -178,6 +178,18 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
     }, 
     "bewype-editor": {
         "submodules": {
+            "bewype-editor-tag": {
+                "requires": [
+                    "bewype-button", 
+                    "bewype-entry-spinner", 
+                    "bewype-utils", 
+                    "dataschema", 
+                    "event-custom", 
+                    "json-stringify", 
+                    "plugin"
+                ], 
+                "skinnable": true
+            }, 
             "bewype-editor-text": {
                 "requires": [
                     "bewype-button", 
@@ -1620,4 +1632,4 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         }
     }
 };
-YUI.Env[Y.version].md5 = 'a449d5d0d61736f124b369151b99e031';
+YUI.Env[Y.version].md5 = 'ddf3cc581623aa669ffa53925393b352';

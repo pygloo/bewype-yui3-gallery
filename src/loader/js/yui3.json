@@ -171,6 +171,18 @@
     }, 
     "bewype-editor": {
         "submodules": {
+            "bewype-editor-tag": {
+                "requires": [
+                    "bewype-button", 
+                    "bewype-entry-spinner", 
+                    "bewype-utils", 
+                    "dataschema", 
+                    "event-custom", 
+                    "json-stringify", 
+                    "plugin"
+                ], 
+                "skinnable": true
+            }, 
             "bewype-editor-text": {
                 "requires": [
                     "bewype-button", 
