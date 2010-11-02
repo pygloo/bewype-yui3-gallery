@@ -94,6 +94,9 @@ YUI.add('bewype-picker-file', function(Y) {
                 _pickerClass  = this.get( 'pickerClass' ),
                 _inputNode    = null;
 
+            // avoid previous value
+            this._fileName = null;
+
             // set event callback
             _inputNode = _contentBox.one( '.' + _pickerClass + '-input' );
 
