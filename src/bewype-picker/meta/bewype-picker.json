@@ -23,6 +23,7 @@
             },
             "bewype-picker-file": {
                 "requires": [
+                    "async-queue",
                     "io",
                     "stylesheet",
                     "substitute",

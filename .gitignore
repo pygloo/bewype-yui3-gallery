@@ -2,4 +2,5 @@ syntax: glob
 *.swp
 build_tmp
 build_rollup_tmp
-
+fenv
+uploads/*

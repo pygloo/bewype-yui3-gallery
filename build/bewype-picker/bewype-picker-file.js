@@ -18,8 +18,11 @@ YUI.add('bewype-picker-file', function(Y) {
     PICKER_TMPL += '      <div class="{pickerClass}-label">File</div>';
     PICKER_TMPL += '    </td>';
     PICKER_TMPL += '    <td>';
-    PICKER_TMPL += '      <form>';
-    PICKER_TMPL += '        <input class="{pickerClass}-input" type="file" />';
+    PICKER_TMPL += '      <form enctype="multipart/form-data" >';
+    PICKER_TMPL += '        <div>';
+    PICKER_TMPL += '          <input class="{pickerClass}-input" type="file" name="file" />';
+    PICKER_TMPL += '        <div>';
+    PICKER_TMPL += '        <div>';
     PICKER_TMPL += '      </form>';
     PICKER_TMPL += '    </td>';
     PICKER_TMPL += '  </tr>';
@@ -48,24 +51,29 @@ YUI.add('bewype-picker-file', function(Y) {
 
     Y.extend( PickerFile, Y.Widget, {
 
+        /**
+         *
+         */
         _fileName : null,
 
         /**
          *
          */
-        initializer : function( config ) {
+        _q : null,
 
+        /**
+         *
+         */
+        initializer : function( config ) {
             // our custom event
             this.publish( 'picker:onChange' );
         },
 
         renderUI : function () {
-
             // vars
             var _contentBox   = this.get( 'contentBox'  ),
                 _pickerClass  = this.get( 'pickerClass' ),
-                _pickerNode   = null,
-                _inputNode    = null;
+                _pickerNode   = null;
 
             // create table
             _pickerNode = new Y.Node.create(
@@ -74,21 +82,26 @@ YUI.add('bewype-picker-file', function(Y) {
                 } )
             );
             _contentBox.append( _pickerNode );
-
-            // set event callback
-            _inputNode = _contentBox.one( '.' + _pickerClass + '-input' );
-            // set value
-            if ( this._fileName ) {
-                _inputNode.set( 'value', this._fileName );
-            }
-            //
-            _inputNode.on( 'yui3-picker-event|change', Y.bind( this._onInputChange, this ) );
         },
 
         bindUI : function () {
         },
 
         syncUI : function () {
+
+            // vars
+            var _contentBox   = this.get( 'contentBox'  ),
+                _pickerClass  = this.get( 'pickerClass' ),
+                _inputNode    = null;
+
+            // set event callback
+            _inputNode = _contentBox.one( '.' + _pickerClass + '-input' );
+
+            //
+            _inputNode.on( 'yui3-picker-event|change', Y.bind( this._onInputChange, this ) );
+
+            // init q
+            this._q = new Y.AsyncQueue();
         },
 
         /**
@@ -119,57 +132,110 @@ YUI.add('bewype-picker-file', function(Y) {
             this._fileName = _fileName;
         },
 
+        _hideMessage : function ( msgNode ) {
+            msgNode.remove();
+        },
+
+        _showMessage : function ( msg, error ) {
+
+            // temp vars                           
+            var _contentBox    = this.get( 'contentBox' ),
+                _pickerForm    = _contentBox.one( 'form' ),
+                _msgInner      = null,
+                _msgClass      = this.get( 'pickerClass' ) + '-message',
+                _errClass      = error ? 'error' : 'info',
+                _msgNode       = _contentBox.one( '.' + _msgClass );
+
+            // little check
+            if ( !_pickerForm ) {
+                return;
+            }
+
+            // remove previous message
+            if ( _msgNode ) {
+                _msgNode.remove();
+            }
+            
+            // prepare message inner html
+            _msgInner =  '<a class="';
+            _msgInner += _msgClass;
+            _msgInner += ' ';
+            _msgInner += _msgClass + _errClass;
+            _msgInner += '">';
+            _msgInner += msg;
+            _msgInner += '</a>';
+            // create node
+            _msgNode = new Y.Node.create( _msgInner );
+            // add to dom
+            _pickerForm.append( _msgNode );
+
+            // stop first ( just in case )
+            this._q.stop();
+
+            // add clean cb
+            this._q.add(
+                { fn: function () {}, timeout: 1000 },
+                { fn: this._hideMessage, args: [ _msgNode ] }
+            );
+
+            // restart
+            this._q.run();
+        },
+
         _doUpload : function () {
 
             // vars
-            var _contentBox    = this.get( 'contentBox' ),
-                _pickerForm    = _contentBox.one( 'form' ),
-                _handleSuccess = null,
-                _handleFailure = null,
-                _conf          = null,
-                _request       = null;
- 
+            var _contentBox     = this.get( 'contentBox' ),
+                _pickerForm     = _contentBox.one( 'form' ),
+                _handleStart    = null,
+                _handleComplete = null,
+                _conf           = null,
+                _request        = null;
+
     		//A function handler to use for successful requests:
-	    	var _handleSuccess = function(ioId, o){
-                this._fileName = null;
+	    	_handleStart = function( transactionid, args ) {
+			    this._showMessage( 'Upload started...' );
+            };
+
+    		//A function handler to use for completed requests:
+	    	_handleComplete = function( transactionid, response, args, evt ) {
+                if ( response.responseText === 'ok' ) {
+                    // :)
+    			    this._showMessage( 'File successfully uploaded' );
+                    // fire custom event on success
+                    this.fire("picker:onChange");
+                } else {
+                    // :(
+    			    this._showMessage( 'Upload failed!', true );
+                }
             };
  
-    		//A function handler to use for failed requests:
-	    	var _handleFailure = function(ioId, o){
-    		};
- 
 	    	//Subscribe our handlers to IO's global custom events:
-		    Y.on('io:success', _handleSuccess);
-    		Y.on('io:failure', _handleFailure);
+		    Y.on('io:start',    Y.bind( _handleStart,    this ) );
+		    Y.on('io:complete', Y.bind( _handleComplete, this ) );
  
- 
-    		/* Configuration object for POST transaction */
+    		// Configuration object for POST transaction
 	    	_conf = {
 		    	method: 'POST',
-    			form: { id : _pickerForm },
-	    		headers: { 'Content-Type': 'multipart/form-data' }
+    			form: { id : _pickerForm, upload: true },
+            	headers: { 'Content-Type': 'multipart/form-data' }
 		    };
  
+            // do request
             _request = Y.io( this.get( 'uploadUrl' ), _conf );
-
     	},
 
         _onInputChange : function ( evt ) {
 
             // vars
-            var _inputNode   = evt ? evt.target : null,
-                _contentBox  = this.get( 'contentBox' ),
-                _pickerForm  = _contentBox.one( 'form' );
+            var _inputNode   = evt ? evt.target : null;
 
             if ( _inputNode ) {
 
                 // TODO - may be check the url first ???
                 this._fileName = _inputNode.get( 'value' );
 
-                this._doUpload()
-
-                // fire custom event
-                this.fire("picker:onChange");
+                this._doUpload();
             }
         }
     } );
@@ -182,4 +248,4 @@ YUI.add('bewype-picker-file', function(Y) {
 
 
 
-}, '@VERSION@' ,{requires:['io', 'stylesheet', 'substitute', 'widget', 'yui-base']});
+}, '@VERSION@' ,{requires:['async-queue', 'io', 'stylesheet', 'substitute', 'widget', 'yui-base']});

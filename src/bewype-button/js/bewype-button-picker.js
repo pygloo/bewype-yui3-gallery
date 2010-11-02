@@ -57,12 +57,9 @@
             value : null,
             writeOnce : true
         },
-        pickerClass : {
-            value : null,
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
+        pickerParams : {
+            value : {},
+            writeOnce : true
         },
         zIndex : {
             value : 4,
@@ -155,11 +152,11 @@
          */
         showPicker : function () {
             // temp vars
-            var _contentBox  = this.get( 'contentBox'  ),
-                _buttonClass = this.get( 'buttonClass' ),
-                _pickerObj   = this.get( 'pickerObj'   ),
-                _pickerClass = this.get( 'pickerClass' ),
-                _pickerHost  = null;
+            var _contentBox   = this.get( 'contentBox'  ),
+                _buttonClass  = this.get( 'buttonClass' ),
+                _pickerObj    = this.get( 'pickerObj'   ),
+                _pickerParams = this.get( 'pickerParams' ),
+                _pickerHost   = null;
 
             // little check
             if ( _contentBox && _pickerObj ) {
@@ -173,13 +170,7 @@
                 _contentBox.append( _pickerHost );
 
                 // create a picker
-                if ( _pickerClass ) {
-                    this._picker = new _pickerObj( {
-                        pickerClass : this.get( 'pickerClass' )
-                    } );
-                } else {
-                    this._picker = new _pickerObj();
-                }
+                this._picker = new _pickerObj( _pickerParams );
 
                 // set value
                 this._picker.setValue( this._value );

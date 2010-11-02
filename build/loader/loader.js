@@ -2565,6 +2565,7 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
             }, 
             "bewype-picker-file": {
                 "requires": [
+                    "async-queue", 
                     "io", 
                     "stylesheet", 
                     "substitute", 
@@ -3900,7 +3901,7 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         }
     }
 };
-YUI.Env[Y.version].md5 = '597bbb78b81550bff98659b076886b96';
+YUI.Env[Y.version].md5 = '876c14de48a598e63d8cc1f924615e42';
 
 
 }, '@VERSION@' ,{requires:['loader-base']});
