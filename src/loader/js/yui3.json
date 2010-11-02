@@ -266,6 +266,16 @@
                 ], 
                 "skinnable": true
             }, 
+            "bewype-picker-file": {
+                "requires": [
+                    "io", 
+                    "stylesheet", 
+                    "substitute", 
+                    "widget", 
+                    "yui-base"
+                ], 
+                "skinnable": true
+            }, 
             "bewype-picker-font-family": {
                 "requires": [
                     "bewype-picker-base"

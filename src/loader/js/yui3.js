@@ -273,6 +273,16 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
                 ], 
                 "skinnable": true
             }, 
+            "bewype-picker-file": {
+                "requires": [
+                    "io", 
+                    "stylesheet", 
+                    "substitute", 
+                    "widget", 
+                    "yui-base"
+                ], 
+                "skinnable": true
+            }, 
             "bewype-picker-font-family": {
                 "requires": [
                     "bewype-picker-base"
@@ -1600,4 +1610,4 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         }
     }
 };
-YUI.Env[Y.version].md5 = '8f6b1302ce54a57a5fa1a46a7024790b';
+YUI.Env[Y.version].md5 = '597bbb78b81550bff98659b076886b96';

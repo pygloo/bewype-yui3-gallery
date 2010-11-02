@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+    {% block head %}
+    <title>Manual Test - Picker</title>
+    <script type="text/javascript" src="static/build/yui/yui.js"></script>
+    {% endblock %}
+</head>
+<body class="yui3-skin-sam">
+
+        <form method="post" name="form" action="http://localhost:5000/upload" enctype="multipart/form-data" >
+            <input type="file" name="file" />
+            <input type="submit" value="submit" />
+        </form>
+
+    <h2>Picker File</h2>
+    
+    <div id="picker-file"></div>
+
+    <!--
+    http://flask.pocoo.org/docs/quickstart/
+    http://flask.pocoo.org/docs/patterns/fileuploads/#uploading-files
+    -->
+
+    <script>
+        <!--
+        YUI( { filter: 'debug' } ).use( 'bewype-picker-file', function( Y ) {
+
+            // picker file manual
+            var _pickerFile = new Y.Bewype.PickerFile( {
+                pickerSize : 'http://localhost:8000/upload'
+            } );
+            _pickerFile.render( '#picker-file' );
+
+            // add custom event listener
+            _pickerFile.on( 'picker:onChange', function ( e ) {
+                alert( 'Picker File has changed to: ' + e.target.getValue() );
+            } );
+
+        } );
+        -->
+    </script>
+</body>
+</html>
+

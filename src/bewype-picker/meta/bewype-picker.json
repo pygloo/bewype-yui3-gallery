@@ -21,6 +21,16 @@
                 ], 
                 "skinnable": true
             },
+            "bewype-picker-file": {
+                "requires": [
+                    "io",
+                    "stylesheet",
+                    "substitute",
+                    "widget",
+                    "yui-base"
+                ], 
+                "skinnable": true
+            },
             "bewype-picker-font-size": {
                 "requires": [
                     "bewype-picker-base"

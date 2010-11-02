@@ -16,7 +16,7 @@
     PICKER_TMPL += '      <div class="{pickerClass}-label">Url</div>';
     PICKER_TMPL += '    </td>';
     PICKER_TMPL += '    <td>';
-    PICKER_TMPL += '      <input class="{pickerClass}-input" type="text">';
+    PICKER_TMPL += '      <input class="{pickerClass}-input" type="text" />';
     PICKER_TMPL += '    </td>';
     PICKER_TMPL += '  </tr>';
     PICKER_TMPL += '</table></div>';
