@@ -1,4 +1,4 @@
-YUI.add('bewype-editor', function(Y) {
+YUI.add('bewype-editor-text', function(Y) {
 
 
     /**
@@ -7,7 +7,7 @@ YUI.add('bewype-editor', function(Y) {
     var PLACE_TMPL   = '',
         BUTTON_TMPL  = '',
         SPINNER_TMPL = '',
-        Editor       = null;
+        EditorText   = null;
 
     /**
      *
@@ -32,26 +32,26 @@ YUI.add('bewype-editor', function(Y) {
     /**
      *
      */
-    Editor = function(config) {
-        Editor.superclass.constructor.apply( this, arguments );
+    EditorText = function(config) {
+        EditorText.superclass.constructor.apply( this, arguments );
     };
 
     /**
      *
      */
-    Editor.NAME = 'bewype-editor';
+    EditorText.NAME = 'bewype-editor-text';
 
     /**
      *
      */
-    Editor.NS   = 'bewypeEditor';
+    EditorText.NS   = 'bewypeEditorText';
 
     /**
      * disabled: 'color', 'background-color'
      */
-    Editor.ATTRS = {
+    EditorText.ATTRS = {
         editorClass : {
-            value : 'yui3-bewype-editor',
+            value : 'bewype-editor-text',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -129,7 +129,7 @@ YUI.add('bewype-editor', function(Y) {
         }
     };
 
-    Y.extend( Editor, Y.Plugin.Base, {
+    Y.extend( EditorText, Y.Plugin.Base, {
 
         /**
          *
@@ -411,8 +411,8 @@ YUI.add('bewype-editor', function(Y) {
             this._initPanel();
 
             // our custom events
-            Y.publish( 'bewype-editor:onClose'  );
-            Y.publish( 'bewype-editor:onChange' );
+            Y.publish( 'bewype-editor-text:onClose'  );
+            Y.publish( 'bewype-editor-text:onChange' );
         },
 
         /**
@@ -866,9 +866,9 @@ YUI.add('bewype-editor', function(Y) {
 
             switch( name ) {
                 case 'apply':
-                    this.get( 'host' ).unplug( Y.Bewype.Editor );
+                    this.get( 'host' ).unplug( Y.Bewype.EditorText );
                     // fire custom event
-                    return Y.fire( 'bewype-editor:onClose' );
+                    return Y.fire( 'bewype-editor-text:onClose' );
                 case 'cancel':
                     break;
                 default:
@@ -892,7 +892,7 @@ YUI.add('bewype-editor', function(Y) {
                     this._updateMainStyle( name );
 
                     // fire custom event
-                    return Y.fire( 'bewype-editor:onChange' );
+                    return Y.fire( 'bewype-editor-text:onChange' );
 
                 } else if ( name === 'reset') {
 
@@ -903,7 +903,7 @@ YUI.add('bewype-editor', function(Y) {
                     Y.Bewype.Utils.setCssDict( _main, this._oMainCssdict );
 
                     // fire custom event
-                    return Y.fire( 'bewype-editor:onChange' );
+                    return Y.fire( 'bewype-editor-text:onChange' );
 
                 }
             }
@@ -959,7 +959,7 @@ YUI.add('bewype-editor', function(Y) {
                 this._refreshSelectionNode();
 
                 // fire custom event
-                Y.fire( 'bewype-editor:onChange' );
+                Y.fire( 'bewype-editor-text:onChange' );
             }
         },
 
@@ -984,7 +984,7 @@ YUI.add('bewype-editor', function(Y) {
 
             var _spinnerMaxWidth = this.get( 'spinnerMaxWidth' ),
                 _spinnerLeft     = this._buttonDict[ 'padding-left' ],
-                _spinnerWidth    = this._buttonDict[ 'width' ],
+                _spinnerWidth    = this._buttonDict.width,
                 _valueLeft       = _spinnerLeft  ? _spinnerLeft.getValue()  : 0,
                 _valueWidth      = _spinnerWidth ? _spinnerWidth.getValue() : 0,
                 _maxLeft         = _spinnerWidth ? _spinnerMaxWidth - _valueWidth  : _spinnerMaxWidth,
@@ -1023,18 +1023,22 @@ YUI.add('bewype-editor', function(Y) {
                 _placeNode.setStyle( Y.Bewype.Utils.camelize( name ), _newValue + 'px' );
 
                 // fire custom event
-                Y.fire( 'bewype-editor:onChange' );
+                Y.fire( 'bewype-editor-text:onChange' );
             }
         }
 
     } );
 
     // manage custom event
-    Y.augment( Editor, Y.EventTarget );
+    Y.augment( EditorText, Y.EventTarget );
 
     Y.namespace( 'Bewype' );
-    Y.Bewype.Editor = Editor;
+    Y.Bewype.EditorText = EditorText;
 
 
 
-}, '@VERSION@' ,{requires:['bewype-button', 'bewype-entry-spinner', 'bewype-utils', 'dataschema', 'editor', 'event-custom', 'json-stringify', 'plugin', 'stylesheet']});
+}, '@VERSION@' ,{requires:['bewype-button', 'bewype-entry-spinner', 'bewype-utils', 'dataschema', 'editor', 'event-custom', 'json-stringify', 'plugin']});
+
+
+YUI.add('bewype-editor', function(Y){}, '@VERSION@' ,{use:['bewype-editor-text']});
+

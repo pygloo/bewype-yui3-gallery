@@ -1,16 +1,19 @@
 {
     "bewype-editor": {
-        "requires": [
-            "bewype-button",
-            "bewype-entry-spinner",
-            "bewype-utils",
-            "dataschema",
-            "editor",
-            "event-custom",
-            "json-stringify",
-            "plugin",
-            "stylesheet"
-        ], 
-        "skinnable": true
+        "submodules": {
+            "bewype-editor-text": {
+                "requires": [
+                    "bewype-button",
+                    "bewype-entry-spinner",
+                    "bewype-utils",
+                    "dataschema",
+                    "editor",
+                    "event-custom",
+                    "json-stringify",
+                    "plugin"
+                ], 
+                "skinnable": true
+            }
+        }
     }
 }

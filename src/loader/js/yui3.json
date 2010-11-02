@@ -170,18 +170,21 @@
         ]
     }, 
     "bewype-editor": {
-        "requires": [
-            "bewype-button", 
-            "bewype-entry-spinner", 
-            "bewype-utils", 
-            "dataschema", 
-            "editor", 
-            "event-custom", 
-            "json-stringify", 
-            "plugin", 
-            "stylesheet"
-        ], 
-        "skinnable": true
+        "submodules": {
+            "bewype-editor-text": {
+                "requires": [
+                    "bewype-button", 
+                    "bewype-entry-spinner", 
+                    "bewype-utils", 
+                    "dataschema", 
+                    "editor", 
+                    "event-custom", 
+                    "json-stringify", 
+                    "plugin"
+                ], 
+                "skinnable": true
+            }
+        }
     }, 
     "bewype-entry": {
         "submodules": {
@@ -217,7 +220,8 @@
                     "plugin", 
                     "substitute", 
                     "async-queue"
-                ]
+                ], 
+                "skinnable": true
             }, 
             "bewype-layout-designer-content-text": {
                 "requires": [
