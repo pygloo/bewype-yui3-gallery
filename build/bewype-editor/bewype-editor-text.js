@@ -34,13 +34,6 @@ YUI.add('bewype-editor-text', function(Y) {
      * disabled: 'color', 'background-color'
      */
     EditorText.ATTRS = {
-        selectionColor : {
-            value : '#ddd',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        }
     };
 
     Y.extend( EditorText, Y.Bewype.EditorBase, {
@@ -437,7 +430,7 @@ YUI.add('bewype-editor-text', function(Y) {
                 case 'apply':
                     this.get( 'host' ).unplug( Y.Bewype.EditorText );
                     // fire custom event
-                    Y.fire( 'bewype-editor-text:onClose' );
+                    Y.fire( 'bewype-editor:onClose' );
                     // nothing changed but close
                     return false;
                 case 'cancel':

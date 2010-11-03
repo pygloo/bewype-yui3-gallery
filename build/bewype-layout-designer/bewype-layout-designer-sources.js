@@ -47,12 +47,12 @@ YUI.add('bewype-layout-designer-sources', function(Y) {
         /**
          *
          */
-        _groups : [ 'horizontal', 'vertical', 'text' ],
+        _groups : [ 'horizontal', 'vertical', 'text', 'image' ],
 
         /**
          *
          */
-        _labels: [ 'Layout Horizontal', 'Layout Vertical', 'Text' ],
+        _labels: [ 'Layout Horizontal', 'Layout Vertical', 'Text', 'Image' ],
 
         /**
          *

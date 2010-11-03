@@ -103,7 +103,7 @@
                     this.get( 'host' ).unplug( Y.Bewype.EditorTag );
 
                     // fire custom event
-                    Y.fire( 'bewype-editor-tag:onClose' );
+                    Y.fire( 'bewype-editor:onClose' );
 
                     // not changed but close
                     return false;

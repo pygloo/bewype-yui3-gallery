@@ -112,7 +112,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
         /**
          *
          */
-        _groups : [ 'horizontal', 'vertical', 'text' ],
+        _groups : [ 'horizontal', 'vertical', 'text', 'image' ],
 
         /**
          *
@@ -399,6 +399,10 @@ YUI.add('bewype-layout-designer-target', function(Y) {
 
                 return 'text';
 
+            }  else if ( _drag._groups.image ) {
+
+                return 'image';
+
             } else {
 
                 return null;
@@ -413,7 +417,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 _host = this.get( 'host' );
 
             // specific for text or image .. nothing to do ..
-            if ( _hitType === 'text' ) { return this._afterDropExit( evt ); }
+            if ( _hitType === 'text' || _hitType === 'image' ) { return this._afterDropExit( evt ); }
 
             // destroy plugins
             _host.unplug( Y.Bewype.LayoutDesignerTarget );

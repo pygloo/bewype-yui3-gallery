@@ -238,6 +238,13 @@
                 ], 
                 "skinnable": true
             }, 
+            "bewype-layout-designer-content-image": {
+                "requires": [
+                    "bewype-layout-designer-content-base", 
+                    "bewype-editor"
+                ], 
+                "skinnable": true
+            }, 
             "bewype-layout-designer-content-text": {
                 "requires": [
                     "bewype-layout-designer-content-base", 
