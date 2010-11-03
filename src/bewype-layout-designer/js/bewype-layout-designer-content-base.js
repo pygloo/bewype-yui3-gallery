@@ -9,59 +9,14 @@
     /**
      *
      */
-    LayoutDesignerContentBase.NAME       = 'layout-designer-content';
+    LayoutDesignerContentBase.NAME = 'layout-designer-content';
 
     /**
      *
      */
-    LayoutDesignerContentBase.NS         = 'layoutDesignerContent';
+    LayoutDesignerContentBase.NS   = 'layoutDesignerContent';
 
-    /**
-     *
-     */
-    LayoutDesignerContentBase.ATTRS = {
-        designerClass : {
-            value : 'layout-designer',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        contentType : {
-            value : 'base',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        contentHeight : {
-            value : 40,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        contentWidth : {
-            value : 40,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        contentZIndex : {
-            value : 1,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        baseNode : {
-            value : null,
-            writeOnce : true
-        },
-        parentNode : {
-            value : null
-        }
-    };
-
-    Y.extend( LayoutDesignerContentBase, Y.Plugin.Base, {
+    Y.extend( LayoutDesignerContentBase, Y.Bewype.LayoutDesignerConfig, {
 
         /**
          *
@@ -73,24 +28,24 @@
          */
         editing : false,
 
-        _init: function ( config, template ) {
+        _init: function ( template ) {
             
             // temp var
-            var _host        = config.host,
-                _parentNode  = config.parentNode,
+            var _host        = this.get( 'host' ),
+                _parentNode  = this.get( 'parentNode' ),
                 _contentNode = null;
 
             // add dest node
             _contentNode = new Y.Node.create( Y.substitute( template, {
-                designerClass : config.designerClass,
-                contentType   : config.contentType
+                designerClass : this.get( 'designerClass' ),
+                contentType   : this.get( 'contentType' )
             } ) ); // create content node
             // dom add
             _host.append( _contentNode );
         
             // common default height
-            _contentNode.setStyle( 'height', config.contentHeight );
-            _contentNode.setStyle( 'width',  config.contentWidth );
+            _contentNode.setStyle( 'height', this.get( 'contentHeight' ) );
+            _contentNode.setStyle( 'width',  this.get( 'contentWidth'  ) );
 
             // set event management
             Y.on( 'mouseenter', Y.bind( this._onMouseEnter, this ) , _host );
@@ -109,6 +64,8 @@
          *
          */
         initializer : function( config ) {
+            // ??
+            this.setAttrs( config );
         },
 
         /**

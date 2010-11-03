@@ -9,36 +9,19 @@
     /**
      *
      */
-    LayoutDesignerContentText.C_TEMPLATE = '<div class="{designerClass}-content {designerClass}-content-{contentType}"></div>';
+    LayoutDesignerContentText.C_TEMPLATE =  '<div class="{designerClass}-content ';
+    LayoutDesignerContentText.C_TEMPLATE += '{designerClass}-content-{contentType}">';
+    LayoutDesignerContentText.C_TEMPLATE += '</div>';
 
     /**
      *
      */
-    LayoutDesignerContentText.NAME  = 'layout-designer-content-text';
+    LayoutDesignerContentText.NAME = 'layout-designer-content-text';
 
     /**
      *
      */
-    LayoutDesignerContentText.NS    = 'layoutDesignerContent';
-
-    /**
-     *
-     */
-    LayoutDesignerContentText.ATTRS = {
-        contentType : {
-            value : 'text',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        defaultContent : {
-            value : 'Text..',
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        }
-    };
+    LayoutDesignerContentText.NS   = 'layoutDesignerContent';
 
     Y.extend( LayoutDesignerContentText, Y.Bewype.LayoutDesignerContentBase, {
 
@@ -57,11 +40,14 @@
          */
         initializer : function( config ) {
 
+            // ??
+            this.setAttrs( config );
+
             // init content  node and plugin content base
-            var _contentNode = this._init( config, LayoutDesignerContentText.C_TEMPLATE );
+            var _contentNode = this._init( LayoutDesignerContentText.C_TEMPLATE );
 
             // set default content
-            _contentNode.set( 'innerHTML', config.defaultContent );
+            _contentNode.set( 'innerHTML', this.get( 'defaultText' ) );
         }
     } );
 

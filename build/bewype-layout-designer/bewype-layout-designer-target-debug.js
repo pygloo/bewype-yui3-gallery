@@ -12,92 +12,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
 
     LayoutDesignerTarget.NS    = 'layoutDesignerTarget';
 
-    LayoutDesignerTarget.ATTRS = {
-        designerClass : {
-            value : 'layout-designer',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        targetOverHeight : {
-            value : 20,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        targetMinHeight : {
-            value : 8,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        targetOverWidth : {
-            value : 20,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        targetMinWidth : {
-            value : 8,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        targetType : {
-            value : 'vertical',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        targetZIndex : {
-            value : 1,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        contentHeight : {
-            value : 40,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        contentWidth : {
-            value : 140,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        contentZIndex : {
-            value : 1,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        defaultContent : {
-            value : 'Text..',
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        layoutWidth : {
-            value : 600,
-            setter : '_setLayoutWidth',
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        baseNode : {
-            value : null,
-            writeOnce : true
-        },
-        parentNode : {
-            value : null
-        }
-    };
-
-    Y.extend( LayoutDesignerTarget, Y.Plugin.Base, {
+    Y.extend( LayoutDesignerTarget, Y.Bewype.LayoutDesignerConfig, {
 
         /**
          *
@@ -118,6 +33,9 @@ YUI.add('bewype-layout-designer-target', function(Y) {
          *
          */
         initializer: function( config ) {
+
+            // ??
+            this.setAttrs( config );
 
             // temp vars
             var _host  = this.get( 'host'       ),
@@ -340,45 +258,31 @@ YUI.add('bewype-layout-designer-target', function(Y) {
         _addPlaces : function ( destNode, type ) {
 
             // temp vars
-            var _host = this.get( 'host' ),
-                _parentNode = ( destNode.ancestor( 'td' ) ) ? _host : null;
+            var _host       = this.get( 'host' ),
+                _parentNode = ( destNode.ancestor( 'td' ) ) ? _host : null,
+                _config     = this.getAttrs();
+
+            // prepare config
+            _config.placesType = type;
+            _config.parentNode = _parentNode;
 
             // plug places
-            destNode.plug( Y.Bewype.LayoutDesignerPlaces, {
-                placesMinHeight : this.get( 'targetMinHeight' ),
-                placesMinWidth  : this.get( 'targetMinWidth'  ),
-                contentHeight   : this.get( 'contentHeight'   ),
-                contentWidth    : this.get( 'contentWidth'    ),
-                contentZIndex   : this.get( 'contentZIndex'   ),
-                defaultContent  : this.get( 'defaultContent'  ),
-                designerClass   : this.get( 'designerClass'   ),
-                placesType      : type,
-                baseNode        : this.get( 'baseNode'        ),
-                parentNode      : _parentNode
-            } );
+            destNode.plug( Y.Bewype.LayoutDesignerPlaces, _config );
         },
 
         _addTarget : function ( destNode, type ) {
 
             // temp vars
             var _host = this.get( 'host' ),
-                _parentNode = ( destNode.ancestor( 'td' ) ) ? _host : null;
+                _parentNode = ( destNode.ancestor( 'td' ) ) ? _host : null,
+                _config     = this.getAttrs();
+
+            // prepare config
+            _config.targetType = type;
+            _config.parentNode = _parentNode;
 
             // plug target
-            destNode.plug( Y.Bewype.LayoutDesignerTarget, {
-                targetOverHeight : this.get( 'targetOverHeight' ),
-                targetMinHeight  : this.get( 'targetMinHeight'  ),
-                targetOverWidth  : this.get( 'targetOverWidth'  ),
-                targetMinWidth   : this.get( 'targetMinWidth'   ),
-                contentHeight    : this.get( 'contentHeight'    ),
-                contentWidth     : this.get( 'contentWidth'     ),
-                contentZIndex    : this.get( 'contentZIndex'    ),
-                defaultContent   : this.get( 'defaultContent'   ),
-                designerClass    : this.get( 'designerClass'    ),
-                targetType       : type,
-                baseNode         : this.get( 'baseNode'         ),
-                parentNode       : _parentNode
-            } );
+            destNode.plug( Y.Bewype.LayoutDesignerTarget, _config );
         },
 
         _getHitType : function ( evt ) {

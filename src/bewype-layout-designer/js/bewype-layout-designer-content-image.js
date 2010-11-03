@@ -11,7 +11,7 @@
      */
     LayoutDesignerContentImage.C_TEMPLATE =  '<image class="{designerClass}-content ';
     LayoutDesignerContentImage.C_TEMPLATE += '{designerClass}-content-{contentType}" ';
-    LayoutDesignerContentImage.C_TEMPLATE += 'src="{defaultImgSrc}" />';
+    LayoutDesignerContentImage.C_TEMPLATE += 'src="{defaultImg}" />';
     /**
      *
      */
@@ -25,23 +25,6 @@
     /**
      *
      */
-    LayoutDesignerContentImage.ATTRS = {
-        contentType : {
-            value : 'image',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        defaultImgSrc : {
-            value : 'http://www.google.fr/images/logo.png',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        }
-    };
-
     Y.extend( LayoutDesignerContentImage, Y.Bewype.LayoutDesignerContentBase, {
 
         /**
@@ -59,12 +42,16 @@
          */
         initializer : function( config ) {
 
+            // ??
+            this.setAttrs( config );
+
             // init content  node and plugin content base
             var _template = Y.substitute( LayoutDesignerContentImage.C_TEMPLATE, {
-                    defaultImgSrc : this.get( 'defaultImgSrc' )
+                    defaultImg : this.get( 'defaultImg' )
                 } );
+
             // do init
-            this._init( config, _template );
+            this._init( _template );
         }
     } );
 

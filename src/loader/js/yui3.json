@@ -235,11 +235,16 @@
                 ], 
                 "skinnable": true
             }, 
+            "bewype-layout-designer-config": {
+                "requires": [
+                    "plugin"
+                ]
+            }, 
             "bewype-layout-designer-content-base": {
                 "requires": [
-                    "plugin", 
                     "substitute", 
-                    "async-queue"
+                    "async-queue", 
+                    "bewype-layout-designer-config"
                 ], 
                 "skinnable": true
             }, 
@@ -267,8 +272,8 @@
             "bewype-layout-designer-sources": {
                 "requires": [
                     "dd", 
-                    "plugin", 
-                    "substitute"
+                    "substitute", 
+                    "bewype-layout-designer-config"
                 ], 
                 "skinnable": true
             }, 

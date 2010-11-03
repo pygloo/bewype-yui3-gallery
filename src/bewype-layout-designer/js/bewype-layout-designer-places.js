@@ -30,53 +30,7 @@
     LayoutDesignerPlaces.V_DEST_TEMPLATE    += '</td>';
     LayoutDesignerPlaces.V_DEST_TEMPLATE    += '</tr>';
 
-    /**
-     *
-     */
-    LayoutDesignerPlaces.ATTRS = {
-        designerClass : {
-            value : 'layout-designer',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        contentHeight : {
-            value : 40,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        contentWidth : {
-            value : 140,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        placesType : {
-            value : 'vertical',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        defaultContent : {
-            value : 'Text..',
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        baseNode : {
-            value : null,
-            writeOnce : true
-        },
-        parentNode : {
-            value : null,
-            writeOnce : false
-        }
-    };
-
-    Y.extend( LayoutDesignerPlaces, Y.Plugin.Base, {
+    Y.extend( LayoutDesignerPlaces, Y.Bewype.LayoutDesignerConfig, {
 
         placesNode : null,
 
@@ -88,6 +42,9 @@
          *
          */
         initializer: function ( config ) {
+
+            // ??
+            this.setAttrs( config );
             
             // temp var
             var _host           = this.get( 'host'       ),
@@ -504,7 +461,12 @@
 
             // add dest node
             var _destNode    = this.addDestNode(),
-                _pluginClass = null;
+                _pluginClass = null,
+                _config     = this.getAttrs();
+
+            // prepare config
+            _config.contentType = contentType;
+            _config.parentNode  = this.get( 'host' );
 
             // content type factory
             switch( contentType ) {
@@ -519,16 +481,7 @@
             }
 
             // plug node
-            _destNode.plug( _pluginClass, {
-                designerClass  : this.get( 'designerClass'  ),
-                contentType    : contentType,
-                contentHeight  : this.get( 'contentHeight'  ),
-                contentWidth   : this.get( 'contentWidth'   ),
-                contentZIndex  : this.get( 'contentZIndex'  ),
-                defaultContent : this.get( 'defaultContent' ),
-                baseNode       : this.get( 'baseNode'       ),
-                parentNode     : this.get( 'host'           )
-            } );
+            _destNode.plug( _pluginClass, _config );
         },
 
         /**
