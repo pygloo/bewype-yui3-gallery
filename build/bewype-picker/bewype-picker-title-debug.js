@@ -22,7 +22,7 @@ YUI.add('bewype-picker-title', function(Y) {
         },
         titles : {
             value : [
-                [ null, 'Normal' ],
+                [ 'normal', 'Normal' ],
                 [ 'h1', 'Title 1' ],
                 [ 'h2', 'Title 2' ],
                 [ 'h3', 'Title 3' ],
@@ -55,7 +55,7 @@ YUI.add('bewype-picker-title', function(Y) {
             // add familys
             Y.Object.each( this.get( 'titles' ), function (v, k) {
                 // prepare values
-                var _text = '<' + v[ 0 ] + '>' + v[ 1 ] + '</' + v[ 0 ] + '>' ;
+                var _text = !v[ 0 ] ? v[ 1 ] : '<' + v[ 0 ] + '>' + v[ 1 ] + '</' + v[ 0 ] + '>' ;
                 // do add
                 this.append( v[ 0 ], _text );
             }, this );

@@ -487,8 +487,11 @@
             // get content position
             var _i = this.contents.indexOf( content );
 
-            // do remove
-            this.contents.splice( _i, 1 );
+            // little check
+            if ( _i != -1 ) {
+                // do remove
+                this.contents.splice( _i, 1 );
+            }
         },
 
         /**

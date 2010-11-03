@@ -1,30 +1,33 @@
 {
     "bewype-editor": {
         "submodules": {
-            "bewype-editor-text": {
+            "bewype-editor-panel": {
                 "requires": [
                     "bewype-button",
                     "bewype-entry-spinner",
                     "bewype-utils",
                     "dataschema",
-                    "editor",
                     "event-custom",
                     "json-stringify",
                     "plugin"
                 ], 
                 "skinnable": true
             },
+            "bewype-editor-base": {
+                "requires": [
+                    "bewype-editor-panel"
+                ]
+            },
             "bewype-editor-tag": {
                 "requires": [
-                    "bewype-button",
-                    "bewype-entry-spinner",
-                    "bewype-utils",
-                    "dataschema",
-                    "event-custom",
-                    "json-stringify",
-                    "plugin"
-                ], 
-                "skinnable": true
+                    "bewype-editor-base"
+                ]
+            },
+            "bewype-editor-text": {
+                "requires": [
+                    "bewype-editor-base",
+                    "editor"
+                ]
             }
         }
     }

@@ -1,19 +1,12 @@
-YUI.add('bewype-editor-tag', function(Y) {
+YUI.add('bewype-editor-panel', function(Y) {
 
 
     /**
      *
      */
-    var PLACE_TMPL   = '',
-        BUTTON_TMPL  = '',
+    var BUTTON_TMPL  = '',
         SPINNER_TMPL = '',
-        EditorTag   = null;
-
-    /**
-     *
-     */
-    PLACE_TMPL += '<div class="{editorClass}-place">';
-    PLACE_TMPL += '</div>';
+        EditorPanel   = null;
 
     /**
      *
@@ -32,26 +25,26 @@ YUI.add('bewype-editor-tag', function(Y) {
     /**
      *
      */
-    EditorTag = function(config) {
-        EditorTag.superclass.constructor.apply( this, arguments );
+    EditorPanel = function(config) {
+        EditorPanel.superclass.constructor.apply( this, arguments );
     };
 
     /**
      *
      */
-    EditorTag.NAME = 'bewype-editor-tag';
+    EditorPanel.NAME = 'bewype-editor-panel';
 
     /**
      *
      */
-    EditorTag.NS   = 'bewypeEditorTag';
+    EditorPanel.NS   = 'bewypeEditorPanel';
 
     /**
-     * disabled: 'color', 'background-color'
+     * disabled: 'color', 'background-color', 'padding-right', 'padding-left', 'file', 'underline'
      */
-    EditorTag.ATTRS = {
+    EditorPanel.ATTRS = {
         editorClass : {
-            value : 'bewype-editor-tag',
+            value : 'bewype-editor-panel',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -60,14 +53,11 @@ YUI.add('bewype-editor-tag', function(Y) {
         activeButtons : {
             value : [
                     'height',
-                    'width',       
-                    'padding-top',  
-                    'padding-right',  
-                    'padding-bottom',  
-                    'padding-left',
+                    'width',
+                    'padding-top',
+                    'padding-bottom',
                     'bold',
                     'italic',
-                    'file',
                     'title',
                     'font-family',
                     'font-size',
@@ -75,17 +65,6 @@ YUI.add('bewype-editor-tag', function(Y) {
                     'apply'
                     ],
             writeOnce : true
-        },
-        panelNode : {
-            value : null,
-            writeOnce : true
-        },
-        selectionColor : {
-            value : '#ddd',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
         },
         spinnerLabelHeight : {
             value : 'height',
@@ -153,21 +132,19 @@ YUI.add('bewype-editor-tag', function(Y) {
         uploadUrl : {
             value : Y.config.doc.location.href + 'upload',
             writeOnce : true
+        },
+        spinnerValues : {
+            value : {}
         }
     };
 
-    Y.extend( EditorTag, Y.Plugin.Base, {
+    Y.extend( EditorPanel, Y.Plugin.Base, {
 
-        /**
-         *
-         */
-        _editor     : null,
+        _buttonDict     : {},
 
-        _buttonDict : {},
+        _editors        : [],
 
         _spinnerButtons : [ 'height', 'width', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left' ],
-
-        _spinnerValues  : {},
 
         _toggleButtons  : [ 'bold', 'italic', 'underline' ],
 
@@ -187,58 +164,15 @@ YUI.add('bewype-editor-tag', function(Y) {
 
         _cssButtons  : [ 'font-family', 'font-size', 'color', 'background-color' ],
 
-        _initSpinnerValues : function () {
+        _addSpinnerButton : function ( name, config ) {
 
-            // get host
-            var _host        = this.get( 'host' ),
-                _cssDict     = Y.Bewype.Utils.getCssDict( _host ),
-                _fn          = null,
-                _h           = Y.Bewype.Utils.getHeight( _host ) + 'px',    
-                _w           = Y.Bewype.Utils.getWidth(  _host ) + 'px';       
-
-            // ensure height and width values
-            if ( !Y.Object.hasKey( _cssDict, 'height' ) ) {   
-                 _host.setStyle( 'height',  _h );        
-                _cssDict.height = _h;
-            }                     
-
-            if ( !Y.Object.hasKey( _cssDict, 'width' ) ) {                  
-                _host.setStyle( 'width',  _w );             
-                _cssDict.width = _w; 
-            }  
-
-            _fn = function ( key, val ) {
-
-                var _isHeight        = key === 'height',            
-                    _isWidth         = key === 'width',            
-                    _keySplt         = key.split( '-' ),            
-                    _keySplt         = key.split( '-' ),            
-                    _hasBorder       = _keySplt.indexOf( 'border'  ) != -1,
-                    _hasPadding      = _keySplt.indexOf( 'padding' ) != -1;
-
-                // place or content style factory
-                if ( _isHeight || _isWidth || _hasBorder || _hasPadding ) {
-                    // update spinner dict
-                    this._spinnerValues[ key ] = val;
-                }
-
-                // return something to continue
-                return val;
-            };
-
-            // separate place and content style
-            Y.JSON.stringify( _cssDict, Y.bind( _fn, this ) );
-        },
-
-        _addSpinnerButton : function ( name ) {
-
-            var _panelNode         = this.get( 'panelNode'   ),
-                _editorClass       = this.get( 'editorClass' ) + '-button',
-                _spinnerClass      = this.get( 'editorClass' ) + '-spinner-' + name,
-                _spinnerNode       = null,
-                _spinner           = null,
-                _valueTxt          = this._spinnerValues[ name ],
-                _value             = _valueTxt ? parseInt( _valueTxt.replace( /px/i, '' ), 10 ) : 0;
+            var _host         = this.get( 'host'   ),
+                _editorClass  = this.get( 'editorClass' ) + '-button',
+                _spinnerClass = this.get( 'editorClass' ) + '-spinner-' + name,
+                _spinnerNode  = null,
+                _spinner      = null,
+                _valueTxt     = config.spinnerValues[ name ],
+                _value        = _valueTxt ? parseInt( _valueTxt.replace( /px/i, '' ), 10 ) : 0;
 
             // create node
             _spinnerNode = new Y.Node.create(
@@ -249,7 +183,7 @@ YUI.add('bewype-editor-tag', function(Y) {
                 } )
             );
             // add new node for the panel
-            _panelNode.append( _spinnerNode );
+            _host.append( _spinnerNode );
             
             // attach spinner
             _spinner = new Y.Bewype.EntrySpinner({
@@ -261,7 +195,7 @@ YUI.add('bewype-editor-tag', function(Y) {
             _spinner.render();
 
            // connect
-           _spinner.on( 'entry:onChange', Y.bind( this._onSpinnerEventChange, this, name ) );
+           _spinner.on( 'entry:onChange', Y.bind( this._onSpinnerChange, this, name ) );
 
             // update button dict
             this._buttonDict[ name ] = _spinner;
@@ -269,7 +203,7 @@ YUI.add('bewype-editor-tag', function(Y) {
 
         __buttonFactory : function ( name, buttonClass, button ) {
 
-            var _panelNode   = this.get( 'panelNode'   ),
+            var _host        = this.get( 'host'   ),
                 _editorClass = this.get( 'editorClass' ),
                 _buttonNode  = null,
                 _customEventChange = null,
@@ -283,7 +217,7 @@ YUI.add('bewype-editor-tag', function(Y) {
                 } )
             );
             // add new node for the panel
-            _panelNode.append( _buttonNode );
+            _host.append( _buttonNode );
 
             // render button after add
             button.render( _buttonNode );
@@ -294,11 +228,11 @@ YUI.add('bewype-editor-tag', function(Y) {
             } else {
                 _customEventChange = 'button:onChange';
             }
-            button.on( _customEventChange, Y.bind( this._onButtonEventChange, this, name ) );
+            button.on( _customEventChange, Y.bind( this._onButtonChange, this, name ) );
 
             if ( this._pickerButtons.indexOf( name ) != -1 ) {
                 _customEventClick = 'button:onClick';
-                button.before( _customEventClick, Y.bind( this._onButtonEventClick, this, name ) );
+                button.before( _customEventClick, Y.bind( this._onButtonClick, this, name ) );
             }
 
             // update button dict
@@ -339,7 +273,7 @@ YUI.add('bewype-editor-tag', function(Y) {
             this.__buttonFactory( name, 'picker-button', _button );
         },
 
-        _initPanel : function () {
+        _initPanel : function ( config ) {
 
             var _activeButtons = this.get( 'activeButtons' );
 
@@ -347,11 +281,11 @@ YUI.add('bewype-editor-tag', function(Y) {
                 // check active
                 if ( _activeButtons.indexOf( v ) != -1 ) { 
                     // do add
-                    this._addSpinnerButton( v );
+                    this._addSpinnerButton( v, config );
                 }
             }, this );
             // set max value
-            this._updateSpinnerMaxWidth();
+            this.updateSpinnerMaxWidth();
 
             Y.Object.each( this._toggleButtons , function( v, k ) {
                 // check active
@@ -379,17 +313,12 @@ YUI.add('bewype-editor-tag', function(Y) {
          */
         initializer : function( config ) {
 
-            // set editor content
-            this._initSpinnerValues();
-
             // set panel
-            this._initPanel();
-
-            this._refreshButtons( true );
+            this._initPanel( config );
 
             // our custom events
-            Y.publish( 'bewype-editor-tag:onClose'  );
-            Y.publish( 'bewype-editor-tag:onChange' );
+            Y.publish( 'bewype-editor:onClose'  );
+            Y.publish( 'bewype-editor:onChange' );
         },
 
         /**
@@ -398,8 +327,8 @@ YUI.add('bewype-editor-tag', function(Y) {
         destructor : function () {
     
             // tmp vars
-            var _editorClass   = this.get( 'editorClass' ),
-                _panelNode     = this.get( 'panelNode'   );
+            var _host        = this.get( 'host' ),
+                _editorClass = this.get( 'editorClass' );
 
             // remove buttons
             Y.Object.each( this.get( 'activeButtons' ) , function( v, k ) {
@@ -409,10 +338,302 @@ YUI.add('bewype-editor-tag', function(Y) {
             }, this );
 
             // remove button nodes
-            _panelNode.all( '.' + _editorClass + '-button' ).each( function( v, k ) {
+            _host.all( '.' + _editorClass + '-button' ).each( function( v, k ) {
                 // remove node
                 v.remove();
             } );
+        },
+
+        registerEditor : function ( editor ) {
+            // check already registered
+            if ( this._editors.indexOf( editor ) == -1 ) {
+                this._editors.push( editor );
+            }
+        },
+
+        unRegisterEditor : function ( editor ) {
+
+            // get editor position
+            var _i = this._editors.indexOf( editor );
+
+            // little check
+            if ( _i != -1 ) {
+                // do remove
+                this._editors.splice( _i, 1 );
+            }
+        },
+
+        getWorkingTagName : function ( name, previous ) {
+
+            switch( name ) {
+                case 'bold':
+                    return 'b';
+
+                case 'italic':
+                    return 'i';
+
+                case 'title':
+                    var _button  = this._buttonDict[ name ],
+                        _tagName = previous ? _button.getPrevious() : _button.getValue();
+                    return _tagName === 'normal' ? null : _tagName;
+
+                case 'underline':
+                    return 'u';
+
+                case 'url':
+                    return 'a';
+
+                default:
+                    return 'span';
+            }
+        },
+
+        getButton : function ( name ) {                        
+            return this._buttonDict[ name ];
+        },
+
+        isCssButton : function ( name ) {
+            return this._cssButtons.indexOf( name ) != -1;
+        },
+
+        _getStyleValue : function ( node, name ) {
+            
+            if ( !node ) {
+                return null;
+            } else if ( name === 'url' ) {
+                return node.get( 'href' );
+            } else {
+                var _cssDict = Y.Bewype.Utils.getCssDict( node );
+                return _cssDict[ name ];
+            }
+        },
+
+        refreshButtons : function ( node, reset, name ) {
+
+            if ( !node ) {
+                return;
+            }
+
+            var _buttonNames   = name ? [ name ] : this.get( 'activeButtons' );
+
+            Y.Object.each( _buttonNames, function( v, k ) {
+
+                // no update for inactive button
+                if ( this.get( 'activeButtons' ).indexOf(v) === -1) {
+                    return;
+                }
+
+                var _value = null;
+
+                switch ( v ) {
+                    case 'bold':
+                        _value = reset ? false : node.one( 'b' ) !== null;
+                        return this._buttonDict[ v ].setValue( _value );
+
+                    case 'italic':
+                        _value = reset ? false : node.one( 'i' ) !== null;
+                        return this._buttonDict[ v ].setValue( _value );
+
+                    case 'underline':
+                        _value = reset ? false : node.one( 'u' ) !== null;
+                        return this._buttonDict[ v ].setValue( _value ); 
+
+                    case 'file':
+                        this._buttonDict.height.setValue( node._node.height );
+                        this._buttonDict.width.setValue(  node._node.width );
+                        return;
+
+                    case 'font-family':
+                    case 'font-size':
+                    case 'color':
+                    case 'background-color':
+                        _value = reset ? false : this._getStyleValue( node, v );
+                        return this._buttonDict[ v ].setValue( _value );
+
+                    case 'url':
+                        _value = reset ? false : this._getStyleValue( node, v );
+                        return this._buttonDict[ v ].setValue( _value );
+                }
+            }, this );
+        },
+
+        updateSpinnerMaxWidth : function () {
+
+            var _spinnerMaxWidth = this.get( 'spinnerMaxWidth' ),
+                _spinnerLeft     = this._buttonDict[ 'padding-left' ],
+                _spinnerRight    = this._buttonDict[ 'padding-right' ],
+                _spinnerWidth    = this._buttonDict.width,
+                _valueLeft       = _spinnerLeft  ? _spinnerLeft.getValue()  : 0,
+                _valueRight      = _spinnerRight ? _spinnerRight.getValue() : 0,
+                _valueWidth      = _spinnerWidth ? _spinnerWidth.getValue() : 0,   
+                _maxLeft         = _spinnerWidth ? _spinnerMaxWidth - _valueWidth - _valueRight  : _spinnerMaxWidth,    
+                _maxRight        = _spinnerWidth ? _spinnerMaxWidth - _valueWidth - _valueLeft   : _spinnerMaxWidth,    
+                _maxWidth        = _spinnerLeft  ? _spinnerMaxWidth - _valueLeft  - _valueRight  : _spinnerMaxWidth;
+
+            if ( _spinnerLeft  ) { _spinnerLeft.set(  'max', _maxLeft  ); }
+            if ( _spinnerWidth ) { _spinnerWidth.set( 'max', _maxWidth ); }
+
+            return {
+                'padding-left'  : _maxLeft,       
+                'padding-right' : _maxRight,       
+                'width'         : _maxWidth
+            };
+        },
+
+        _onButtonClick : function ( name, e ) {
+
+            var _activeButtons = this.get( 'activeButtons' );
+
+            // close all pickers first
+            Y.Object.each( this._pickerButtons , function( v, k ) {
+                // check active
+                if ( _activeButtons.indexOf( v ) != -1 && v != name ) { 
+                    // hide
+                    this._buttonDict[ v ].hidePicker();
+                }
+            }, this );
+
+            // call editors for sepcific task
+            Y.each( this._editors , function( v, k ) {
+                v.onButtonClick( name, e );
+            } );
+        },
+
+        _onButtonChange : function ( name, e ) {
+
+            // init changed flag
+            var _changed = false;                              
+
+            // call editors for sepcific task
+            Y.each( this._editors , function( v, k ) {
+                _changed |= v.onButtonChange( name, e );
+            } );
+
+            // fire custom event
+            return _changed ? Y.fire( 'bewype-editor:onChange' ) : null;
+        },
+
+        _onSpinnerChange : function ( name, e ) {
+
+            // init changed flag
+            var _changed = false;
+
+            // call editors for sepcific task
+            Y.each( this._editors , function( v, k ) {
+                _changed |= v.onSpinnerChange( name, e );
+            } );
+
+            // fire custom event
+            return _changed ? Y.fire( 'bewype-editor:onChange' ) : null;
+        }
+    } );
+
+    // manage custom event
+    Y.augment( EditorPanel, Y.EventTarget );
+
+    Y.namespace( 'Bewype' );
+    Y.Bewype.EditorPanel = EditorPanel;
+
+
+
+}, '@VERSION@' ,{requires:['bewype-button', 'bewype-entry-spinner', 'bewype-utils', 'dataschema', 'event-custom', 'json-stringify', 'plugin']});
+YUI.add('bewype-editor-base', function(Y) {
+
+
+    /**
+     *
+     */
+    var EditorBase = null;
+
+    /**
+     *
+     */
+    EditorBase = function(config) {
+        EditorBase.superclass.constructor.apply( this, arguments );
+    };
+
+    /**
+     *
+     */
+    EditorBase.NAME = 'bewype-editor-base';
+
+    /**
+     * disabled: 'color', 'background-color'
+     */
+    EditorBase.ATTRS = {
+        editorClass : {
+            value : 'bewype-editor',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },
+        panelNode : {
+            value : null,
+            writeOnce : true
+        },
+        spinnerValues : {
+            value : {}
+        }
+    };
+
+    Y.extend( EditorBase, Y.Plugin.Base, {
+
+        /**
+         *
+         */
+        _panel : null,
+
+        /**
+         * common init file
+         */
+        _init : function ( config, spinnerValues ) {
+
+            // temp var
+            var _panelNode = this.get( 'panelNode' );
+
+            // plug panel using passed config
+            config.spinnerValues = spinnerValues;
+            _panelNode.plug( Y.Bewype.EditorPanel, config );
+
+            // set our global panel var
+            this._panel = _panelNode.bewypeEditorPanel;
+
+            // register
+            this._panel.registerEditor( this );
+
+        },
+
+        /**
+         *
+         */
+        initializer : function( config ) {             
+        },
+
+        /**
+         *
+         */
+        _destroy : function () {
+
+            // temp var
+            var _panelNode = this.get( 'panelNode' );
+
+            // unplug panel
+            if ( this._panel && _panelNode.bewypeEditorPanel ) {
+
+                // un-register
+                this._panel.unRegisterEditor( this );
+
+                // un plug
+                this.get( 'panelNode' ).unplug( Y.Bewype.EditorPanel );
+            }
+        },
+
+        /**
+         *
+         */
+        destructor : function () {
+            this._destroy();                       
         },
 
         _hasLeftBlank : function (str){
@@ -433,7 +654,7 @@ YUI.add('bewype-editor-tag', function(Y) {
             return false;
         },
 
-        _getInnerHTML : function ( node, raw ) {
+        getInnerHTML : function ( node, raw ) {
             // get text
             var _node = node._node ? node._node : node,
                 _html = _node.innerHTML,
@@ -446,31 +667,7 @@ YUI.add('bewype-editor-tag', function(Y) {
             return raw ? _t : _t.trim() === '' ? null : new Y.Node.create( _t );
         },
 
-        _getWorkingTagName : function ( name, previous ) {
-
-            switch( name ) {
-                case 'bold':
-                    return 'b';
-
-                case 'italic':
-                    return 'i';
-
-                case 'title':
-                    var _button = this._buttonDict[ name ];
-                    return previous ? _button.getPrevious() : _button.getValue();
-
-                case 'underline':
-                    return 'u';
-
-                case 'url':
-                    return 'a';
-
-                default:
-                    return 'span';
-            }
-        },
-
-        _removeTagOrStyle : function ( node, selector, styleProperty ) {
+        removeTagOrStyle : function ( node, selector, styleProperty ) {
             // little check
             if ( node && node._node.innerHTML ) {
 
@@ -496,7 +693,7 @@ YUI.add('bewype-editor-tag', function(Y) {
                             return;
                         }
                     }
-                    _innerHTML = this._getInnerHTML( v );
+                    _innerHTML = this.getInnerHTML( v );
                     if ( !_innerHTML ) {
                         v.remove();
                     } else {
@@ -506,101 +703,196 @@ YUI.add('bewype-editor-tag', function(Y) {
             }
         },
 
-        _updateStyle : function ( name ) {
+        updateStyle : function ( node, name ) {
 
             // tmp vars
-            var _host            = this.get( 'host' ),
-                _value           = this._buttonDict[ name ].getValue();
+            var _button = this._panel.getButton( name ),
+                _value  = _button ? _button.getValue() : null;
 
-            // do update
-            _host.setStyle( Y.Bewype.Utils.camelize( name ), _value );
-        },
-
-        _resetStyle : function () {
-
-            var _host = this.get( 'host' );
-
-            // do reset
-            Y.Object.each( [ 'h1', 'h2', 'h3', 'h4', 'span', 'a', 'b', 'i', 'u' ], function( v, k ) {
-                this._removeTagOrStyle( _host, v );
-            }, this );
-        },
-
-        _getStyleValue : function ( name ) {
-
-            var _host    = this.get( 'host' ),
-                _cssDict = null;
-            
-            if ( name === 'url' ) {
-                return _host.get( 'href' );
-            } else {
-                _cssDict = Y.Bewype.Utils.getCssDict( _host );
-                return _cssDict[ name ];
+            if ( _value ) {
+                // do update
+                node.setStyle( Y.Bewype.Utils.camelize( name ), _value );
             }
         },
 
-        _refreshButtons : function ( reset, name ) {
+        resetStyle : function ( node ) {
 
-            var _host          = this.get( 'host' ),
-                _buttonNames   = name ? [ name ] : this._toggleButtons;
-
-            Y.Object.each( _buttonNames, function( v, k ) {
-
-                // no update for inactive button
-                if ( this.get( 'activeButtons' ).indexOf(v) === -1) {
-                    return;
-                }
-
-                var _value = null;
-
-                switch ( v ) {
-                    case 'bold':
-                        _value = reset ? false : _host.one( 'b' ) !== null;
-                        return this._buttonDict[ v ].setValue( _value );
-
-                    case 'italic':
-                        _value = reset ? false : _host.one( 'i' ) !== null;
-                        return this._buttonDict[ v ].setValue( _value );
-
-                    case 'underline':
-                        _value = reset ? false : _host.one( 'u' ) !== null;
-                        return this._buttonDict[ v ].setValue( _value ); 
-
-                    case 'file':
-                        this._buttonDict.height.setValue( _host._node.height );
-                        this._buttonDict.width.setValue(  _host._node.width );
-                        return;
-
-                    case 'font-family':
-                    case 'font-size':
-                    case 'color':
-                    case 'background-color':
-                        _value = reset ? false : this._getStyleValue( v );
-                        return this._buttonDict[ v ].setValue( _value );
-
-                    case 'url':
-                        _value = reset ? false : this._getStyleValue( v );
-                        return this._buttonDict[ v ].setValue( _value );
-                }
+            // do reset
+            Y.Object.each( [ 'h1', 'h2', 'h3', 'h4', 'span', 'a', 'b', 'i', 'u' ], function( v, k ) {
+                this.removeTagOrStyle( node, v );
             }, this );
         },
 
-        _onButtonEventChange : function ( name, e ) {
+        onButtonClick : function ( name, e ) {
+            // should be overriden                            
+        },
+
+        onButtonChange : function ( name, e ) {
+            // should be overriden
+            return false;
+        },
+
+        _onSpinnerChange : function ( node, name, evt ) {
+            // get host
+            var _spinner     = this._panel.getButton( name ),
+                // compute current css value
+                _cssDict     = Y.Bewype.Utils.getCssDict( node ),
+                _oldStrValue = _cssDict[ name ],
+                _oldValue    = _oldStrValue ? parseInt( _oldStrValue.replace( /px/i, '' ), 10 ) : 0,
+                // ensure new value - should not happen
+                _newValue    = _spinner ? _spinner.getValue() : 0,
+                // specific for horizontal padding ??
+                _cmpValue    = ( name == 'padding-left' || name == 'padding-right' ) ? _newValue / 2 : _newValue,
+                _maxDict     = _spinner ? this._panel.updateSpinnerMaxWidth() : 0,
+                _max         = _maxDict[ name ]; // update spinner max value
+
+            if ( !_spinner ) {
+                return false;
+            }
+
+            if ( _max && _cmpValue > _max ) {
+
+                // restore old value
+                _spinner.setValue( _oldValue );
+                // nothing has changed
+                return false;
+
+            } else {
+
+                // style for the edited place
+                node.setStyle( Y.Bewype.Utils.camelize( name ), _newValue + 'px' );
+                // changed
+                return true;
+            }
+        },
+
+        onSpinnerChange : function ( name, evt ) {
+            // should be overriden
+            return false;
+        }
+    } );
+
+    Y.namespace( 'Bewype' );
+    Y.Bewype.EditorBase = EditorBase;
+
+
+
+}, '@VERSION@' ,{requires:['bewype-editor-panel']});
+YUI.add('bewype-editor-tag', function(Y) {
+
+
+    /**
+     *
+     */
+    var EditorTag = function(config) {
+        EditorTag.superclass.constructor.apply( this, arguments );
+    };
+
+    /**
+     *
+     */
+    EditorTag.NAME = 'bewype-editor-tag';
+
+    /**
+     *
+     */
+    EditorTag.NS   = 'bewypeEditorTag';
+
+    /**
+     *
+     */
+    EditorTag.ATTRS = {
+    };
+
+    Y.extend( EditorTag, Y.Bewype.EditorBase, {
+
+        _initSpinnerValues : function () {
+
+            // get host
+            var _host          = this.get( 'host' ),
+                _cssDict       = Y.Bewype.Utils.getCssDict( _host ),
+                _fn            = null,
+                _h             = Y.Bewype.Utils.getHeight( _host ) + 'px',    
+                _w             = Y.Bewype.Utils.getWidth(  _host ) + 'px',
+                _spinnerValues = {};       
+
+            // ensure height and width values
+            if ( !Y.Object.hasKey( _cssDict, 'height' ) ) {       
+                _cssDict.height = _h;
+            }                     
+
+            if ( !Y.Object.hasKey( _cssDict, 'width' ) ) {                  
+                _cssDict.width = _w; 
+            }  
+
+            _fn = function ( key, val ) {
+
+                var _isHeight        = key === 'height',            
+                    _isWidth         = key === 'width',            
+                    _keySplt         = key.split( '-' ),            
+                    _hasBorder       = _keySplt.indexOf( 'border'  ) != -1,
+                    _hasPadding      = _keySplt.indexOf( 'padding' ) != -1;
+
+                // place or content style factory
+                if ( _isHeight || _isWidth || _hasBorder || _hasPadding ) {
+                    // update spinner dict
+                    _spinnerValues[ key ] = val;
+                }
+
+                // return something to continue
+                return val;
+            };
+
+            // separate place and content style
+            Y.JSON.stringify( _cssDict, Y.bind( _fn, this ) );
+
+            //
+            return _spinnerValues;
+        },
+
+        /**
+         *
+         */
+        initializer : function( config ) {
+
+            // set editor content
+            var _spinnerValues = this._initSpinnerValues();
+
+            // set panel
+            this._init( config, _spinnerValues );
+        },
+
+        onButtonClick : function ( name, e ) {
+
+            // simple refresh
+            this._panel.refreshButtons( this.get( 'host' ), false, name );
+        },
+
+        onButtonChange : function ( name, e ) {
 
             var _host        = this.get( 'host' ),
                 _hostTagName = _host.get( 'tagName' ),
-                _value       = this._buttonDict[ name ].getValue(),
+                _button      = this._panel.getButton( name ),
+                _value       = _button ? _button.getValue() : null,
                 _filePath    = ( name === 'file' ) ? ( this.get( 'fileStaticPath' ) + _value ) : null,
                 _tag         = null,
                 _tagNode     = null;
 
             switch ( name ) {
+
                 case 'apply':
+                    // ...
                     this.get( 'host' ).unplug( Y.Bewype.EditorTag );
+
                     // fire custom event
-                    return Y.fire( 'bewype-editor-tag:onClose' );
+                    Y.fire( 'bewype-editor-tag:onClose' );
+
+                    // not changed but close
+                    return false;
+
                 case 'cancel':
                     break;
+
                 case 'file':
                     if ( _hostTagName && _hostTagName.toLowerCase() === 'img' ) {
 
@@ -612,27 +904,29 @@ YUI.add('bewype-editor-tag', function(Y) {
                         _host.setStyle( 'width',  null );       
 
                         // refresh buttons
-                        this._refreshButtons( false, name );  
+                        this._panel.refreshButtons( _host, false, name );  
 
-                        // fire custom event
-                        return Y.fire( 'bewype-editor-tag:onChange' );
+                        // changed
+                        return true;
                     }
-                    return;
+                    return false;
+
                 default:
                     break;
             }
 
             // get previous tag
-            _tag = this._getWorkingTagName( name, true );
+            _tag = this._panel.getWorkingTagName( name, true );
 
             // do some cleaning
             if ( _tag ) {
-                this._removeTagOrStyle( _host, _tag, name );
+                this.removeTagOrStyle( _host, _tag, name );
             }
             
             // current tag
-            _tag = this._getWorkingTagName( name );
+            _tag = this._panel.getWorkingTagName( name );
 
+            // has new value to set
             if ( _value && ( _value === true || _value.trim() !== '' ) ) {
 
                 // create tag node
@@ -643,108 +937,46 @@ YUI.add('bewype-editor-tag', function(Y) {
                 }
 
                 // update with css property
-                if ( this._cssButtons.indexOf( name ) != -1 ) {
+                if ( this._panel.isCssButton( name ) ) {
+
+                    // simple style update
                     _tagNode.setStyle( Y.Bewype.Utils.camelize( name ), _value);
+
+                    // experimental
                     if ( name === 'background-color' ) {
                         _tagNode.setStyle( 'display', 'inline-block' );
                     }
                 }
-                //
-                _tagNode.append( this._getInnerHTML( _host ) );
 
+                //
+                _tagNode.append( this.getInnerHTML( _host ) );
                 // update current content
                 _host.setContent( _tagNode );
 
             } else if ( name === 'reset' ) {
                 
                 // do reset
-                this._resetStyle();
-
+                this.resetStyle( _host );
                 // refresh buttons
-                this._refreshButtons( true );
+                this._panel.refreshButtons( _host, true );
             }
 
-            // fire custom event
-            Y.fire( 'bewype-editor-tag:onChange' );
+            // changed
+            return true;
         },
 
-        _onButtonEventClick : function ( name, e ) {
-
-            var _activeButtons = this.get( 'activeButtons' );
-
-            // close all pickers first
-            Y.Object.each( this._pickerButtons , function( v, k ) {
-                // check active
-                if ( _activeButtons.indexOf( v ) != -1 && v != name ) { 
-                    // hide
-                    this._buttonDict[ v ].hidePicker();
-                }
-            }, this );
-
-            // simple refresh
-            this._refreshButtons( false, name );
-        },
-
-        _updateSpinnerMaxWidth : function () {
-
-            var _spinnerMaxWidth = this.get( 'spinnerMaxWidth' ),
-                _spinnerLeft     = this._buttonDict[ 'padding-left' ],
-                _spinnerRight     = this._buttonDict[ 'padding-right' ],
-                _spinnerWidth    = this._buttonDict.width,
-                _valueLeft       = _spinnerLeft  ? _spinnerLeft.getValue()  : 0,
-                _valueRight      = _spinnerRight ? _spinnerRight.getValue() : 0,
-                _valueWidth      = _spinnerWidth ? _spinnerWidth.getValue() : 0,   
-                _valueWidth      = _spinnerWidth ? _spinnerWidth.getValue() : 0,   
-                _maxLeft         = _spinnerWidth ? _spinnerMaxWidth - _valueWidth - _valueRight  : _spinnerMaxWidth,    
-                _maxRight        = _spinnerWidth ? _spinnerMaxWidth - _valueWidth - _valueLeft   : _spinnerMaxWidth,    
-                _maxWidth        = _spinnerLeft  ? _spinnerMaxWidth - _valueLeft - _valueRight   : _spinnerMaxWidth;
-
-            if ( _spinnerLeft  ) { _spinnerLeft.set(  'max', _maxLeft  ); }
-            if ( _spinnerWidth ) { _spinnerWidth.set( 'max', _maxWidth ); }
-
-            return {
-                'padding-left'  : _maxLeft,       
-                'padding-right' : _maxRight,       
-                'width'         : _maxWidth
-            };
-        },
-
-        _onSpinnerEventChange : function ( name, evt ) {
-            // get host
-            var _host        = this.get( 'host' ),
-                _spinner     = this._buttonDict[ name ],
-                _cssDict     = Y.Bewype.Utils.getCssDict( _host ),
-                _oldStrValue = _cssDict[ name ],
-                _oldValue    = _oldStrValue ? parseInt( _oldStrValue.replace( /px/i, '' ), 10 ) : 0,
-                _newValue    = _spinner.getValue(),
-                _cmpValue    = ( name == 'padding-left' || name == 'padding-right' ) ? _newValue / 2 : _newValue,
-                _maxDict     = this._updateSpinnerMaxWidth(); // update spinner max value
-
-            if ( _maxDict[name] && _cmpValue > _maxDict[name] ) {
-
-                // restore old value
-                _spinner.setValue( _oldValue );                
-
-            } else {
-
-                // style for the edited place
-                _host.setStyle( Y.Bewype.Utils.camelize( name ), _newValue + 'px' );
-
-                // fire custom event
-                Y.fire( 'bewype-editor-tag:onChange' );
-            }
+        onSpinnerChange : function ( name, evt ) {
+            // do change
+            return this._onSpinnerChange( this.get( 'host' ), name, evt );
         }
     } );
-
-    // manage custom event
-    Y.augment( EditorTag, Y.EventTarget );
 
     Y.namespace( 'Bewype' );
     Y.Bewype.EditorTag = EditorTag;
 
 
 
-}, '@VERSION@' ,{requires:['bewype-button', 'bewype-entry-spinner', 'bewype-utils', 'dataschema', 'event-custom', 'json-stringify', 'plugin']});
+}, '@VERSION@' ,{requires:['bewype-editor-base']});
 YUI.add('bewype-editor-text', function(Y) {
 
 
@@ -752,8 +984,6 @@ YUI.add('bewype-editor-text', function(Y) {
      *
      */
     var PLACE_TMPL   = '',
-        BUTTON_TMPL  = '',
-        SPINNER_TMPL = '',
         EditorText   = null;
 
     /**
@@ -761,20 +991,6 @@ YUI.add('bewype-editor-text', function(Y) {
      */
     PLACE_TMPL += '<div class="{editorClass}-place">';
     PLACE_TMPL += '</div>';
-
-    /**
-     *
-     */
-    BUTTON_TMPL += '<div class="{editorClass} {buttonClass}">';
-    BUTTON_TMPL += '</div>';
-
-    /**
-     *
-     */
-    SPINNER_TMPL += '<div class="{editorClass}">';
-    SPINNER_TMPL += '{label}';
-    SPINNER_TMPL += '<div class="{spinnerClass}"></div>';
-    SPINNER_TMPL += '</div>';
 
     /**
      *
@@ -797,116 +1013,21 @@ YUI.add('bewype-editor-text', function(Y) {
      * disabled: 'color', 'background-color'
      */
     EditorText.ATTRS = {
-        editorClass : {
-            value : 'bewype-editor-text',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        activeButtons : {
-            value : [
-                    'height',
-                    'width',
-                    'padding-left',
-                    'padding-top',
-                    'bold',
-                    'italic',
-                    'underline',
-                    'title',
-                    'font-family',
-                    'font-size',
-                    'reset',
-                    'apply'
-                    ],
-            writeOnce : true
-        },
-        panelNode : {
-            value : null,
-            writeOnce : true
-        },
         selectionColor : {
             value : '#ddd',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
-        },
-        spinnerLabelHeight : {
-            value : 'height',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        spinnerLabelWidth : {
-            value : 'width',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        spinnerLabelPaddingLeft : {
-            value : 'padding-left',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        spinnerLabelPaddingTop : {
-            value : 'padding-top',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        spinnerMaxHeight : {
-            value : 480,
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        spinnerMaxWidth : {
-            value : 640,
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
         }
     };
 
-    Y.extend( EditorText, Y.Plugin.Base, {
+    Y.extend( EditorText, Y.Bewype.EditorBase, {
 
         /**
          *
          */
         _editor     : null,
-
-        _buttonDict : {},
-
-        _spinnerButtons : [ 'height', 'width', 'padding-left', 'padding-top' ],
-
-        _spinnerValues  : {},
-
-        _toggleButtons  : [ 'bold', 'italic', 'underline' ],
-
-        _pickerButtons  : [ 'title', 'font-family', 'font-size', 'color', 'background-color', 'url' ],
-
-        _pickerObjDict  : {
-            'background-color' : Y.Bewype.PickerColor,
-            'color'            : Y.Bewype.PickerColor,
-            'font-family'      : Y.Bewype.PickerFontFamily,
-            'font-size'        : Y.Bewype.PickerFontSize,
-            'title'            : Y.Bewype.PickerTitle,
-            'url'              : Y.Bewype.PickerUrl
-        },
-
-        _tagButtons  : [ 'bold', 'italic', 'title', 'underline', 'url' ],
-
-        _cssButtons  : [ 'font-family', 'font-size', 'color', 'background-color' ],
-
-        _selectedNodeList : null,
 
         _oMainCssdict : {},
 
@@ -922,7 +1043,7 @@ YUI.add('bewype-editor-text', function(Y) {
                 _main        = new Y.Node.create( '<div><div class="main" /></div>' );
 
             // set content to main
-            _main.one( '.main' ).append( this._getInnerHTML( _host ) );
+            _main.one( '.main' ).append( this.getInnerHTML( _host ) );
             
             // and empty tag content temporary
             _host.set( 'innerHTML', '' );
@@ -954,12 +1075,13 @@ YUI.add('bewype-editor-text', function(Y) {
         _initContent : function ( cssDict ) {
 
             // get host
-            var _host       = this.get( 'host' ),
-                _placeClass = this.get( 'editorClass' ) + '-place',
-                _placeNode  = _host.one( '.' + _placeClass ),
-                _body       = this._editor.getInstance().one( 'body' ),
-                _main       = _body.one( '.main' ),
-                _fn         = null;
+            var _host          = this.get( 'host' ),
+                _placeClass    = this.get( 'editorClass' ) + '-place',
+                _placeNode     = _host.one( '.' + _placeClass ),
+                _body          = this._editor.getInstance().one( 'body' ),
+                _main          = _body.one( '.main' ),
+                _fn            = null,
+                _spinnerValues = {};
 
             // ensure nice body
             _body.setStyle( 'cssText', 'padding: 0; margin: 0; height: 100%; width: 100%;');
@@ -976,7 +1098,7 @@ YUI.add('bewype-editor-text', function(Y) {
                     // style for the edited place
                     _placeNode.setStyle( Y.Bewype.Utils.camelize( key ), val );
                     // update spinner dict
-                    this._spinnerValues[ key ] = val;
+                    _spinnerValues[ key ] = val;
                 } else if ( key ) {
                     // style for the edited content
                     _main.setStyle( Y.Bewype.Utils.camelize( key ), val );
@@ -997,150 +1119,9 @@ YUI.add('bewype-editor-text', function(Y) {
 
             // clear previous css
             _host.setStyle( 'cssText',  '');
-        },
-
-        _addSpinnerButton : function ( name ) {
-
-            var _panelNode         = this.get( 'panelNode'   ),
-                _editorClass       = this.get( 'editorClass' ) + '-button',
-                _spinnerClass      = this.get( 'editorClass' ) + '-spinner-' + name,
-                _spinnerNode       = null,
-                _spinner           = null,
-                _valueTxt          = this._spinnerValues[ name ],
-                _value             = _valueTxt ? parseInt( _valueTxt.replace( /px/i, '' ), 10 ) : 0;
-
-            // create node
-            _spinnerNode = new Y.Node.create(
-                Y.substitute( SPINNER_TMPL, {
-                    editorClass  : _editorClass,
-                    label        : this.get( Y.Bewype.Utils.camelize( 'spinner-label-' + name ) ),
-                    spinnerClass : _spinnerClass
-                } )
-            );
-            // add new node for the panel
-            _panelNode.append( _spinnerNode );
-            
-            // attach spinner
-            _spinner = new Y.Bewype.EntrySpinner({
-                srcNode : _spinnerNode.one( '.' + _spinnerClass ),
-                max     : this.get( Y.Bewype.Utils.camelize( 'spinner-max-' + name ) ),
-                min     : 0,
-                value   : _value
-            });
-            _spinner.render();
-
-           // connect
-           _spinner.on( 'entry:onChange', Y.bind( this._onSpinnerEventChange, this, name ) );
-
-            // update button dict
-            this._buttonDict[ name ] = _spinner;
-        },
-
-        __buttonFactory : function ( name, buttonClass, button ) {
-
-            var _panelNode   = this.get( 'panelNode'   ),
-                _editorClass = this.get( 'editorClass' ),
-                _buttonNode  = null,
-                _customEventChange = null,
-                _customEventClick  = null;
-
-            // create node
-            _buttonNode = new Y.Node.create(
-                Y.substitute( BUTTON_TMPL, {
-                    editorClass : _editorClass + '-button',
-                    buttonClass : _editorClass + '-button-' + name
-                } )
-            );
-            // add new node for the panel
-            _panelNode.append( _buttonNode );
-
-            // render button after add
-            button.render( _buttonNode );
-
-            // add custom event listener
-            if ( buttonClass === 'button') {
-                _customEventChange = 'button:onClick';
-            } else {
-                _customEventChange = 'button:onChange';
-            }
-            button.on( _customEventChange, Y.bind( this._onButtonEventChange, this, name ) );
-
-            if ( this._pickerButtons.indexOf( name ) != -1 ) {
-                _customEventClick = 'button:onClick';
-                button.before( _customEventClick, Y.bind( this._onButtonEventClick, this, name ) );
-            }
-
-            // update button dict
-            this._buttonDict[ name ] = button;
-        },
-
-        _addButton : function ( name ) {
-
-            // create\render toggle button
-            var _button = new Y.Bewype.Button( {
-                label : name
-            } );
-
-            // do add
-            this.__buttonFactory( name, 'button', _button );
-        },
-
-        _addToggleButton : function ( name ) {
-
-            // create\render toggle button
-            var _button = new Y.Bewype.ButtonToggle( {
-                label : name
-            } );
-
-            // do add
-            this.__buttonFactory( name, 'toggle-button', _button );
-        },
-
-        _addPickerButton : function ( name, pickerObj ) {
-
-            // create\render toggle button
-            var _button = new Y.Bewype.ButtonPicker( {
-                label     : name,
-                pickerObj :  pickerObj
-            } );
-
-            // do add
-            this.__buttonFactory( name, 'picker-button', _button );
-        },
-
-        _initPanel : function () {
-
-            var _activeButtons = this.get( 'activeButtons' );
-
-            Y.Object.each( this._spinnerButtons, function( v, k ) {
-                // check active
-                if ( _activeButtons.indexOf( v ) != -1 ) { 
-                    // do add
-                    this._addSpinnerButton( v );
-                }
-            }, this );
-            // set max value
-            this._updateSpinnerMaxWidth();
-
-            Y.Object.each( this._toggleButtons , function( v, k ) {
-                // check active
-                if ( _activeButtons.indexOf( v ) != -1 ) { 
-                    // do add
-                    this._addToggleButton( v );
-                }
-            }, this );
-
-            Y.Object.each( this._pickerButtons , function( v, k ) {
-                // check active
-                if ( _activeButtons.indexOf( v ) != -1 ) { 
-                    // do add
-                    this._addPickerButton( v, this._pickerObjDict[ v ] );
-                }
-            }, this );
-
-            this._addButton( 'reset' );
-
-            this._addButton( 'apply' );
+        
+            //
+            return _spinnerValues;
         },
 
         /**
@@ -1148,18 +1129,11 @@ YUI.add('bewype-editor-text', function(Y) {
          */
         initializer : function( config ) {
 
-            // add editor
-            var _cssDict = this._initEditor();
-
-            // set editor content
-            this._initContent( _cssDict );
+            var _cssDict       = this._initEditor(), // add editor
+                _spinnerValues = this._initContent( _cssDict ); // set editor content
 
             // set panel
-            this._initPanel();
-
-            // our custom events
-            Y.publish( 'bewype-editor-text:onClose'  );
-            Y.publish( 'bewype-editor-text:onChange' );
+            this._init( config, _spinnerValues );
         },
 
         /**
@@ -1173,7 +1147,6 @@ YUI.add('bewype-editor-text', function(Y) {
     
             // tmp vars
             var _host          = this.get( 'host'        ),
-                _panelNode     = this.get( 'panelNode'   ),
                 _editorClass   = this.get( 'editorClass' ),
                 _placeClass    = '.' + _editorClass + '-place',
                 _placeNode     = _host.one( _placeClass  ),
@@ -1187,7 +1160,7 @@ YUI.add('bewype-editor-text', function(Y) {
 
             // remove selection node
             if ( _selectionNode ) {
-                _selectionNode.replace( this._getInnerHTML( _selectionNode ) );
+                _selectionNode.replace( this.getInnerHTML( _selectionNode ) );
             }
 
             // restore content
@@ -1213,129 +1186,28 @@ YUI.add('bewype-editor-text', function(Y) {
             // destroy editor
             this._editor.destroy();
 
-            Y.Object.each( this.get( 'activeButtons' ) , function( v, k ) {
-                // remove button
-                this._buttonDict[ v ].destroy();
-                delete( this._buttonDict[ v ] );
-            }, this );
-
-            // remove button nodes
-            _panelNode.all( '.' + _editorClass + '-button' ).each( function( v, k ) {
-                // remove node
-                v.remove();
-            } );
+            // remove panel using common destroy method
+            this._destroy();
         },
 
-        _hasLeftBlank : function (str){
-            if (str.length === 0) {
-                return false;
-            } else if ( str.substring(0, 1).trim().length === 0 ) {
-                return true;
-            }
-            return false;
-        },
-
-        _hasRightBlank : function (str){
-            if (str.length === 0) {
-                return false;
-            } else if ( str.substring(str.length - 1, str.length).trim().length === 0 ) {
-                return true;
-            }
-            return false;
-        },
-
-        _getInnerHTML : function ( node, raw ) {
-            // get text
-            var _node = node._node ? node._node : node,
-                _html = _node.innerHTML,
-                _t    = '';
-            // ensure blank
-            _t += this._hasLeftBlank( _html )  ? '&nbsp;' : '';
-            _t += _html.trim();
-            _t += this._hasRightBlank( _html ) ? '&nbsp;' : '';
-            // update new node
-            return raw ? _t : _t.trim() === '' ? null : new Y.Node.create( _t );
-        },
-
-        _getWorkingTagName : function ( name, previous ) {
-
-            switch( name ) {
-                case 'bold':
-                    return 'b';
-
-                case 'italic':
-                    return 'i';
-
-                case 'title':
-                    var _button = this._buttonDict[ name ];
-                    return previous ? _button.getPrevious() : _button.getValue();
-
-                case 'underline':
-                    return 'u';
-
-                case 'url':
-                    return 'a';
-
-                default:
-                    return 'span';
-            }
-        },
-
-        _removeTagOrStyle : function ( node, selector, styleProperty ) {
-            // little check
-            if ( node && node._node.innerHTML ) {
-
-                node.all( selector ).each( function ( v, k ) {
-                    var _cssDict   = null,
-                        _innerHTML = null,
-                        _l         = null;
-                    if ( styleProperty ) {
-                        // get css dict
-                        _cssDict = Y.Bewype.Utils.getCssDict( v );
-                        // remove property
-                        if ( _cssDict[ styleProperty ] ) {
-                            delete( _cssDict[ styleProperty ] );
-                            if ( styleProperty === 'background-color' ) {
-                                delete( _cssDict.display );
-                            }
-                        }
-                        // reset css without property
-                        Y.Bewype.Utils.setCssDict( v, _cssDict );
-                        // keep it?
-                        _l = Y.Object.keys( _cssDict ).length;
-                        if ( _l !== 0 ) {
-                            return;
-                        }
-                    }
-                    _innerHTML = this._getInnerHTML( v );
-                    if ( !_innerHTML ) {
-                        v.remove();
-                    } else {
-                        v.replace( _innerHTML );
-                    }
-                }, this );
-            }
-        },
-
-        _updateMainStyle : function ( name, node ) {
+        updateStyle : function ( name ) {
 
             // tmp vars
             var _host            = this.get( 'host' ),
                 _isHeightOrWidth = [ 'height', 'width' ].indexOf( name ) != -1,
                 _keySplt         = name.split( '-' ),
                 _hasPadding      = _keySplt.indexOf( 'padding' ) != -1,
-                _node            = node ? node : null,
-                _value           = this._buttonDict[ name ].getValue();
+                _node            = null,
+                _button          = this._panel.getButton( name ),
+                _value           = _button ? _button.getValue() : null;
 
-            if ( !_node ) {
-                // get place or content node factory
-                if ( _isHeightOrWidth || _hasPadding ) {
-                    // get place node
-                    _node = _host.one( '.' + this.get( 'editorClass' ) + '-place' );
-                } else {
-                    // get content node
-                    _node = this._editor.getInstance().one( '.main' );
-                }
+            // get place or content node factory
+            if ( _isHeightOrWidth || _hasPadding ) {
+                // get place node
+                _node = _host.one( '.' + this.get( 'editorClass' ) + '-place' );
+            } else {
+                // get content node
+                _node = this._editor.getInstance().one( '.main' );
             }
 
             // do update
@@ -1356,7 +1228,7 @@ YUI.add('bewype-editor-text', function(Y) {
                 var _inst = this._editor.getInstance(),
                     _main = _inst.one( 'body' ).one( '.main' );
 
-                this._removeTagOrStyle(_main, '.selection');
+                this.removeTagOrStyle( _main, '.selection' );
             }
         },
 
@@ -1444,7 +1316,7 @@ YUI.add('bewype-editor-text', function(Y) {
         _refreshSelectionNode : function () {
 
             var _inst           = this._editor.getInstance(),
-                _selectionNode  = _inst.one( 'body' ).one( '.selection' ),
+                _selectionNode  = _inst.one( '.selection' ),
                 _selectionColor = this.get( 'selectionColor' );
 
             if ( !_selectionNode ) {
@@ -1457,15 +1329,15 @@ YUI.add('bewype-editor-text', function(Y) {
 
         _updateSelection : function () {
 
-            var _host             = this.get( 'host' ),
-                _inst             = this._editor.getInstance(),
-                _body             = _inst.one( 'body'  ),
-                _main             = _body.one( '.main' ),
-                _selectionNode    = _main.one( '.selection' ),
-                _selection        = Y.Bewype.Utils.getSelection( _host ),
-                _range            = Y.Bewype.Utils.getRange( _selection ),
-                _firstNode        = null,
-                _lastNode         = null;
+            var _host          = this.get( 'host' ),
+                _inst          = this._editor.getInstance(),
+                _body          = _inst.one( 'body'  ),
+                _main          = _body.one( '.main' ),
+                _selectionNode = _main.one( '.selection' ),
+                _selection     = Y.Bewype.Utils.getSelection( _host ),
+                _range         = Y.Bewype.Utils.getRange( _selection ),
+                _firstNode     = null,
+                _lastNode      = null;
 
             // little check
             if ( !_selection.anchorNode || !_selection.focusNode ) {
@@ -1474,7 +1346,7 @@ YUI.add('bewype-editor-text', function(Y) {
 
             // remove previous surrounding node
             if ( _selectionNode ) {
-                _selectionNode.replace( this._getInnerHTML( _selectionNode ) );
+                _selectionNode.replace( this.getInnerHTML( _selectionNode ) );
             }
             
             if ( _selection.anchorNode != _selection.focusNode || _selection.anchorOffset != _selection.focusOffset ) {
@@ -1510,11 +1382,11 @@ YUI.add('bewype-editor-text', function(Y) {
                 this._clearSelection( _selection, _range, false );
 
             } else {
-                this._removeTagOrStyle(_main, '.selection');
+                this.removeTagOrStyle( _main, '.selection' );
             }
 
             // update button status
-            this._refreshButtons();
+            this._panel.refreshButtons( _selectionNode );
 
             // custom rendering
             this._refreshSelectionNode();
@@ -1529,143 +1401,73 @@ YUI.add('bewype-editor-text', function(Y) {
             }
         },
 
-        _resetSelection : function ( main ) {
+        onButtonClick : function ( name, e ) {
 
-            var _inst = this._editor.getInstance(),
-                _body = _inst.one( 'body' ),
-                _node = main ? _body.one( '.main' ) : _body.one( '.selection' );
+            var _inst           = this._editor.getInstance(),
+                _selectionNode  = _inst.one( '.selection' );
 
-            if ( !_node ) {
-                return;
-            }
-
-            // do reset
-            Y.Object.each( [ 'h1', 'h2', 'h3', 'h4', 'span', 'a', 'b', 'i', 'u' ], function( v, k ) {
-                this._removeTagOrStyle( _node, v );
-            }, this );
+            // simple refresh
+            this._panel.refreshButtons( _selectionNode, false, name );
         },
 
-        _getValueFromNode : function ( parentNode, tagName, name ) {
-
-            var _node    = parentNode ? parentNode.one( tagName ) : null,
-                _cssDict = null;
-
-            if ( _node ) {
-                if ( name === 'url' ) {
-                    return _node.get( 'href' );
-                } else {
-                    _cssDict = Y.Bewype.Utils.getCssDict( _node );
-                    return _cssDict[ name ];
-                }
-            }
-
-            return null;
-        },
-
-        _refreshButtons : function ( reset, name ) {
-
-            var _inst          = this._editor.getInstance(),
-                _selectionNode = _inst.one( 'body' ).one( '.selection' ),
-                _buttonNames   = name ? [ name ] : this._toggleButtons;
-                
-
-            if ( !_selectionNode ) {
-                reset = true;
-            }
-
-            Y.Object.each( _buttonNames, function( v, k ) {
-
-                // no update for inactive button
-                if ( this.get( 'activeButtons' ).indexOf(v) === -1) {
-                    return;
-                }
-
-                var _value = null;
-
-                switch( v ) {
-                    case 'bold':
-                        _value = reset ? false : ( _selectionNode && _selectionNode.one( 'b' ) !== null );
-                        return this._buttonDict[ v ].setValue( _value );
-
-                    case 'italic':
-                        _value = reset ? false : ( _selectionNode && _selectionNode.one( 'i' ) !== null );
-                        return this._buttonDict[ v ].setValue( _value );
-
-                    case 'underline':
-                        _value = reset ? false : ( _selectionNode && _selectionNode.one( 'u' ) !== null );
-                        return this._buttonDict[ v ].setValue( _value );
-
-                    case 'font-family':
-                    case 'font-size':
-                    case 'color':
-                    case 'background-color':
-                        _value = reset ? false : this._getValueFromNode( _selectionNode, 'span', v );
-                        return this._buttonDict[ v ].setValue( _value );
-
-                    case 'url':
-                        _value = reset ? false : this._getValueFromNode( _selectionNode, 'a', v );
-                        return this._buttonDict[ v ].setValue( _value );
-                }
-            }, this );
-        },
-
-        _onButtonEventChange : function ( name, e ) {
+        onButtonChange : function ( name, e ) {
 
             switch( name ) {
                 case 'apply':
                     this.get( 'host' ).unplug( Y.Bewype.EditorText );
                     // fire custom event
-                    return Y.fire( 'bewype-editor-text:onClose' );
+                    Y.fire( 'bewype-editor-text:onClose' );
+                    // nothing changed but close
+                    return false;
                 case 'cancel':
                     break;
                 default:
                     break;
             }
 
-            var _inst             = this._editor.getInstance(),
-                _body             = _inst.one( 'body'  ),
-                _main             = _body.one( '.main' ),
-                _selectionNode    = _main.one( '.selection' ),
-                _value            = this._buttonDict[ name ].getValue(),
-                _tag              = null,
-                _tagNode          = null,
-                _newNode          = null;             
+            var _inst          = this._editor.getInstance(),
+                _body          = _inst.one( 'body'  ),
+                _main          = _body.one( '.main' ),
+                _selectionNode = _main.one( '.selection' ),
+                _button        = this._panel.getButton( name ),
+                _value         = _button ? _button.getValue() : null,
+                _tag           = null,
+                _tagNode       = null,
+                _newNode       = null;             
 
             if ( !_selectionNode ) {
 
-                if ( this._cssButtons.indexOf( name ) != -1 ) {
+                if ( this._panel.isCssButton( name ) ) {
 
                     // style update
-                    this._updateMainStyle( name );
+                    this.updateStyle( name );
 
                     // fire custom event
-                    return Y.fire( 'bewype-editor-text:onChange' );
+                    return true;
 
                 } else if ( name === 'reset') {
 
                     // reset main node
-                    this._resetSelection( true );
+                    this.resetStyle( _main, true );
 
                     // restore original values and quit
                     Y.Bewype.Utils.setCssDict( _main, this._oMainCssdict );
 
                     // fire custom event
-                    return Y.fire( 'bewype-editor-text:onChange' );
-
+                    return true;
                 }
-            }
-            
-            if ( _selectionNode ) {
+
+            } else {
                 // get previous tag
-                _tag = this._getWorkingTagName( name, true );
+                _tag = this._panel.getWorkingTagName( name, true );
 
                 // do some cleaning
                 if ( _tag ) {
-                    this._removeTagOrStyle( _selectionNode, _tag, name );
+                    this.removeTagOrStyle( _selectionNode, _tag, name );
                 }
                 
                 // current tag
-                _tag = this._getWorkingTagName( name );
+                _tag = this._panel.getWorkingTagName( name );
 
                 if ( _value && ( _value === true || _value.trim() !== '' ) ) {
 
@@ -1677,7 +1479,7 @@ YUI.add('bewype-editor-text', function(Y) {
                     }
 
                     // update with css property
-                    if ( this._cssButtons.indexOf( name ) != -1 ) {
+                    if ( this._panel.isCssButton( name ) ) {
                         _tagNode.setStyle( Y.Bewype.Utils.camelize( name ), _value);
                         if ( name === 'background-color' ) {
                             _tagNode.setStyle( 'display', 'inline-block' );
@@ -1688,7 +1490,7 @@ YUI.add('bewype-editor-text', function(Y) {
                     _newNode = Y.Node.create( '<span class="selection"></span>' );
                     _newNode.append( _tagNode );
                     //
-                    _newNode.one( _tag ).append( this._getInnerHTML( _selectionNode ) );
+                    _newNode.one( _tag ).append( this.getInnerHTML( _selectionNode ) );
 
                     // update current selection
                     _selectionNode.replace(_newNode);
@@ -1696,84 +1498,31 @@ YUI.add('bewype-editor-text', function(Y) {
                 } else if ( name === 'reset' ) {
                     
                     // do reset
-                    this._resetSelection();
+                    this.resetStyle( _selectionNode );
 
                     // refresh buttons
-                    this._refreshButtons( true );
+                    this._panel.refreshButtons( _selectionNode, true );
                 }
 
                 // custom rendering
                 this._refreshSelectionNode();
 
                 // fire custom event
-                Y.fire( 'bewype-editor-text:onChange' );
+                return true;
             }
+
+            // default
+            return false;
         },
 
-        _onButtonEventClick : function ( name, e ) {
-
-            var _activeButtons = this.get( 'activeButtons' );
-
-            // close all pickers first
-            Y.Object.each( this._pickerButtons , function( v, k ) {
-                // check active
-                if ( _activeButtons.indexOf( v ) != -1 && v != name ) { 
-                    // hide
-                    this._buttonDict[ v ].hidePicker();
-                }
-            }, this );
-
-            // simple refresh
-            this._refreshButtons( false, name );
-        },
-
-        _updateSpinnerMaxWidth : function () {
-
-            var _spinnerMaxWidth = this.get( 'spinnerMaxWidth' ),
-                _spinnerLeft     = this._buttonDict[ 'padding-left' ],
-                _spinnerWidth    = this._buttonDict.width,
-                _valueLeft       = _spinnerLeft  ? _spinnerLeft.getValue()  : 0,
-                _valueWidth      = _spinnerWidth ? _spinnerWidth.getValue() : 0,
-                _maxLeft         = _spinnerWidth ? _spinnerMaxWidth - _valueWidth  : _spinnerMaxWidth,
-                _maxWidth        = _spinnerLeft  ? _spinnerMaxWidth - _valueLeft   : _spinnerMaxWidth;
-
-            if ( _spinnerLeft  ) { _spinnerLeft.set(  'max', _maxLeft  ); }
-            if ( _spinnerWidth ) { _spinnerWidth.set( 'max', _maxWidth ); }
-
-            return {
-                'padding-left' : _maxLeft,
-                'width'        : _maxWidth
-            };
-        },
-
-        _onSpinnerEventChange : function ( name, evt ) {
-            // get host
+        onSpinnerChange : function ( name, evt ) {
+            // get place node
             var _host        = this.get( 'host' ),
                 _placeClass  = this.get( 'editorClass' ) + '-place',
-                _placeNode   = _host.one( '.' + _placeClass ),
-                _spinner     = this._buttonDict[ name ],
-                _cssDict     = Y.Bewype.Utils.getCssDict( _host ),
-                _oldStrValue = _cssDict[ name ],
-                _oldValue    = _oldStrValue ? parseInt( _oldStrValue.replace( /px/i, '' ), 10 ) : 0,
-                _newValue    = _spinner.getValue(),
-                _cmpValue    = ( name == 'padding-left' ) ? _newValue / 2 : _newValue,
-                _maxDict     = this._updateSpinnerMaxWidth(); // update spinner max value
-
-            if ( _maxDict[name] && _cmpValue > _maxDict[name] ) {
-
-                // restore old value
-                _spinner.setValue( _oldValue );                
-
-            } else {
-
-                // style for the edited place
-                _placeNode.setStyle( Y.Bewype.Utils.camelize( name ), _newValue + 'px' );
-
-                // fire custom event
-                Y.fire( 'bewype-editor-text:onChange' );
-            }
+                _placeNode   = _host.one( '.' + _placeClass );
+            // do change
+            return this._onSpinnerChange( _placeNode, name, evt );
         }
-
     } );
 
     // manage custom event
@@ -1784,8 +1533,8 @@ YUI.add('bewype-editor-text', function(Y) {
 
 
 
-}, '@VERSION@' ,{requires:['bewype-button', 'bewype-entry-spinner', 'bewype-utils', 'dataschema', 'editor', 'event-custom', 'json-stringify', 'plugin']});
+}, '@VERSION@' ,{requires:['bewype-editor-base', 'editor']});
 
 
-YUI.add('bewype-editor', function(Y){}, '@VERSION@' ,{use:['bewype-editor-tag', 'bewype-editor-text']});
+YUI.add('bewype-editor', function(Y){}, '@VERSION@' ,{use:['bewype-editor-panel', 'bewype-editor-base', 'bewype-editor-tag', 'bewype-editor-text']});
 
