@@ -1,48 +1,22 @@
-YUI.add('bewype-editor-panel', function(Y) {
+YUI.add('bewype-editor-config', function(Y) {
 
 
     /**
      *
      */
-    var BUTTON_TMPL  = '',
-        SPINNER_TMPL = '',
-        EditorPanel   = null;
-
-    /**
-     *
-     */
-    BUTTON_TMPL += '<div class="{editorClass} {buttonClass}">';
-    BUTTON_TMPL += '</div>';
-
-    /**
-     *
-     */
-    SPINNER_TMPL += '<div class="{editorClass}">';
-    SPINNER_TMPL += '{label}';
-    SPINNER_TMPL += '<div class="{spinnerClass}"></div>';
-    SPINNER_TMPL += '</div>';
-
-    /**
-     *
-     */
-    EditorPanel = function(config) {
-        EditorPanel.superclass.constructor.apply( this, arguments );
+    var EditorConfig = function(config) {
+        EditorConfig.superclass.constructor.apply( this, arguments );
     };
 
     /**
      *
      */
-    EditorPanel.NAME = 'bewype-editor-panel';
+    EditorConfig.NAME = 'bewype-editor-config';
 
     /**
-     *
+     * disabled: 'color', 'background-color'
      */
-    EditorPanel.NS   = 'bewypeEditorPanel';
-
-    /**
-     * disabled: 'color', 'background-color', 'padding-right', 'padding-left', 'file', 'underline'
-     */
-    EditorPanel.ATTRS = {
+    EditorConfig.ATTRS = {
         editorClass : {
             value : 'bewype-editor-panel',
             writeOnce : true,
@@ -133,12 +107,77 @@ YUI.add('bewype-editor-panel', function(Y) {
             value : Y.config.doc.location.href + 'upload',
             writeOnce : true
         },
+        panelNode : {
+            value : null,
+            writeOnce : true
+        },
         spinnerValues : {
             value : {}
+        },
+        selectionColor : {
+            value : '#ddd',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
         }
     };
 
-    Y.extend( EditorPanel, Y.Plugin.Base, {
+    Y.extend( EditorConfig, Y.Plugin.Base );
+
+    Y.namespace( 'Bewype' );
+    Y.Bewype.EditorConfig = EditorConfig;
+
+
+
+}, '@VERSION@' ,{requires:['plugin']});
+YUI.add('bewype-editor-panel', function(Y) {
+
+
+    /**
+     *
+     */
+    var BUTTON_TMPL  = '',
+        SPINNER_TMPL = '',
+        EditorPanel   = null;
+
+    /**
+     *
+     */
+    BUTTON_TMPL += '<div class="{editorClass} {buttonClass}">';
+    BUTTON_TMPL += '</div>';
+
+    /**
+     *
+     */
+    SPINNER_TMPL += '<div class="{editorClass}">';
+    SPINNER_TMPL += '{label}';
+    SPINNER_TMPL += '<div class="{spinnerClass}"></div>';
+    SPINNER_TMPL += '</div>';
+
+    /**
+     *
+     */
+    EditorPanel = function(config) {
+        EditorPanel.superclass.constructor.apply( this, arguments );
+    };
+
+    /**
+     *
+     */
+    EditorPanel.NAME = 'bewype-editor-panel';
+
+    /**
+     *
+     */
+    EditorPanel.NS   = 'bewypeEditorPanel';
+
+    /**
+     * disabled: 'color', 'background-color', 'padding-right', 'padding-left', 'file', 'underline'
+     */
+    // EditorPanel.ATTRS = {};
+
+    Y.extend( EditorPanel, Y.Bewype.EditorConfig, {
 
         _buttonDict     : {},
 
@@ -536,7 +575,7 @@ YUI.add('bewype-editor-panel', function(Y) {
 
 
 
-}, '@VERSION@' ,{requires:['bewype-button', 'bewype-entry-spinner', 'bewype-utils', 'dataschema', 'event-custom', 'json-stringify', 'plugin']});
+}, '@VERSION@' ,{requires:['bewype-button', 'bewype-entry-spinner', 'bewype-utils', 'dataschema', 'event-custom', 'json-stringify', 'bewype-editor-config']});
 YUI.add('bewype-editor-base', function(Y) {
 
 
@@ -560,114 +599,9 @@ YUI.add('bewype-editor-base', function(Y) {
     /**
      * disabled: 'color', 'background-color'
      */
-    EditorBase.ATTRS = {
-        editorClass : {
-            value : 'bewype-editor-panel',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        activeButtons : {
-            value : [
-                    'height',
-                    'width',
-                    'padding-top',
-                    'padding-bottom',
-                    'bold',
-                    'italic',
-                    'title',
-                    'font-family',
-                    'font-size',
-                    'reset',
-                    'apply'
-                    ],
-            writeOnce : true
-        },
-        spinnerLabelHeight : {
-            value : 'height',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        spinnerLabelWidth : {
-            value : 'width',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },              
-        spinnerMaxHeight : {
-            value : 480,
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        spinnerMaxWidth : {
-            value : 640,
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },       
-        spinnerLabelPaddingTop : {
-            value : 'padding-top',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },    
-        spinnerLabelPaddingRight : {
-            value : 'padding-right',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },    
-        spinnerLabelPaddingBottom : {
-            value : 'padding-bottom',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },    
-        spinnerLabelPaddingLeft : {
-            value : 'padding-left',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        fileStaticPath : {
-            value : Y.config.doc.location.href + 'static/',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        uploadUrl : {
-            value : Y.config.doc.location.href + 'upload',
-            writeOnce : true
-        },
-        panelNode : {
-            value : null,
-            writeOnce : true
-        },
-        spinnerValues : {
-            value : {}
-        },
-        selectionColor : {
-            value : '#ddd',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        }
-    };
+    // EditorBase.ATTRS = {};
 
-    Y.extend( EditorBase, Y.Plugin.Base, {
+    Y.extend( EditorBase, Y.Bewype.EditorConfig, {
 
         /**
          *
@@ -1619,5 +1553,5 @@ YUI.add('bewype-editor-text', function(Y) {
 }, '@VERSION@' ,{requires:['bewype-editor-base', 'editor']});
 
 
-YUI.add('bewype-editor', function(Y){}, '@VERSION@' ,{use:['bewype-editor-panel', 'bewype-editor-base', 'bewype-editor-tag', 'bewype-editor-text']});
+YUI.add('bewype-editor', function(Y){}, '@VERSION@' ,{use:['bewype-editor-config', 'bewype-editor-panel', 'bewype-editor-base', 'bewype-editor-tag', 'bewype-editor-text']});
 

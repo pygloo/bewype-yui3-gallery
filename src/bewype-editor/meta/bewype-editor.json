@@ -1,6 +1,11 @@
 {
     "bewype-editor": {
         "submodules": {
+            "bewype-editor-config": {
+                "requires": [
+                    "plugin"
+                ]
+            },
             "bewype-editor-panel": {
                 "requires": [
                     "bewype-button",
@@ -9,7 +14,7 @@
                     "dataschema",
                     "event-custom",
                     "json-stringify",
-                    "plugin"
+                    "bewype-editor-config"
                 ], 
                 "skinnable": true
             },
