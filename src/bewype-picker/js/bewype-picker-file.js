@@ -42,8 +42,11 @@
             }
         },
         uploadUrl : {
-            value : null,
-            writeOnce : true
+            value : Y.config.doc.location.href + 'upload',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }                
         }
     };
 
@@ -188,6 +191,7 @@
             // vars
             var _contentBox     = this.get( 'contentBox' ),
                 _pickerForm     = _contentBox.one( 'form' ),
+                _uploadUrl      = this.get( 'uploadUrl' ),
                 _handleStart    = null,
                 _handleComplete = null,
                 _conf           = null,
@@ -200,14 +204,16 @@
 
     		//A function handler to use for completed requests:
 	    	_handleComplete = function( transactionid, response, args, evt ) {
-                if ( response.responseText === 'ok' ) {
+                if ( response.responseText === 'error' ) {  
+                    // :(
+    			    this._showMessage( 'Upload failed!', true );    
+                } else {            
+                    // TODO - may be check the url first ???
+                    this._fileName = response.responseText;   
                     // :)
     			    this._showMessage( 'File successfully uploaded' );
                     // fire custom event on success
                     this.fire("picker:onChange");
-                } else {
-                    // :(
-    			    this._showMessage( 'Upload failed!', true );
                 }
             };
  
@@ -223,7 +229,7 @@
 		    };
  
             // do request
-            _request = Y.io( this.get( 'uploadUrl' ), _conf );
+            _request = Y.io( _uploadUrl, _conf );
     	},
 
         _onInputChange : function ( evt ) {
@@ -232,10 +238,6 @@
             var _inputNode   = evt ? evt.target : null;
 
             if ( _inputNode ) {
-
-                // TODO - may be check the url first ???
-                this._fileName = _inputNode.get( 'value' );
-
                 this._doUpload();
             }
         }

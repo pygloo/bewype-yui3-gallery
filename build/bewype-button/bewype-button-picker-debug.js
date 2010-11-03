@@ -213,16 +213,17 @@ YUI.add('bewype-button-picker', function(Y) {
             evt.stopPropagation();
         },
 
-        _onPickerChange : function ( e ) {
+        _onPickerChange : function ( e ) {   
 
-            if ( this._picker ) {
+            // get new value
+            var _value = this._picker ? this._picker.getValue() : null; 
 
+            // check value exist
+            if ( _value ) {    
                 // get value
-                this.setValue( this._picker.getValue() );
-
+                this.setValue( _value ); 
                 // remove picker
                 this.hidePicker();
-
                 // fire custom event
                 this.fire("button:onChange");
             }

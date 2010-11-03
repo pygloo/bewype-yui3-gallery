@@ -58,12 +58,14 @@
         activeButtons : {
             value : [
                     'height',
-                    'width',
+                    'width',       
+                    'padding-top',  
+                    'padding-right',  
+                    'padding-bottom',  
                     'padding-left',
-                    'padding-top',
                     'bold',
                     'italic',
-                    'underline',
+                    'file',
                     'title',
                     'font-family',
                     'font-size',
@@ -96,21 +98,7 @@
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
-        },
-        spinnerLabelPaddingLeft : {
-            value : 'padding-left',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        spinnerLabelPaddingTop : {
-            value : 'padding-top',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
+        },              
         spinnerMaxHeight : {
             value : 480,
             writeOnce : true,
@@ -124,6 +112,45 @@
             validator : function( val ) {
                 return Y.Lang.isNumber( val );
             }
+        },       
+        spinnerLabelPaddingTop : {
+            value : 'padding-top',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },    
+        spinnerLabelPaddingRight : {
+            value : 'padding-right',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },    
+        spinnerLabelPaddingBottom : {
+            value : 'padding-bottom',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },    
+        spinnerLabelPaddingLeft : {
+            value : 'padding-left',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },
+        fileStaticPath : {
+            value : Y.config.doc.location.href + 'static/',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },
+        uploadUrl : {
+            value : Y.config.doc.location.href + 'upload',
+            writeOnce : true
         }
     };
 
@@ -136,17 +163,18 @@
 
         _buttonDict : {},
 
-        _spinnerButtons : [ 'height', 'width', 'padding-left', 'padding-top' ],
+        _spinnerButtons : [ 'height', 'width', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left' ],
 
         _spinnerValues  : {},
 
         _toggleButtons  : [ 'bold', 'italic', 'underline' ],
 
-        _pickerButtons  : [ 'title', 'font-family', 'font-size', 'color', 'background-color', 'url' ],
+        _pickerButtons  : [ 'title', 'font-family', 'font-size', 'color', 'background-color', 'url', 'file' ],
 
         _pickerObjDict  : {
             'background-color' : Y.Bewype.PickerColor,
             'color'            : Y.Bewype.PickerColor,
+            'file'             : Y.Bewype.PickerFile,
             'font-family'      : Y.Bewype.PickerFontFamily,
             'font-size'        : Y.Bewype.PickerFontSize,
             'title'            : Y.Bewype.PickerTitle,
@@ -160,19 +188,32 @@
         _initSpinnerValues : function () {
 
             // get host
-            var _host        = this.get( 'host'        ),
+            var _host        = this.get( 'host' ),
                 _cssDict     = Y.Bewype.Utils.getCssDict( _host ),
-                _fn = null;
+                _fn          = null,
+                _h           = Y.Bewype.Utils.getHeight( _host ) + 'px',    
+                _w           = Y.Bewype.Utils.getWidth(  _host ) + 'px';       
+
+            // ensure height and width values
+            if ( !Y.Object.hasKey( _cssDict, 'height' ) ) {       
+                _cssDict.height = _h;
+            }                     
+
+            if ( !Y.Object.hasKey( _cssDict, 'width' ) ) {                  
+                _cssDict.width = _w; 
+            }  
 
             _fn = function ( key, val ) {
 
-                var _isHeightOrWidth = [ 'height', 'width' ].indexOf( key ) != -1,
-                    _keySplt         = key.split( '-' ),
+                var _isHeight        = key === 'height',            
+                    _isWidth         = key === 'width',            
+                    _keySplt         = key.split( '-' ),            
+                    _keySplt         = key.split( '-' ),            
                     _hasBorder       = _keySplt.indexOf( 'border'  ) != -1,
                     _hasPadding      = _keySplt.indexOf( 'padding' ) != -1;
 
                 // place or content style factory
-                if ( _isHeightOrWidth || _hasBorder || _hasPadding ) {
+                if ( _isHeight || _isWidth || _hasBorder || _hasPadding ) {
                     // update spinner dict
                     this._spinnerValues[ key ] = val;
                 }
@@ -517,7 +558,12 @@
 
                     case 'underline':
                         _value = reset ? false : _host.one( 'u' ) !== null;
-                        return this._buttonDict[ v ].setValue( _value );
+                        return this._buttonDict[ v ].setValue( _value ); 
+
+                    case 'file':
+                        this._buttonDict.height.setValue( _host._node.height );
+                        this._buttonDict.width.setValue(  _host._node.width );
+                        return;
 
                     case 'font-family':
                     case 'font-size':
@@ -535,6 +581,13 @@
 
         _onButtonEventChange : function ( name, e ) {
 
+            var _host        = this.get( 'host' ),
+                _hostTagName = _host.get( 'tagName' ),
+                _value       = this._buttonDict[ name ].getValue(),
+                _filePath    = ( name === 'file' ) ? ( this.get( 'fileStaticPath' ) + _value ) : null,
+                _tag         = null,
+                _tagNode     = null;
+
             switch ( name ) {
                 case 'apply':
                     this.get( 'host' ).unplug( Y.Bewype.EditorTag );
@@ -542,15 +595,26 @@
                     return Y.fire( 'bewype-editor-tag:onClose' );
                 case 'cancel':
                     break;
+                case 'file':
+                    if ( _hostTagName && _hostTagName.toLowerCase() === 'img' ) {
+
+                        // update file src after upload
+                        _host.setAttribute( 'src', _filePath );
+
+                        // clear previous                        
+                        _host.setStyle( 'height', null );
+                        _host.setStyle( 'width',  null );       
+
+                        // refresh buttons
+                        this._refreshButtons( false, name );  
+
+                        // fire custom event
+                        return Y.fire( 'bewype-editor-tag:onChange' );
+                    }
+                    return;
                 default:
                     break;
             }
-
-            var _host = this.get( 'host' ),
-                _value            = this._buttonDict[ name ].getValue(),
-                _tag              = null,
-                _tagNode          = null,
-                _newNode          = null;             
 
             // get previous tag
             _tag = this._getWorkingTagName( name, true );
@@ -619,18 +683,23 @@
 
             var _spinnerMaxWidth = this.get( 'spinnerMaxWidth' ),
                 _spinnerLeft     = this._buttonDict[ 'padding-left' ],
+                _spinnerRight     = this._buttonDict[ 'padding-right' ],
                 _spinnerWidth    = this._buttonDict.width,
                 _valueLeft       = _spinnerLeft  ? _spinnerLeft.getValue()  : 0,
-                _valueWidth      = _spinnerWidth ? _spinnerWidth.getValue() : 0,
-                _maxLeft         = _spinnerWidth ? _spinnerMaxWidth - _valueWidth  : _spinnerMaxWidth,
-                _maxWidth        = _spinnerLeft  ? _spinnerMaxWidth - _valueLeft   : _spinnerMaxWidth;
+                _valueRight      = _spinnerRight ? _spinnerRight.getValue() : 0,
+                _valueWidth      = _spinnerWidth ? _spinnerWidth.getValue() : 0,   
+                _valueWidth      = _spinnerWidth ? _spinnerWidth.getValue() : 0,   
+                _maxLeft         = _spinnerWidth ? _spinnerMaxWidth - _valueWidth - _valueRight  : _spinnerMaxWidth,    
+                _maxRight        = _spinnerWidth ? _spinnerMaxWidth - _valueWidth - _valueLeft   : _spinnerMaxWidth,    
+                _maxWidth        = _spinnerLeft  ? _spinnerMaxWidth - _valueLeft - _valueRight   : _spinnerMaxWidth;
 
             if ( _spinnerLeft  ) { _spinnerLeft.set(  'max', _maxLeft  ); }
             if ( _spinnerWidth ) { _spinnerWidth.set( 'max', _maxWidth ); }
 
             return {
-                'padding-left' : _maxLeft,
-                'width'        : _maxWidth
+                'padding-left'  : _maxLeft,       
+                'padding-right' : _maxRight,       
+                'width'         : _maxWidth
             };
         },
 
@@ -642,7 +711,7 @@
                 _oldStrValue = _cssDict[ name ],
                 _oldValue    = _oldStrValue ? parseInt( _oldStrValue.replace( /px/i, '' ), 10 ) : 0,
                 _newValue    = _spinner.getValue(),
-                _cmpValue    = ( name == 'padding-left' ) ? _newValue / 2 : _newValue,
+                _cmpValue    = ( name == 'padding-left' || name == 'padding-right' ) ? _newValue / 2 : _newValue,
                 _maxDict     = this._updateSpinnerMaxWidth(); // update spinner max value
 
             if ( _maxDict[name] && _cmpValue > _maxDict[name] ) {

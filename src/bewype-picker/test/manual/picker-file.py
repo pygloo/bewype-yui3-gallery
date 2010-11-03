@@ -10,10 +10,10 @@ def hello_world():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    file = request.files['file']
-    filename = secure_filename(file.filename)
-    file.save(os.path.join('uploads', filename))
-    return 'ok'
+    _file = request.files['file']
+    _filename = secure_filename(_file.filename)
+    _file.save(os.path.join('static', _filename))
+    return _filename
 
 if __name__ == '__main__':
     app.run(debug=True)

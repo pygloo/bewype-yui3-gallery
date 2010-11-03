@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    return render_template('button-picker-file.html')
+    return render_template('bewype-editor-tag.html')
 
 @app.route('/upload', methods=['POST'])
 def upload_file():

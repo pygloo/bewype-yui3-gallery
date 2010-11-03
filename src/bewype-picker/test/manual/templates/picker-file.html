@@ -3,37 +3,14 @@
 <head>
     {% block head %}
     <title>Manual Test - Picker</title>
-    <script type="text/javascript" src="static/build/yui/yui.js"></script>
-
-    <script type="text/javascript">
-    function init() {
-    	document.getElementById("file_upload_form").onsubmit=function() {
-		    document.getElementById("file_upload_form").target = "upload_target";
-	    }
-    }
-    // window.onload=init;
-
-    </script>
-
+    <script type="text/javascript" src="static/ybuild/yui/yui.js"></script>
     {% endblock %}
 </head>
 <body class="yui3-skin-sam">
 
-        <!--form method="post" id="file_upload_form" action="http://localhost:5000/upload" enctype="multipart/form-data" >
-            <input type="file" name="file" />
-            <input type="submit" name="action" value="submit" />
-            <iframe id="upload_target" name="upload_target" src="" style="display:none">
-            </iframe>
-        </form-->
-
     <h2>Picker File</h2>
     
     <div id="picker-file"></div>
-
-    <!--
-    http://flask.pocoo.org/docs/quickstart/
-    http://flask.pocoo.org/docs/patterns/fileuploads/#uploading-files
-    -->
 
     <script>
         <!--

@@ -88,28 +88,57 @@
             Y.each( _results, function( v, k ) {
                 var _name  = camelize ? Y.Bewype.Utils.camelize( v.name ) : v.name.trim(),
                     _value = (v.value) ? v.value.trim() : null,
+                    _spVal = _value ? _value.split(' ') : null,
                     _s = null,
                     _r = null;
                 if ( _name && _value ) {
-                    if ( _name === 'padding' ) {    
-                        // prepare schema
-                        _s = {
-                            resultFields: [ {key:'top'}, {key:'right'}, {key:'bottom'}, {key:'left'} ]
-                        };
-                        // apply schema
-                        _r = Y.DataSchema.Array.apply( _s, [_value.split(' ')] ).results[ 0 ];
-                        // update css dict
-                        Y.each( [ 'top', 'left' ], function( v, k ) {
-                            // prepare name
-                            var _n = camelize ? Y.Bewype.Utils.camelize( _name + '-' + v ) : _name + '-' + v;
-                            if ( _r[ v ] ) {
+                    if ( _name === 'padding' ) {
+                        if ( _spVal && _spVal.length === 4 ) {
+
+                            // prepare schema
+                            _s = {
+                                resultFields: [ {key:'top'}, {key:'right'}, {key:'bottom'}, {key:'left'} ]
+                            };
+                            // apply schema
+                            _r = Y.DataSchema.Array.apply( _s, [ _spVal ] ).results[ 0 ];
+                            // update css dict
+                            Y.each( [ 'top', 'right', 'bottom', 'left' ], function( v, k ) {
+                                // prepare name
+                                var _n = camelize ? Y.Bewype.Utils.camelize( _name + '-' + v ) : _name + '-' + v;
                                 // do update
-                                _cssDict[ _n ] = _r[ v ].trim();
-                            } else {
+                                _cssDict[ _n ] = _r[ v ] ? _r[ v ].trim() : 0;
+                            } );
+
+                        } else if ( _spVal.length === 2 ) {   
+
+                            // prepare schema
+                            _s = {
+                                resultFields: [ {key:'top-bottom'}, {key:'right-left'} ]
+                            };
+                            // apply schema
+                            _r = Y.DataSchema.Array.apply( _s, [ _spVal ] ).results[ 0 ];
+                            // update css dict
+                            Y.each( [ 'top', 'right', 'bottom', 'left' ], function( v, k ) {
+                                // prepare name
+                                var _n = camelize ? Y.Bewype.Utils.camelize( _name + '-' + v ) : _name + '-' + v;
                                 // do update
-                                _cssDict[ _n ] = 0;
-                            }
-                        } );
+                                if ( v === 'top' || v === 'bottom' ) {
+                                    _cssDict[ _n ] = _r[ 'top-bottom' ] ? _r[ 'top-bottom' ].trim() : 0;
+                                } else {                                                                     
+                                    _cssDict[ _n ] = _r[ 'right-left' ] ? _r[ 'right-left' ].trim() : 0;
+                                }
+                            } );
+                                    
+                        } else if ( _spVal.length === 1 ) {
+
+                            // update css dict
+                            Y.each( [ 'top', 'right', 'bottom', 'left' ], function( v, k ) {
+                                // prepare name
+                                var _n = camelize ? Y.Bewype.Utils.camelize( _name + '-' + v ) : _name + '-' + v;
+                                // do update
+                                _cssDict[ _n ] = _spVal[ 0 ];
+                            } );
+                        }
                     } else {
                         _cssDict[ _name.trim() ] = _value;
                     }
