@@ -197,9 +197,6 @@
 
             // destroy editor
             this._editor.destroy();
-
-            // remove panel using common destroy method
-            this._destroy();
         },
 
         updateStyle : function ( name ) {
@@ -423,19 +420,6 @@
         },
 
         onButtonChange : function ( name, e ) {
-
-            switch( name ) {
-                case 'apply':
-                    this.get( 'host' ).unplug( Y.Bewype.EditorText );
-                    // fire custom event
-                    Y.fire( 'bewype-editor:onClose' );
-                    // nothing changed but close
-                    return false;
-                case 'cancel':
-                    break;
-                default:
-                    break;
-            }
 
             var _inst          = this._editor.getInstance(),
                 _body          = _inst.one( 'body'  ),

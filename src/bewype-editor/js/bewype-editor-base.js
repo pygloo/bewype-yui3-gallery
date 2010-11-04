@@ -34,15 +34,20 @@
             // temp var
             var _panelNode = this.get( 'panelNode' );
 
-            // plug panel using passed config
-            config.spinnerValues = spinnerValues;
-            _panelNode.plug( Y.Bewype.EditorPanel, config );
+            // unplug panel
+            if ( !_panelNode.bewypeEditorPanel ) {
+
+                // plug panel using passed config
+                config.spinnerValues = spinnerValues;
+                _panelNode.plug( Y.Bewype.EditorPanel, config );
+
+                // register
+                _panelNode.bewypeEditorPanel.registerEditor( this.get( 'host' ) );
+            }                
 
             // set our global panel var
             this._panel = _panelNode.bewypeEditorPanel;
 
-            // register
-            this._panel.registerEditor( this );
 
         },
 
@@ -55,27 +60,7 @@
         /**
          *
          */
-        _destroy : function () {
-
-            // temp var
-            var _panelNode = this.get( 'panelNode' );
-
-            // unplug panel
-            if ( this._panel && _panelNode.bewypeEditorPanel ) {
-
-                // un-register
-                this._panel.unRegisterEditor( this );
-
-                // un plug
-                this.get( 'panelNode' ).unplug( Y.Bewype.EditorPanel );
-            }
-        },
-
-        /**
-         *
-         */
         destructor : function () {
-            this._destroy();                       
         },
 
         _hasLeftBlank : function (str){

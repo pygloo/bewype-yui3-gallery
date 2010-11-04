@@ -14,7 +14,7 @@ YUI.add('bewype-editor-config', function(Y) {
     EditorConfig.NAME = 'bewype-editor-config';
 
     /**
-     * disabled: 'color', 'background-color'
+     * disabled: 'color', 'background-color', 'padding-right', 'padding-left', 'file', 'underline'
      */
     EditorConfig.ATTRS = {
         editorClass : {

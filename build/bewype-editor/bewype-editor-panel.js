@@ -40,10 +40,8 @@ YUI.add('bewype-editor-panel', function(Y) {
     EditorPanel.NS   = 'bewypeEditorPanel';
 
     /**
-     * disabled: 'color', 'background-color', 'padding-right', 'padding-left', 'file', 'underline'
+     *
      */
-    // EditorPanel.ATTRS = {};
-
     Y.extend( EditorPanel, Y.Bewype.EditorConfig, {
 
         _buttonDict     : {},
@@ -248,6 +246,20 @@ YUI.add('bewype-editor-panel', function(Y) {
                 // remove node
                 v.remove();
             } );
+
+            // remove all attached editor
+            Y.Object.each( this._editors, function( v, k ) {
+                // unplug
+                if ( v.bewypeEditorTag ) {
+                    v.unplug( Y.Bewype.EditorTag );
+                } else if ( v.bewypeEditorText ) {
+                    v.unplug( Y.Bewype.EditorText );
+                } else {
+                    return;
+                }
+                // unregister
+                this.unRegisterEditor( v );
+            }, this );
         },
 
         registerEditor : function ( editor ) {
@@ -401,18 +413,31 @@ YUI.add('bewype-editor-panel', function(Y) {
 
             // call editors for sepcific task
             Y.each( this._editors , function( v, k ) {
-                v.onButtonClick( name, e );
+                // get editor plugin feature
+                var _p = v.bewypeEditorTag || v.bewypeEditorText;
+                // do click
+                _p.onButtonClick( name, e );
             } );
         },
 
         _onButtonChange : function ( name, e ) {
+
+            if ( name === 'apply' ) {
+                // ...
+                this.get( 'host' ).unplug( Y.Bewype.EditorPanel );
+                // fire custom event
+                return Y.fire( 'bewype-editor:onClose' );
+            }
 
             // init changed flag
             var _changed = false;                              
 
             // call editors for sepcific task
             Y.each( this._editors , function( v, k ) {
-                _changed |= v.onButtonChange( name, e );
+                // get editor plugin feature
+                var _p = v.bewypeEditorTag || v.bewypeEditorText;
+                // do change
+                _changed |= _p.onButtonChange( name, e );
             } );
 
             // fire custom event
@@ -426,7 +451,10 @@ YUI.add('bewype-editor-panel', function(Y) {
 
             // call editors for sepcific task
             Y.each( this._editors , function( v, k ) {
-                _changed |= v.onSpinnerChange( name, e );
+                // get editor plugin feature
+                var _p = v.bewypeEditorTag || v.bewypeEditorText;
+                // do change
+                _changed |= _p.onSpinnerChange( name, e );
             } );
 
             // fire custom event

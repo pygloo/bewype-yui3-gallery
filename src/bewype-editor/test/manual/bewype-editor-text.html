@@ -18,15 +18,16 @@
         <!--
             YUI( { filter: 'debug' } ).use( 'bewype-editor-text', function ( Y ) {
 
-                var _content = Y.one( "#content" );
+                var _content   = Y.one( "#content" ),
+                    _panelNode = Y.one( "#panel"   );
 
                 // attach event
                 Y.on( 'click',
                     function( e ) {
                         if ( !_content.bewypeEditorText ) {
                             _content.plug( Y.Bewype.EditorText, {
-                                panelNode : Y.one( "#panel" )
-                            } )
+                                panelNode : _panelNode
+                            } );
                         }
                     },
                     Y.one( "#attach" )
@@ -36,20 +37,11 @@
                 Y.on( 'click',
                     function( e ) {
                         if ( _content.bewypeEditorText ) {
-                            _content.unplug( Y.Bewype.EditorText )
+                            _panelNode.unplug( Y.Bewype.EditorPanel );
                         }
                     },
                     Y.one( "#detach" )
                 );
-
-                // add custom events
-                // Y.on( 'bewype-editor-text:onChange', function () {
-                //     alert( 'Editor changed!' );
-                // } );
-
-                Y.on( 'bewype-editor:onClose', function () {
-                    alert( 'Editor closed!' );
-                } );
             } );
         -->
         </script>

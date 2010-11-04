@@ -11,18 +11,18 @@
         <br />
         <br />
 
-        <div id="content">This is a test</div>    
-        <!-- img id="content" src="static/logo.gif" / -->       
+        <div id="content" style="border: solid 1px black;">This is a test</div>    
 
         <p />
 
-        <a id="attach">Attach</a> | <a id="detach">Detach</a>
+        <a id="attach" href="#">Attach</a> | <a id="detach" href="#">Detach</a>
 
         <script type="text/javascript">
         <!--
             YUI( { filter: 'debug' } ).use( 'bewype-editor-tag', function ( Y ) {
 
-                var _content = Y.one( "#content" );
+                var _content   = Y.one( "#content" ),
+                    _panelNode = Y.one( "#panel"   );
 
                 // attach event
                 Y.on( 'click',
@@ -30,7 +30,7 @@
                         if ( !_content.bewypeEditorTag ) {
                             _content.plug( Y.Bewype.EditorTag, {
                                 panelNode : Y.one( "#panel" )
-                            } )
+                            } );
                         }
                     },
                     Y.one( "#attach" )
@@ -40,7 +40,7 @@
                 Y.on( 'click',
                     function( e ) {
                         if ( _content.bewypeEditorTag ) {
-                            _content.unplug( Y.Bewype.EditorTag )
+                            _panelNode.unplug( Y.Bewype.EditorPanel );
                         }
                     },
                     Y.one( "#detach" )

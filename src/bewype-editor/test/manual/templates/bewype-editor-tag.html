@@ -13,7 +13,6 @@
         <br />
         <br />
 
-        <!-- div id="content">This is a test</div -->    
         <img id="content" src="static/logo.gif" />       
 
         <p />
@@ -24,7 +23,8 @@
         <!--
             YUI( { filter: 'debug' } ).use( 'bewype-editor-tag', function ( Y ) {
 
-                var _content = Y.one( "#content" );
+                var _content   = Y.one( "#content" ),
+                    _panelNode = Y.one( "#panel"   );
 
                 // attach event
                 Y.on( 'click',
@@ -42,15 +42,11 @@
                 Y.on( 'click',
                     function( e ) {
                         if ( _content.bewypeEditorTag ) {
-                            _content.unplug( Y.Bewype.EditorTag )
+                            _panelNode.unplug( Y.Bewype.EditorPanel );
                         }
                     },
                     Y.one( "#detach" )
                 );
-
-                Y.on( 'bewype-editor:onClose', function () {
-                    alert( 'Editor Tag Closed!' );
-                } );
             } );
         -->
         </script>

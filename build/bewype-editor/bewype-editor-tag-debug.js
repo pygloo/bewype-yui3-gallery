@@ -100,16 +100,6 @@ YUI.add('bewype-editor-tag', function(Y) {
 
             switch ( name ) {
 
-                case 'apply':
-                    // ...
-                    this.get( 'host' ).unplug( Y.Bewype.EditorTag );
-
-                    // fire custom event
-                    Y.fire( 'bewype-editor:onClose' );
-
-                    // not changed but close
-                    return false;
-
                 case 'cancel':
                     break;
 

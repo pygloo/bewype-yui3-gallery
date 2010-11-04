@@ -19,10 +19,8 @@ YUI.add('bewype-editor-base', function(Y) {
     EditorBase.NAME = 'bewype-editor-base';
 
     /**
-     * disabled: 'color', 'background-color'
+     *
      */
-    // EditorBase.ATTRS = {};
-
     Y.extend( EditorBase, Y.Bewype.EditorConfig, {
 
         /**
@@ -38,15 +36,20 @@ YUI.add('bewype-editor-base', function(Y) {
             // temp var
             var _panelNode = this.get( 'panelNode' );
 
-            // plug panel using passed config
-            config.spinnerValues = spinnerValues;
-            _panelNode.plug( Y.Bewype.EditorPanel, config );
+            // unplug panel
+            if ( !_panelNode.bewypeEditorPanel ) {
+
+                // plug panel using passed config
+                config.spinnerValues = spinnerValues;
+                _panelNode.plug( Y.Bewype.EditorPanel, config );
+
+                // register
+                _panelNode.bewypeEditorPanel.registerEditor( this.get( 'host' ) );
+            }                
 
             // set our global panel var
             this._panel = _panelNode.bewypeEditorPanel;
 
-            // register
-            this._panel.registerEditor( this );
 
         },
 
@@ -59,27 +62,7 @@ YUI.add('bewype-editor-base', function(Y) {
         /**
          *
          */
-        _destroy : function () {
-
-            // temp var
-            var _panelNode = this.get( 'panelNode' );
-
-            // unplug panel
-            if ( this._panel && _panelNode.bewypeEditorPanel ) {
-
-                // un-register
-                this._panel.unRegisterEditor( this );
-
-                // un plug
-                this.get( 'panelNode' ).unplug( Y.Bewype.EditorPanel );
-            }
-        },
-
-        /**
-         *
-         */
         destructor : function () {
-            this._destroy();                       
         },
 
         _hasLeftBlank : function (str){
