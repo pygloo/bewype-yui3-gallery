@@ -56,7 +56,7 @@ YUI.add('bewype-layout-designer-config', function(Y) {
             }
         },
         contentWidth : {
-            value : 120,
+            value : 40,
             validator : function( val ) {
                 return Y.Lang.isNumber( val );
             }

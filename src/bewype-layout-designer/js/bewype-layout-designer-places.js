@@ -195,29 +195,10 @@
         getAvailablePlace : function () {
 
             // get the target node
-            var _parentNode = this.get( 'parentNode' ) || this.placesNode.ancestor( 'div' ),                
-                _pWidth     = null,
-                _cWidth     = null;
-            
-            // update target style
-            switch( this.get( 'placesType' ) ) {
-                // must use an vertical parent
-                case 'vertical':
-                    _parentNode = this.get( 'parentNode' ) || this.placesNode.ancestor( 'div' );
-                    break;
-                // no break - no we can compute remaining width
-                case 'horizontal':
-                    break;
-                // ??
-                default:
-                    return null;
-            }
-            
-            // get parent width
-            _pWidth = Y.Bewype.Utils.getWidth( _parentNode );
-
-            // get contents width
-            _cWidth = this.getPlacesWidth();
+            var _parentNode = this.get( 'parentNode' ) || this.placesNode.ancestor( 'div' ),
+                _pPlaces    = this.get( 'parentNode' ) ? _parentNode.layoutDesignerPlaces : null,
+                _pWidth     = _pPlaces ? _pPlaces.getPlacesWidth() : Y.Bewype.Utils.getWidth( _parentNode ),
+                _cWidth     = this.getPlacesWidth();
 
             // compute available place
             return _pWidth - _cWidth;
@@ -282,7 +263,7 @@
                     break;
             }
             // return it
-            return ( _cWidth === 0 ) ? this.get( 'contentWidth' ) : _cWidth;
+            return _cWidth;
         },
 
         getPlacesHeight : function () {
@@ -313,10 +294,12 @@
                         }
                         if ( _h > _cHeight ) { _cHeight = _h; }
                     } );
+                    // specific for horizontal
+                    _cHeight = ( _cHeight === 0 ) ? this.get( 'contentHeight' ) : _cHeight;
                     break;
             }
             // return it
-            return ( _cHeight === 0 ) ? this.get( 'contentHeight' ) : _cHeight;
+            return _cHeight;
         },
 
         /**
@@ -329,6 +312,9 @@
                 _placesHeight   = this.getPlacesHeight(),
                 _placesWidth    = this.getPlacesWidth(),
                 _parentNode     = this.get( 'parentNode' );
+
+            _placesHeight = _placesHeight === 0 ? this.get( 'contentHeight' ) : _placesHeight;
+            _placesWidth  = _placesWidth  === 0 ? this.getAvailablePlace()    : _placesWidth;
 
             this.placesNode.setStyle( 'height', _placesHeight );
             this.placesNode.setStyle( 'width' , _placesWidth  );
@@ -465,8 +451,10 @@
                 _config     = this.getAttrs();
 
             // prepare config
-            _config.contentType = contentType;
-            _config.parentNode  = this.get( 'host' );
+            _config.contentType  = contentType;
+            _config.parentNode   = this.get( 'host' );
+            // set max available width
+            _config.contentWidth = this.getAvailablePlace();
 
             // content type factory
             switch( contentType ) {

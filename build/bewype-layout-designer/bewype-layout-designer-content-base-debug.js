@@ -140,6 +140,9 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
             _editPanNode.setStyle( 'display', 'none'  );
             _sourcesNode.setStyle( 'display', 'block' );
 
+            // refresh clone
+            this._refreshCloneNode();
+
             return true;
         },
 
@@ -169,28 +172,16 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
             _sourcesNode.setStyle( 'display', 'none'  );
             _editPanNode.setStyle( 'display', 'block' );
 
-            // set max width or not
-            if ( _availableWidth ) {
+            // compute max width
+            _maxWidth =  _availableWidth ? _availableWidth : 0;
+            _maxWidth += this.getContentWidth();
 
-                // compute max width
-                _maxWidth =  _availableWidth;
-                _maxWidth += this.getContentWidth();
-
-                // update conf
-                _conf = {
-                    panelNode       : _editPanNode,
-                    spinnerMaxWidth : _maxWidth,
-                    activeButtons   : this.get( _activeButtons )
-                    };
-
-            } else {
-
-                // no max
-                _conf = {
-                    panelNode       : _editPanNode,
-                    activeButtons   : this.get( _activeButtons )
-                };
-            }
+            // update conf
+            _conf = {
+                panelNode       : _editPanNode,
+                spinnerMaxWidth : _maxWidth,
+                activeButtons   : this.get( _activeButtons )
+            };
 
             // plug
             _contentNode.plug( _editorClass, _conf );
