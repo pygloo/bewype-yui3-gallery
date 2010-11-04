@@ -306,8 +306,6 @@
          */
         _onKeyDown : function ( e ) {
 
-            e.preventDefault();
-
             var currVal = this.get( 'value' ),
                 newVal  = currVal,
                 handled = false,
@@ -358,9 +356,14 @@
          * Simple change handler, to make sure user does not input an invalid value
          */
         _onInputChange : function ( e ) {
-            if ( !this._validateValue( this.inputNode.get( 'value' ) ) ) {
+            var _value = parseInt( this.inputNode.get( 'value' ), 10 );
+            // check valid
+            if ( this._validateValue( _value ) ) {
                 // update
-                this.syncUI();
+                this.set( 'value', _value );
+            } else {
+                // restore old value
+                this.inputNode.set( 'value', this.get( 'value' ) );
             }
         },
 
