@@ -314,88 +314,39 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             }
         },
 
-        _onDropHitStart : function ( evt ) {
+        _onDropHit : function ( evt ) {
 
             // get hitType
-            var _hitType = this._getHitType( evt ),
-                _host = this.get( 'host' );
+            var _host       = this.get( 'host' ),
+                _targetType = this.get( 'targetType' ),
+                _hitType    = this._getHitType( evt ),
+                _destNode   = _targetType === 'start' ? _host : _host.layoutDesignerPlaces.addDestNode();
 
             // specific for text or image .. nothing to do ..
-            if ( _hitType === 'text' || _hitType === 'image' ) { return this._afterDropExit( evt ); }
+            if ( _targetType === 'start' ) {
+                // do not manage content at start
+                if ( _hitType === 'text' || _hitType === 'image' ) {
+                    return this._afterDropExit( evt );
+                }
+                // destroy plugins to add places
+                _host.unplug( Y.Bewype.LayoutDesignerTarget );
+            }
 
-            // destroy plugins
-            _host.unplug( Y.Bewype.LayoutDesignerTarget );
-
-            // add places and target
-            this._addPlaces( _host, _hitType );
-            this._addTarget( _host, _hitType );
-            
-            // refresh parent
-            _host.layoutDesignerTarget.refresh();
-        },
-
-        _onDropHitHorizontal : function ( evt ) {
-
-            // temp vars
-            var _host       = this.get( 'host' ),
-                _hitType    = this._getHitType( evt ),
-                _destNode   = null;
-
-            if ( _hitType === 'vertical' ) {
-                // add dest node
-                _destNode = _host.layoutDesignerPlaces.addDestNode();
+            if ( _hitType === 'start' || _hitType === 'horizontal' || _hitType === 'vertical') {
                 // add places and target
                 this._addPlaces( _destNode, _hitType );
                 this._addTarget( _destNode, _hitType );
                 // refresh dest node
-                _destNode.layoutDesignerTarget.refresh();
+                if ( _hitType !== 'start' ) {
+                    _destNode.layoutDesignerTarget.refresh();
+                }
             } else {
                 // default: add content text or image
                 _host.layoutDesignerPlaces.addContent( _hitType );
             }
-            
+
             // restore width
             this._afterDropExit( evt );
-        },
-
-        _onDropHitVertical : function ( evt ) {
-
-            // temp vars
-            var _host       = this.get( 'host' ),
-                _hitType    = this._getHitType( evt ),
-                _destNode   = null;
-
-            if ( _hitType === 'horizontal' ) {
-                // add dest node
-                _destNode = _host.layoutDesignerPlaces.addDestNode();
-                // add places and target
-                this._addPlaces( _destNode, _hitType );
-                this._addTarget( _destNode, _hitType );
-                // refresh dest node
-                _destNode.layoutDesignerTarget.refresh();
-            } else {
-                // add content text or image
-                _host.layoutDesignerPlaces.addContent( _hitType );
-            }
-            
-            // restore width
-            this._afterDropExit( evt );
-        },
-
-        _onDropHit : function ( evt ) {
-
-            // hit factory
-            switch( this.get( 'targetType' ) ) {
-
-                case 'start':
-                    return this._onDropHitStart( evt );
-
-                case 'horizontal':
-                    return this._onDropHitHorizontal( evt );
-
-                case 'vertical':
-                    return this._onDropHitVertical( evt );
-            }
         },
 
         refresh : function () {
