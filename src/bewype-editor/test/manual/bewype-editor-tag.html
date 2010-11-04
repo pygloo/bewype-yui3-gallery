@@ -11,7 +11,7 @@
         <br />
         <br />
 
-        <div id="content" style="border: solid 1px black;">This is a test</div>    
+        <div id="content" style="border: solid 1px black; width: 150px">This is a test</div>    
 
         <p />
 
@@ -29,7 +29,22 @@
                     function( e ) {
                         if ( !_content.bewypeEditorTag ) {
                             _content.plug( Y.Bewype.EditorTag, {
-                                panelNode : Y.one( "#panel" )
+                                panelNode : Y.one( "#panel" ),
+                                activeButtons : [
+                                            'height',
+                                            'width',
+                                            'bold',
+                                            'italic',
+                                            'underline',
+                                            'title',
+                                            'font-family',
+                                            'font-size',
+                                            'color',
+                                            'background-color',
+                                            'url',
+                                            'reset',
+                                            'apply'
+                                            ]
                             } );
                         }
                     },

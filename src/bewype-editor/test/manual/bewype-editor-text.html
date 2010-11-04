@@ -26,7 +26,22 @@
                     function( e ) {
                         if ( !_content.bewypeEditorText ) {
                             _content.plug( Y.Bewype.EditorText, {
-                                panelNode : _panelNode
+                                panelNode     : _panelNode,
+                                activeButtons : [
+                                            'height',
+                                            'width',
+                                            'bold',
+                                            'italic',
+                                            'underline',
+                                            'title',
+                                            'font-family',
+                                            'font-size',
+                                            'color',
+                                            'background-color',
+                                            'url',
+                                            'reset',
+                                            'apply'
+                                            ]
                             } );
                         }
                     },

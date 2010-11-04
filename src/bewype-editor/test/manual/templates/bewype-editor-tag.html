@@ -31,7 +31,19 @@
                     function( e ) {
                         if ( !_content.bewypeEditorTag ) {
                             _content.plug( Y.Bewype.EditorTag, {
-                                panelNode : Y.one( "#panel" )
+                                panelNode : Y.one( "#panel" ),
+                                activeButtons : [
+                                            'file',
+                                            'background-color',
+                                            'height',
+                                            'width',
+                                            'padding-top',
+                                            'padding-right',
+                                            'padding-bottom',
+                                            'padding-left',
+                                            'reset',
+                                            'apply'
+                                            ]
                             } )
                         }
                     },

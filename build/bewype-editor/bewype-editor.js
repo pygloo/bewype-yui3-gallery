@@ -14,7 +14,7 @@ YUI.add('bewype-editor-config', function(Y) {
     EditorConfig.NAME = 'bewype-editor-config';
 
     /**
-     * disabled: 'color', 'background-color', 'padding-right', 'padding-left', 'file', 'underline'
+     *
      */
     EditorConfig.ATTRS = {
         editorClass : {
@@ -29,12 +29,19 @@ YUI.add('bewype-editor-config', function(Y) {
                     'height',
                     'width',
                     'padding-top',
+                    'padding-right',
                     'padding-bottom',
+                    'padding-left',
                     'bold',
                     'italic',
+                    'underline',
                     'title',
                     'font-family',
                     'font-size',
+                    'color',
+                    'background-color',
+                    'url',
+                    'file',
                     'reset',
                     'apply'
                     ],
@@ -954,29 +961,25 @@ YUI.add('bewype-editor-tag', function(Y) {
             // has new value to set
             if ( _value && ( _value === true || _value.trim() !== '' ) ) {
 
-                // create tag node
-                if ( name === 'url' ) {
-                    _tagNode = Y.Node.create( '<a href="' + _value + '"></a>' );
-                } else {
-                    _tagNode = Y.Node.create( '<' + _tag + '></' + _tag + '>' );
-                }
-
                 // update with css property
                 if ( this._panel.isCssButton( name ) ) {
 
                     // simple style update
-                    _tagNode.setStyle( Y.Bewype.Utils.camelize( name ), _value);
+                    _host.setStyle( Y.Bewype.Utils.camelize( name ), _value);
 
-                    // experimental
-                    if ( name === 'background-color' ) {
-                        _tagNode.setStyle( 'display', 'inline-block' );
+                } else {
+                    // create tag node
+                    if ( name === 'url' ) {
+                        _tagNode = Y.Node.create( '<a href="' + _value + '"></a>' );
+                    } else {
+                        _tagNode = Y.Node.create( '<' + _tag + '></' + _tag + '>' );
                     }
+                    //
+                    _tagNode.append( this.getInnerHTML( _host ) );
+                    // update current content
+                    _host.setContent( _tagNode );
                 }
 
-                //
-                _tagNode.append( this.getInnerHTML( _host ) );
-                // update current content
-                _host.setContent( _tagNode );
 
             } else if ( name === 'reset' ) {
                 

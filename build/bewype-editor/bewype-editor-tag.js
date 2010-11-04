@@ -139,29 +139,25 @@ YUI.add('bewype-editor-tag', function(Y) {
             // has new value to set
             if ( _value && ( _value === true || _value.trim() !== '' ) ) {
 
-                // create tag node
-                if ( name === 'url' ) {
-                    _tagNode = Y.Node.create( '<a href="' + _value + '"></a>' );
-                } else {
-                    _tagNode = Y.Node.create( '<' + _tag + '></' + _tag + '>' );
-                }
-
                 // update with css property
                 if ( this._panel.isCssButton( name ) ) {
 
                     // simple style update
-                    _tagNode.setStyle( Y.Bewype.Utils.camelize( name ), _value);
+                    _host.setStyle( Y.Bewype.Utils.camelize( name ), _value);
 
-                    // experimental
-                    if ( name === 'background-color' ) {
-                        _tagNode.setStyle( 'display', 'inline-block' );
+                } else {
+                    // create tag node
+                    if ( name === 'url' ) {
+                        _tagNode = Y.Node.create( '<a href="' + _value + '"></a>' );
+                    } else {
+                        _tagNode = Y.Node.create( '<' + _tag + '></' + _tag + '>' );
                     }
+                    //
+                    _tagNode.append( this.getInnerHTML( _host ) );
+                    // update current content
+                    _host.setContent( _tagNode );
                 }
 
-                //
-                _tagNode.append( this.getInnerHTML( _host ) );
-                // update current content
-                _host.setContent( _tagNode );
 
             } else if ( name === 'reset' ) {
                 

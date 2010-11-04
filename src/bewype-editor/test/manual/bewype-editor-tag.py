@@ -5,11 +5,11 @@ from werkzeug import secure_filename
 app = Flask(__name__)
 
 @app.route('/')
-def hello_world():
+def index():
     return render_template('bewype-editor-tag.html')
 
 @app.route('/upload', methods=['POST'])
-def upload_file():
+def upload():
     _file = request.files['file']
     _filename = secure_filename(_file.filename)
     _file.save(os.path.join('static', _filename))
