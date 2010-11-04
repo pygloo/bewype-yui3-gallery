@@ -113,6 +113,37 @@ YUI.add('bewype-layout-designer-config', function(Y) {
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
+        },
+        editorTextButtons : {
+            value : [
+                    'height',
+                    'width',
+                    'bold',
+                    'italic',
+                    'underline',
+                    'title',
+                    'font-family',
+                    'font-size',
+                    'color',
+                    'background-color',
+                    'url',
+                    'reset',
+                    'apply'
+                    ]
+        },
+        editorImageButtons : {
+            value : [
+                    'file',
+                    'background-color',
+                    'height',
+                    'width',
+                    'padding-top',
+                    'padding-right',
+                    'padding-bottom',
+                    'padding-left',
+                    'reset',
+                    'apply'
+                    ]
         }
     };
 
@@ -351,32 +382,30 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
                 _bNode           = this.get( 'baseNode'      ),
                 _sourcesClass    = this.get( 'designerClass' ) + '-sources',
                 _editPanClass    = this.get( 'designerClass' ) + '-edit-panel',
-                _contentClass    = this.get( 'designerClass' ) + '-content',
                 _sourcesNode     = _bNode.one( 'div.' + _sourcesClass ),
-                _editPanNode     = _bNode.one( 'div.' + _editPanClass ),
-                _contentSelector = this.get(  'contentType' ) === 'image' ? 'img.' : 'div.',
-                _contentNode     = _host.one(  _contentSelector + _contentClass ),
-                _editorClass     = this.get(  'contentType' ) === 'image' ? Y.Bewype.EditorTag : Y.Bewype.EditorText;
+                _editPanNode     = _bNode.one( 'div.' + _editPanClass );
 
-            // detach events
-            _host.detachAll( 'bewype-editor:onClose'  );
-            _host.detachAll( 'bewype-editor:onChange' );
+            if ( _editPanNode.bewypeEditorPanel ) {
+
+                // diconnect
+                _editPanNode.unplug( Y.Bewype.EditorPanel );
+
+                // detach events
+                _host.detachAll( 'bewype-editor:onClose'  );
+                _host.detachAll( 'bewype-editor:onChange' );
+
+                // just in case
+                this.refresh();
+            }
 
             // set editing flag to false
             this.editing = false;
-
-            // just in case
-            this.refresh();
-
-            if ( _contentNode.bewypeEditorTag || _contentNode.bewypeEditorText ) {
-
-                // diconnect
-                _contentNode.unplug( _editorClass );
-            }
                 
             // show sources
             _editPanNode.setStyle( 'display', 'none'  );
             _sourcesNode.setStyle( 'display', 'block' );
+
+            return true;
         },
 
         /**
@@ -395,8 +424,9 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
                 _editPanNode     = _bNode.one( 'div.' + _editPanClass ),
                 _availableWidth  = _pNode.layoutDesignerPlaces.getAvailablePlace(),
                 _contentSelector = this.get(  'contentType' ) === 'image' ? 'img.' : 'div.',
-                _contentNode     = _host.one(  _contentSelector + _contentClass ),
                 _editorClass     = this.get(  'contentType' ) === 'image' ? Y.Bewype.EditorTag : Y.Bewype.EditorText,
+                _activeButtons   = this.get(  'contentType' ) === 'image' ? 'editorImageButtons' : 'editorTextButtons',
+                _contentNode     = _host.one(  _contentSelector + _contentClass ),
                 _conf            = null,
                 _maxWidth        = null;
 
@@ -414,26 +444,30 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
                 // update conf
                 _conf = {
                     panelNode       : _editPanNode,
-                    spinnerMaxWidth : _maxWidth
+                    spinnerMaxWidth : _maxWidth,
+                    activeButtons   : this.get( _activeButtons )
                     };
 
             } else {
 
                 // no max
-                _conf = { panelNode : _editPanNode };
+                _conf = {
+                    panelNode       : _editPanNode,
+                    activeButtons   : this.get( _activeButtons )
+                };
             }
 
             // plug
             _contentNode.plug( _editorClass, _conf );
-
-            // set editing flag to false
-            this.editing = true;
             
             // set on close event
             Y.on( 'bewype-editor:onClose',  Y.bind( this._detachEditor, this ), _contentNode );
 
             // set on change event
             Y.on( 'bewype-editor:onChange', Y.bind( this.refresh, this ), _contentNode );
+
+            // set editing flag to false
+            this.editing = true;
         },
 
         /**
@@ -442,7 +476,7 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
         _onClickEdit : function ( evt ) {
 
             // get callback
-            var _pNode         = this.get( 'parentNode' );
+            var _pNode    = this.get( 'parentNode' );
             
             // stop editing all
             Y.each( _pNode.layoutDesignerPlaces.getContents(), function( v, k ) {

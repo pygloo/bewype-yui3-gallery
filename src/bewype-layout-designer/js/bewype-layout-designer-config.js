@@ -111,6 +111,37 @@
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
+        },
+        editorTextButtons : {
+            value : [
+                    'height',
+                    'width',
+                    'bold',
+                    'italic',
+                    'underline',
+                    'title',
+                    'font-family',
+                    'font-size',
+                    'color',
+                    'background-color',
+                    'url',
+                    'reset',
+                    'apply'
+                    ]
+        },
+        editorImageButtons : {
+            value : [
+                    'file',
+                    'background-color',
+                    'height',
+                    'width',
+                    'padding-top',
+                    'padding-right',
+                    'padding-bottom',
+                    'padding-left',
+                    'reset',
+                    'apply'
+                    ]
         }
     };
 
