@@ -1,4 +1,13 @@
 
+
+ul.layout-designer-places ,
+ul.layout-designer-places li  {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
 table.layout-designer-places {
     border-collapse     : collapse;
     border-spacing      : 0;

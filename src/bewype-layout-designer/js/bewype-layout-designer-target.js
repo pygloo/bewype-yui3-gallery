@@ -257,12 +257,12 @@
 
             // temp vars
             var _host       = this.get( 'host' ),
-                _parentNode = ( destNode.ancestor( 'td' ) ) ? _host : null,
+                _targetType = this.get( 'targetType' ),
                 _config     = this.getAttrs();
 
             // prepare config
             _config.placesType = type;
-            _config.parentNode = _parentNode;
+            _config.parentNode = ( _targetType === 'start' || type === 'start' ) ? null : _host;
 
             // plug places
             destNode.plug( Y.Bewype.LayoutDesignerPlaces, _config );
@@ -271,13 +271,13 @@
         _addTarget : function ( destNode, type ) {
 
             // temp vars
-            var _host = this.get( 'host' ),
-                _parentNode = ( destNode.ancestor( 'td' ) ) ? _host : null,
+            var _host       = this.get( 'host'       ),
+                _targetType = this.get( 'targetType' ),
                 _config     = this.getAttrs();
 
             // prepare config
             _config.targetType = type;
-            _config.parentNode = _parentNode;
+            _config.parentNode = ( _targetType === 'start' || type === 'start' ) ? null : _host;
 
             // plug target
             destNode.plug( Y.Bewype.LayoutDesignerTarget, _config );
@@ -330,7 +330,12 @@
                 _host.unplug( Y.Bewype.LayoutDesignerTarget );
             }
 
-            if ( _hitType === 'start' || _hitType === 'horizontal' || _hitType === 'vertical') {
+            if ( _hitType === _targetType ) {
+
+                // do nothing
+                return;
+
+            } else if ( _hitType === 'start' || _hitType === 'horizontal' || _hitType === 'vertical' ) {
                 // add places and target
                 this._addPlaces( _destNode, _hitType );
                 this._addTarget( _destNode, _hitType );
@@ -352,12 +357,13 @@
             // tmp vars
             var _host       = this.get( 'host'       ),
                 _type       = this.get( 'targetType' ),
+                _parentNode = this.get( 'parentNode' ) || _host,
                 _HW         = null,
                 _pHeight    = null,
                 _pWidth     = null,
                 _hHeight    = null,
                 _hWidth     = null,
-                _parentNode = null;
+                _cellNode   = null;
             
             // refresh corresponding places first
             if (_host.layoutDesignerPlaces) {
@@ -375,8 +381,8 @@
             _hHeight = Y.Bewype.Utils.getHeight( this._targetNode );
             _hWidth  = Y.Bewype.Utils.getWidth(  this._targetNode );
 
-            // update position
-            _parentNode = this._targetNode.ancestor( 'td' ) || this._targetNode.ancestor( 'div' );
+            // ...
+            _cellNode = this._targetNode.ancestor( 'div' );
             // update target style
             switch( _type ) {
 
@@ -386,7 +392,7 @@
                     // this._targetNode.setY( _parentNode.getY() + _pHeight - _hHeight );
 
                     // set host position
-                    if ( _parentNode.get( 'tagName' ).toLowerCase() === 'div') {
+                    if ( _parentNode == _host ) {
                         this._targetNode.setY( _parentNode.getY() + _pHeight - _hHeight );
                     } else {
                         this._targetNode.setStyle( 'position', 'absolute');
@@ -404,7 +410,7 @@
                     this._targetNode.setX( _parentNode.getX() + _pWidth - _hWidth );
 
                     // set host position
-                    if ( _parentNode.get( 'tagName' ).toLowerCase() === 'div') {
+                    if ( _parentNode == _host ) {
                         this._targetNode.setY( _parentNode.getY() );
                     } else {
                         this._targetNode.setStyle( 'position', 'absolute');
@@ -413,10 +419,12 @@
                     // always set height
                     this._targetNode.setStyle( 'height' , _pHeight );
                     break;
+
+                default:
+                    return;
             }
 
-            _parentNode = _host.layoutDesignerPlaces.get( 'parentNode' );
-            if ( _parentNode ) {
+            if ( _parentNode != _host ) {
                 _parentNode.layoutDesignerTarget.refresh();
             }
         }

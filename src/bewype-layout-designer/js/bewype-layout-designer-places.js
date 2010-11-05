@@ -17,18 +17,15 @@
     LayoutDesignerPlaces.H_PLACES_TEMPLATE  += '<tr />';
     LayoutDesignerPlaces.H_PLACES_TEMPLATE  += '</table>';
 
-    LayoutDesignerPlaces.V_PLACES_TEMPLATE  = '<table class="{designerClass}-places {designerClass}-places-vertical"></table>';
+    LayoutDesignerPlaces.V_PLACES_TEMPLATE  = '<ul class="{designerClass}-places {designerClass}-places-vertical"></ul>';
 
     LayoutDesignerPlaces.H_DEST_TEMPLATE    =  '<td class="{designerClass}-cell {designerClass}-cell-horizontal">';
-    LayoutDesignerPlaces.H_DEST_TEMPLATE    += '<div class="{designerClass}-container">';
-    LayoutDesignerPlaces.H_DEST_TEMPLATE    += '</div>';
+    LayoutDesignerPlaces.H_DEST_TEMPLATE    += '<div class="{designerClass}-container"></div>';
     LayoutDesignerPlaces.H_DEST_TEMPLATE    += '</td>';
 
-    LayoutDesignerPlaces.V_DEST_TEMPLATE    =  '<tr class="{designerClass}-cell {designerClass}-cell-vertical">';
-    LayoutDesignerPlaces.V_DEST_TEMPLATE    += '<td>';
+    LayoutDesignerPlaces.V_DEST_TEMPLATE    =  '<li class="{designerClass}-cell {designerClass}-cell-vertical">';
     LayoutDesignerPlaces.V_DEST_TEMPLATE    += '<div class="{designerClass}-container"></div>';
-    LayoutDesignerPlaces.V_DEST_TEMPLATE    += '</td>';
-    LayoutDesignerPlaces.V_DEST_TEMPLATE    += '</tr>';
+    LayoutDesignerPlaces.V_DEST_TEMPLATE    += '</li>';
 
     Y.extend( LayoutDesignerPlaces, Y.Bewype.LayoutDesignerConfig, {
 
@@ -79,7 +76,7 @@
         _initSortable: function () {
             // get type                       
             var _placesType = this.get( 'placesType' ),
-                _nodes = ( _placesType === 'horizontal' ) ? 'td' : 'tr';
+                _nodes = ( _placesType === 'horizontal' ) ? 'td' : 'li';
 
             if ( this.sortable ) {
                 this.sortable.destroy();
@@ -93,9 +90,10 @@
             } );
 
             // ... 
-            Y.DD.DDM.on( 'drop:hit',   Y.bind( this._dropHitGotcha, this ), this.placesNode );
+            // Y.DD.DDM.on( 'drop:hit',   Y.bind( this._dropHitGotcha, this ), this.placesNode );
         },
 
+        /*                       
         _dropHitGotcha : function ( evt ) {
             //
             var _dragNode           = evt.drag.get( 'node' ),
@@ -150,6 +148,7 @@
                 _parentHost.layoutDesignerTarget.refresh();
             }
         },
+        */
 
         /**
          *
@@ -196,12 +195,20 @@
 
             // get the target node
             var _parentNode = this.get( 'parentNode' ) || this.placesNode.ancestor( 'div' ),
+                _placesType = this.get( 'placesType' ),
                 _pPlaces    = this.get( 'parentNode' ) ? _parentNode.layoutDesignerPlaces : null,
-                _pWidth     = _pPlaces ? _pPlaces.getPlacesWidth() : Y.Bewype.Utils.getWidth( _parentNode ),
+                _pNodeWidth = Y.Bewype.Utils.getWidth( _parentNode ),
+                _pWidth     = _pPlaces ? _pPlaces.getAvailablePlace() : _pNodeWidth,
                 _cWidth     = this.getPlacesWidth();
 
-            // compute available place
-            return _pWidth - _cWidth;
+            if ( _placesType === 'vertical' ) {
+                // just added or already set
+                return _cWidth === 0 ? _pWidth : _cWidth;
+
+            } else {
+                // simple diff
+                return _pWidth - _cWidth;
+            }
         },
 
         /**
@@ -210,26 +217,14 @@
         hasPlace : function ( contentWidth ) {
 
             // get the target node
-            var _parentNode = this.get( 'parentNode' ) || this.placesNode.ancestor( 'div' ),
-                _pWidth     = null,
-                _cWidth     = null;
+            var _availablePlace = this.getAvailablePlace(),
+                _placesType     = this.get( 'placesType' );
 
             // ensure content width
             contentWidth = contentWidth ? contentWidth : this.get( 'contentWidth' );
             
-            // update target style
-            switch( this.get( 'placesType' ) ) {
-
-                case 'vertical':
-                    return true;
-
-                case 'horizontal':
-                    // get parent width
-                    _pWidth = Y.Bewype.Utils.getWidth( _parentNode );
-                    // get contents width
-                    _cWidth = this.getPlacesWidth();
-                    return _pWidth >= ( _cWidth + contentWidth );
-            }
+            // so ??
+            return _placesType === 'vertical' || _availablePlace >= contentWidth;
         },
 
         getPlacesWidth : function () {
@@ -262,7 +257,6 @@
                     } );
                     break;
             }
-            // return it
             return _cWidth;
         },
 
@@ -294,11 +288,9 @@
                         }
                         if ( _h > _cHeight ) { _cHeight = _h; }
                     } );
-                    // specific for horizontal
                     _cHeight = ( _cHeight === 0 ) ? this.get( 'contentHeight' ) : _cHeight;
                     break;
             }
-            // return it
             return _cHeight;
         },
 
@@ -382,8 +374,7 @@
             // little check
             if ( !this.hasPlace() ) { return null; }
 
-            var _destNode   = null,
-                _tr         = this.placesNode.one('tr');
+            var _destNode   = null;
 
             // add
             switch( this.get( 'placesType' ) ) {
@@ -395,7 +386,7 @@
                     } ) );
 
                     // dom add
-                    _tr.append( _destNode );
+                    this.placesNode.one('tr').append( _destNode );
                     break;
 
                 case 'vertical':
@@ -489,8 +480,8 @@
                     break;
 
                 case 'vertical':
-                    // get parent tr
-                    _destNode = contentNode.ancestor( 'tr' );
+                    // get parent li
+                    _destNode = contentNode.ancestor( 'li' );
                     break;
             }
 
