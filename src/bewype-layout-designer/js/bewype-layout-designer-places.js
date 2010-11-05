@@ -230,12 +230,18 @@
         getPlacesWidth : function () {
 
             // result
-            var _cWidth = 0;
+            var _cWidth     = 0,
+                _parentNode = this.get( 'parentNode' ) || this.placesNode.ancestor( 'div' );
 
             // update target style
             switch( this.get( 'placesType' ) ) {
 
                 case 'vertical':
+
+                    if ( !this.get( 'parentNode' ) ) {
+                        return Y.Bewype.Utils.getWidth( _parentNode );
+                    }
+
                     Y.each( this.contents, function( v, k ) {
                         var _w = 0;
                         if ( v.layoutDesignerPlaces ) {
