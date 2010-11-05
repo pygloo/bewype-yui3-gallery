@@ -48,11 +48,31 @@ YUI.add('bewype-editor-panel', function(Y) {
 
         _editors        : [],
 
-        _spinnerButtons : [ 'height', 'width', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left' ],
+        _spinnerButtons : [
+                        'height',
+                        'width',
+                        'padding-top',
+                        'padding-right',
+                        'padding-bottom',
+                        'padding-left'
+                        ],
 
-        _toggleButtons  : [ 'bold', 'italic', 'underline' ],
+        _toggleButtons  : [
+                        'bold',
+                        'italic',
+                        'underline'
+                        ],
 
-        _pickerButtons  : [ 'title', 'font-family', 'font-size', 'color', 'background-color', 'url', 'file' ],
+        _pickerButtons  : [
+                        'title',
+                        'font-family',
+                        'font-size',
+                        'text-align',
+                        'color',
+                        'background-color',
+                        'url',
+                        'file'
+                        ],
 
         _pickerObjDict  : {
             'background-color' : Y.Bewype.PickerColor,
@@ -60,13 +80,14 @@ YUI.add('bewype-editor-panel', function(Y) {
             'file'             : Y.Bewype.PickerFile,
             'font-family'      : Y.Bewype.PickerFontFamily,
             'font-size'        : Y.Bewype.PickerFontSize,
+            'text-align'       : Y.Bewype.PickerTextAlign,
             'title'            : Y.Bewype.PickerTitle,
             'url'              : Y.Bewype.PickerUrl
         },
 
         _tagButtons  : [ 'bold', 'italic', 'title', 'underline', 'url' ],
 
-        _cssButtons  : [ 'font-family', 'font-size', 'color', 'background-color' ],
+        _cssButtons  : [ 'font-family', 'font-size', 'text-align', 'color', 'background-color' ],
 
         _addSpinnerButton : function ( name, config ) {
 

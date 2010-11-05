@@ -330,6 +330,12 @@
                 ], 
                 "skinnable": true
             }, 
+            "bewype-picker-text-align": {
+                "requires": [
+                    "bewype-picker-base"
+                ], 
+                "skinnable": true
+            }, 
             "bewype-picker-title": {
                 "requires": [
                     "bewype-picker-base"

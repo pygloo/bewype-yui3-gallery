@@ -134,6 +134,32 @@ suite.add( new Y.Test.Case( {
         Y.Assert.areEqual( '\'Comic Sans MS\', cursive, sans-serif', this._picker.getValue(), 'Ooops!' );
     },
 
+    "test picker text align": function () {
+
+        // tmp vars
+        var _evtNode = null;
+
+        // init normal picker
+        this._picker = new Y.Bewype.PickerTextAlign();
+
+        // check exist
+        Y.Assert.isNotNull( this._picker, 'Ooops!' );
+        Y.Assert.isNotUndefined( this._picker, 'Ooops!' );
+
+        // render
+        this._picker.render( '#test' );
+
+        // check current value
+        Y.Assert.isNull( this._picker.getValue(), 'Ooops!' );
+
+        // select test2
+        _evtNode = Y.one( '#' + this._picker.get ( 'pickerClass' ) + '-row-center' );
+        _evtNode.simulate( 'click' );
+
+        // check current value again
+        Y.Assert.areEqual( 'center', this._picker.getValue(), 'Ooops!' );
+    },
+
     "test picker title": function () {
 
         // tmp vars

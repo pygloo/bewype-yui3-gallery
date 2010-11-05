@@ -142,12 +142,25 @@
             }
         },
 
-        resetStyle : function ( node ) {
+        resetStyle : function ( node, tagOnly) {
 
             // do reset
             Y.Object.each( [ 'h1', 'h2', 'h3', 'h4', 'span', 'a', 'b', 'i', 'u' ], function( v, k ) {
                 this.removeTagOrStyle( node, v );
             }, this );
+
+            // and clear tag style
+            if ( !tagOnly ) {
+                var _cssDict = Y.Bewype.Utils.getCssDict( node );
+                // remove buttons
+                Y.Object.each( this._panel.get( 'activeButtons' ) , function( v, k ) {
+                    if ( this._panel._cssButtons.indexOf( v ) != -1) {
+                        delete( _cssDict[ v ] );
+                    }
+                }, this );
+                // set updated dict
+                Y.Bewype.Utils.setCssDict( node, _cssDict );
+            }
         },
 
         onButtonClick : function ( name, e ) {

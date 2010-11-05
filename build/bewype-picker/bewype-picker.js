@@ -1004,6 +1004,68 @@ YUI.add('bewype-picker-font-family', function(Y) {
 
 
 }, '@VERSION@' ,{requires:['bewype-picker-base']});
+YUI.add('bewype-picker-text-align', function(Y) {
+
+
+    var PickerTextAlign = function(config) {
+        PickerTextAlign.superclass.constructor.apply(this, arguments);
+    };
+
+    /**
+     */
+    PickerTextAlign.NAME = "pickerTextAlign";
+
+    /**
+     *
+     */
+    PickerTextAlign.ATTRS = {
+        pickerClass : {
+            value : 'bewype-picker-text-align',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },
+        alignProps : {
+            value : [ 'left', 'center', 'right' ],
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang. isArray( val );
+            }
+        }
+    };
+
+    Y.extend( PickerTextAlign, Y.Bewype.Picker, {
+
+        /**
+         *
+         */
+        initializer : function( config ) {
+            this._init( config );
+        },
+
+        /**
+         *
+         */
+        renderUI : function () {
+
+            // render default
+            this._renderBaseUI();
+
+            // add sizes
+            Y.Object.each( this.get( 'alignProps' ), function (v, k) {
+                var _style = 'text-align: ' + v + ';';
+                this.append( v,  v, _style);
+            }, this );
+        }
+    } );
+
+    Y.namespace('Bewype');
+    Y.Bewype.PickerTextAlign = PickerTextAlign;
+
+
+
+}, '@VERSION@' ,{requires:['bewype-picker-base']});
 YUI.add('bewype-picker-title', function(Y) {
 
 
@@ -1215,5 +1277,5 @@ YUI.add('bewype-picker-url', function(Y) {
 }, '@VERSION@' ,{requires:['stylesheet', 'substitute', 'widget', 'yui-base']});
 
 
-YUI.add('bewype-picker', function(Y){}, '@VERSION@' ,{use:['bewype-picker-base', 'bewype-picker-color', 'bewype-picker-file', 'bewype-picker-font-size', 'bewype-picker-font-family', 'bewype-picker-title', 'bewype-picker-url']});
+YUI.add('bewype-picker', function(Y){}, '@VERSION@' ,{use:['bewype-picker-base', 'bewype-picker-color', 'bewype-picker-file', 'bewype-picker-font-size', 'bewype-picker-font-family', 'bewype-picker-text-align', 'bewype-picker-title', 'bewype-picker-url']});
 

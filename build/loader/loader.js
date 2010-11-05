@@ -2627,6 +2627,12 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
                 ], 
                 "skinnable": true
             }, 
+            "bewype-picker-text-align": {
+                "requires": [
+                    "bewype-picker-base"
+                ], 
+                "skinnable": true
+            }, 
             "bewype-picker-title": {
                 "requires": [
                     "bewype-picker-base"
@@ -3942,7 +3948,7 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         }
     }
 };
-YUI.Env[Y.version].md5 = '8777ec3493c476fdfeb6e20f3a881b3f';
+YUI.Env[Y.version].md5 = 'd94e3fbf7714db27146733b672eade48';
 
 
 }, '@VERSION@' ,{requires:['loader-base']});

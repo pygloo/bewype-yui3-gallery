@@ -110,8 +110,8 @@ YUI.add('bewype-editor-tag', function(Y) {
                         _host.setAttribute( 'src', _filePath );
 
                         // clear previous                        
-                        _host.setStyle( 'height', null );
-                        _host.setStyle( 'width',  null );       
+                        _host.setStyle( 'height', '' );
+                        _host.setStyle( 'width',  '' );       
 
                         // refresh buttons
                         this._panel.refreshButtons( _host, false, name );  

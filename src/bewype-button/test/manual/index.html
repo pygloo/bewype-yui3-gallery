@@ -22,6 +22,14 @@
 
     <div id="button-picker-font-size"></div>
 
+    <h2>Button Picker Font Family</h2>
+
+    <div id="button-picker-font-family"></div>
+
+    <h2>Button Picker Text Align</h2>
+
+    <div id="button-picker-text-align"></div>
+
     <h2>Button Title</h2>
 
     <div id="button-picker-title"></div>
@@ -82,6 +90,30 @@
             // add custom event listener
             _buttonFontSize.on( 'button:onChange', function ( e ) {
                 alert( 'Button Picker Font Size Changed: ' + _buttonFontSize.getValue() );
+            } );
+
+            // button manual
+            var _buttonFontFamily = new Y.Bewype.ButtonPicker( {
+                label     : 'Font Family',
+                pickerObj :  Y.Bewype.PickerFontFamily
+            } );
+            _buttonFontFamily.render( '#button-picker-font-family' );
+
+            // add custom event listener
+            _buttonFontFamily.on( 'button:onChange', function ( e ) {
+                alert( 'Button Picker Font Family Changed: ' + _buttonFontFamily.getValue() );
+            } );
+
+            // button manual
+            var _buttonTextAlign = new Y.Bewype.ButtonPicker( {
+                label     : 'Text Align',
+                pickerObj :  Y.Bewype.PickerTextAlign
+            } );
+            _buttonTextAlign.render( '#button-picker-text-align' );
+
+            // add custom event listener
+            _buttonTextAlign.on( 'button:onChange', function ( e ) {
+                alert( 'Button Picker Text Align Changed: ' + _buttonTextAlign.getValue() );
             } );
 
             // button manual

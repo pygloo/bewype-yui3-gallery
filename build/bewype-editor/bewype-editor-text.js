@@ -446,7 +446,7 @@ YUI.add('bewype-editor-text', function(Y) {
                 } else if ( name === 'reset') {
 
                     // reset main node
-                    this.resetStyle( _main, true );
+                    this.resetStyle( _main );
 
                     // restore original values and quit
                     Y.Bewype.Utils.setCssDict( _main, this._oMainCssdict );
@@ -496,7 +496,7 @@ YUI.add('bewype-editor-text', function(Y) {
                 } else if ( name === 'reset' ) {
                     
                     // do reset
-                    this.resetStyle( _selectionNode );
+                    this.resetStyle( _selectionNode, true );
 
                     // refresh buttons
                     this._panel.refreshButtons( _selectionNode, true );

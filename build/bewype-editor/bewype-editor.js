@@ -38,6 +38,7 @@ YUI.add('bewype-editor-config', function(Y) {
                     'title',
                     'font-family',
                     'font-size',
+                    'text-align',
                     'color',
                     'background-color',
                     'url',
@@ -188,11 +189,31 @@ YUI.add('bewype-editor-panel', function(Y) {
 
         _editors        : [],
 
-        _spinnerButtons : [ 'height', 'width', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left' ],
+        _spinnerButtons : [
+                        'height',
+                        'width',
+                        'padding-top',
+                        'padding-right',
+                        'padding-bottom',
+                        'padding-left'
+                        ],
 
-        _toggleButtons  : [ 'bold', 'italic', 'underline' ],
+        _toggleButtons  : [
+                        'bold',
+                        'italic',
+                        'underline'
+                        ],
 
-        _pickerButtons  : [ 'title', 'font-family', 'font-size', 'color', 'background-color', 'url', 'file' ],
+        _pickerButtons  : [
+                        'title',
+                        'font-family',
+                        'font-size',
+                        'text-align',
+                        'color',
+                        'background-color',
+                        'url',
+                        'file'
+                        ],
 
         _pickerObjDict  : {
             'background-color' : Y.Bewype.PickerColor,
@@ -200,13 +221,14 @@ YUI.add('bewype-editor-panel', function(Y) {
             'file'             : Y.Bewype.PickerFile,
             'font-family'      : Y.Bewype.PickerFontFamily,
             'font-size'        : Y.Bewype.PickerFontSize,
+            'text-align'       : Y.Bewype.PickerTextAlign,
             'title'            : Y.Bewype.PickerTitle,
             'url'              : Y.Bewype.PickerUrl
         },
 
         _tagButtons  : [ 'bold', 'italic', 'title', 'underline', 'url' ],
 
-        _cssButtons  : [ 'font-family', 'font-size', 'color', 'background-color' ],
+        _cssButtons  : [ 'font-family', 'font-size', 'text-align', 'color', 'background-color' ],
 
         _addSpinnerButton : function ( name, config ) {
 
@@ -757,12 +779,25 @@ YUI.add('bewype-editor-base', function(Y) {
             }
         },
 
-        resetStyle : function ( node ) {
+        resetStyle : function ( node, tagOnly) {
 
             // do reset
             Y.Object.each( [ 'h1', 'h2', 'h3', 'h4', 'span', 'a', 'b', 'i', 'u' ], function( v, k ) {
                 this.removeTagOrStyle( node, v );
             }, this );
+
+            // and clear tag style
+            if ( !tagOnly ) {
+                var _cssDict = Y.Bewype.Utils.getCssDict( node );
+                // remove buttons
+                Y.Object.each( this._panel.get( 'activeButtons' ) , function( v, k ) {
+                    if ( this._panel._cssButtons.indexOf( v ) != -1) {
+                        delete( _cssDict[ v ] );
+                    }
+                }, this );
+                // set updated dict
+                Y.Bewype.Utils.setCssDict( node, _cssDict );
+            }
         },
 
         onButtonClick : function ( name, e ) {
@@ -932,8 +967,8 @@ YUI.add('bewype-editor-tag', function(Y) {
                         _host.setAttribute( 'src', _filePath );
 
                         // clear previous                        
-                        _host.setStyle( 'height', null );
-                        _host.setStyle( 'width',  null );       
+                        _host.setStyle( 'height', '' );
+                        _host.setStyle( 'width',  '' );       
 
                         // refresh buttons
                         this._panel.refreshButtons( _host, false, name );  
@@ -1453,7 +1488,7 @@ YUI.add('bewype-editor-text', function(Y) {
                 } else if ( name === 'reset') {
 
                     // reset main node
-                    this.resetStyle( _main, true );
+                    this.resetStyle( _main );
 
                     // restore original values and quit
                     Y.Bewype.Utils.setCssDict( _main, this._oMainCssdict );
@@ -1503,7 +1538,7 @@ YUI.add('bewype-editor-text', function(Y) {
                 } else if ( name === 'reset' ) {
                     
                     // do reset
-                    this.resetStyle( _selectionNode );
+                    this.resetStyle( _selectionNode, true );
 
                     // refresh buttons
                     this._panel.refreshButtons( _selectionNode, true );

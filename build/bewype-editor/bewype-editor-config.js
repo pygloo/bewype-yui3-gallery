@@ -38,6 +38,7 @@ YUI.add('bewype-editor-config', function(Y) {
                     'title',
                     'font-family',
                     'font-size',
+                    'text-align',
                     'color',
                     'background-color',
                     'url',
