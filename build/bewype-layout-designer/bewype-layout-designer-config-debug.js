@@ -108,7 +108,7 @@ YUI.add('bewype-layout-designer-config', function(Y) {
             }
         },
         defaultImg : {
-            value : 'http://www.google.fr/images/logo.png',
+            value : Y.config.base + 'bewype-layout-designer/assets/blank.png',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -124,6 +124,7 @@ YUI.add('bewype-layout-designer-config', function(Y) {
                     'title',
                     'font-family',
                     'font-size',
+                    'text-align',
                     'color',
                     'background-color',
                     'url',

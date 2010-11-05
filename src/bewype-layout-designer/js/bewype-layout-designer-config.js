@@ -106,7 +106,7 @@
             }
         },
         defaultImg : {
-            value : 'http://www.google.fr/images/logo.png',
+            value : Y.config.base + 'bewype-layout-designer/assets/blank.png',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -122,6 +122,7 @@
                     'title',
                     'font-family',
                     'font-size',
+                    'text-align',
                     'color',
                     'background-color',
                     'url',
