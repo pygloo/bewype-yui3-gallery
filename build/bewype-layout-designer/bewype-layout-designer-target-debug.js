@@ -160,7 +160,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             }
 
             // keep default position
-            this.refresh( evt );
+            this.refresh();
         },
 
         _afterDropExit : function ( evt ) {
@@ -179,7 +179,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             }
 
             // keep default position
-            this.refresh( evt );
+            this.refresh();
         },
 
         _onClickRemove: function ( evt ) {
@@ -239,7 +239,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             }
 
             // keep default position
-            this.refresh( evt );
+            this.refresh();
         },
 
         /**
@@ -354,7 +354,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             this._afterDropExit( evt );
         },
 
-        refresh : function () {
+        refresh : function ( forcedWidth ) {
 
             // tmp vars
             var _host       = this.get( 'host'       ),
@@ -370,7 +370,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             // refresh corresponding places first
             if (_host.layoutDesignerPlaces) {
                 // refresh place node only
-                _HW = _host.layoutDesignerPlaces.refresh();
+                _HW = _host.layoutDesignerPlaces.refresh( forcedWidth );
             } else {
                 return;
             }

@@ -2562,6 +2562,7 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
             "bewype-layout-designer-places": {
                 "requires": [
                     "sortable", 
+                    "dd-constrain", 
                     "bewype-layout-designer-content-text"
                 ], 
                 "skinnable": true
@@ -3948,7 +3949,7 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         }
     }
 };
-YUI.Env[Y.version].md5 = 'd94e3fbf7714db27146733b672eade48';
+YUI.Env[Y.version].md5 = '18d9bbdb4267037bee07eff9d2af6181';
 
 
 }, '@VERSION@' ,{requires:['loader-base']});

@@ -89,11 +89,19 @@
                 opacity     : '.2'
             } );
 
+            /*
+            this.sortable.delegate.dd.plug( Y.Plugin.DDConstrained, {
+                constrain2node: this.get( 'host' )
+            } );
+            */
+
             // ... 
-            // Y.DD.DDM.on( 'drop:hit',   Y.bind( this._dropHitGotcha, this ), this.placesNode );
+            Y.DD.DDM.on( 'drop:hit', Y.bind( this._dropHitGotcha, this ), this.placesNode );
         },
 
-        /*                       
+        /**
+         *
+         */
         _dropHitGotcha : function ( evt ) {
             //
             var _dragNode           = evt.drag.get( 'node' ),
@@ -126,7 +134,8 @@
                 _parentHost.layoutDesignerPlaces.removeContent( _contentNode );
 
                 // final places factory
-                _finalPlaces = _dropPlaces.hasPlace( _contentWidth ) ? _dropPlaces : _parentHost.layoutDesignerPlaces;
+                // _finalPlaces = _dropPlaces.hasPlace( _contentWidth ) ? _dropPlaces : _parentHost.layoutDesignerPlaces;
+                _finalPlaces = _parentHost.layoutDesignerPlaces;
                 
                 // get new dest node
                 _newDest = _finalPlaces.addDestNode();
@@ -148,7 +157,6 @@
                 _parentHost.layoutDesignerTarget.refresh();
             }
         },
-        */
 
         /**
          *

@@ -265,6 +265,7 @@
             "bewype-layout-designer-places": {
                 "requires": [
                     "sortable", 
+                    "dd-constrain", 
                     "bewype-layout-designer-content-text"
                 ], 
                 "skinnable": true

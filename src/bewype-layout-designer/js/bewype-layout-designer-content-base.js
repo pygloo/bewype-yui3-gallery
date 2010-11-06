@@ -155,14 +155,12 @@
                 _pNode           = this.get( 'parentNode'    ),
                 _sourcesClass    = this.get( 'designerClass' ) + '-sources',
                 _editPanClass    = this.get( 'designerClass' ) + '-edit-panel',
-                _contentClass    = this.get( 'designerClass' ) + '-content',
                 _sourcesNode     = _bNode.one( 'div.' + _sourcesClass ),
                 _editPanNode     = _bNode.one( 'div.' + _editPanClass ),
                 _availableWidth  = _pNode.layoutDesignerPlaces.getAvailablePlace(),
-                _contentSelector = this.get(  'contentType' ) === 'image' ? 'img.' : 'div.',
                 _editorClass     = this.get(  'contentType' ) === 'image' ? Y.Bewype.EditorTag : Y.Bewype.EditorText,
                 _activeButtons   = this.get(  'contentType' ) === 'image' ? 'editorImageButtons' : 'editorTextButtons',
-                _contentNode     = _host.one(  _contentSelector + _contentClass ),
+                _contentNode     = this.getContentNode(),
                 _conf            = null,
                 _maxWidth        = null;
 
@@ -332,10 +330,7 @@
 
         getContentHeight : function () {
             // temp var
-            var _host            = this.get( 'host' ),
-                _contentClass    = this.get( 'designerClass' ) + '-content',
-                _contentSelector = this.get( 'contentType' ) === 'image' ? 'img.' : 'div.',
-                _contentNode     = _host.one( _contentSelector + _contentClass ),
+            var _contentNode = this.getContentNode(),
                 _cHeight = Y.Bewype.Utils.getHeight( _contentNode ),
                 _pTop    = Y.Bewype.Utils.getStyleValue( _contentNode, 'paddingTop'    ) || 0,
                 _pBottom = Y.Bewype.Utils.getStyleValue( _contentNode, 'paddingBottom' ) || 0;
@@ -346,25 +341,30 @@
 
         getContentWidth : function () {
             // temp var
-            var _host           = this.get( 'host' ),
-                _contentClass   = this.get( 'designerClass' ) + '-content',
-                _contentSelector = this.get( 'contentType' ) === 'image' ? 'img.' : 'div.',
-                _contentNode    = _host.one( _contentSelector + _contentClass ),
-                _cWidth = Y.Bewype.Utils.getWidth( _contentNode ),
-                _pRight = Y.Bewype.Utils.getStyleValue( _contentNode, 'paddingRight' ) || 0,
-                _pLeft  = Y.Bewype.Utils.getStyleValue( _contentNode, 'paddingLeft'  ) || 0;
+            var _contentNode = this.getContentNode(),
+                _cWidth      = Y.Bewype.Utils.getWidth( _contentNode ),
+                _pRight      = Y.Bewype.Utils.getStyleValue( _contentNode, 'paddingRight' ) || 0,
+                _pLeft       = Y.Bewype.Utils.getStyleValue( _contentNode, 'paddingLeft'  ) || 0;
             // return width
             return _cWidth + _pLeft + _pRight;
         },
 
-        _refreshCloneNode : function () {
+        getContentNode : function () {
+            var _host            = this.get( 'host' ),
+                _contentClass    = this.get( 'designerClass' ) + '-content',
+                _contentSelector = this.get( 'contentType' ) === 'image' ? 'img.' : 'div.';
+
+            return _host.one( _contentSelector + _contentClass );
+        },
+
+        _refreshCloneNode : function ( forcedWidth ) {
 
             // temp var
             var _host           = this.get( 'host'          ),
                 _contentClass   = this.get( 'designerClass' ) + '-content',
                 _cloneNode      = _host.one( 'div.' + _contentClass + '-clone' ),
                 _h              = this.getContentHeight(),
-                _w              = this.getContentWidth();
+                _w              = forcedWidth || this.getContentWidth();
             
             // update clone height & width style
             if ( _cloneNode ) {
@@ -373,13 +373,19 @@
             }
         },
 
-        refresh : function () {
-
-            // refresh clone
-            this._refreshCloneNode();
+        refresh : function ( forcedWidth ) {
 
             // temp var
-            var _parentNode = this.get( 'parentNode' );
+            var _parentNode  = this.get( 'parentNode' ),
+                _contentNode = this.getContentNode();
+
+            // force node width
+            if ( _contentNode ) {
+
+            }
+
+            // refresh clone
+            this._refreshCloneNode( forcedWidth );
 
             // refresh parent target
             _parentNode.layoutDesignerTarget.refresh();
