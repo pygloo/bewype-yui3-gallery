@@ -407,10 +407,11 @@ YUI.add('bewype-editor-panel', function(Y) {
                 _valueWidth      = _spinnerWidth ? _spinnerWidth.getValue() : 0,   
                 _maxLeft         = _spinnerWidth ? _spinnerMaxWidth - _valueWidth - _valueRight  : _spinnerMaxWidth,    
                 _maxRight        = _spinnerWidth ? _spinnerMaxWidth - _valueWidth - _valueLeft   : _spinnerMaxWidth,    
-                _maxWidth        = _spinnerLeft  ? _spinnerMaxWidth - _valueLeft  - _valueRight  : _spinnerMaxWidth;
+                _maxWidth        = _spinnerWidth ? _spinnerMaxWidth - _valueLeft  - _valueRight  : _spinnerMaxWidth;
 
             if ( _spinnerLeft  ) { _spinnerLeft.set(  'max', _maxLeft  ); }
             if ( _spinnerWidth ) { _spinnerWidth.set( 'max', _maxWidth ); }
+            if ( _spinnerRight ) { _spinnerRight.set( 'max', _maxRight ); }
 
             return {
                 'padding-left'  : _maxLeft,       

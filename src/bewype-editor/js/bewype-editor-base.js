@@ -182,7 +182,7 @@
                 // ensure new value - should not happen
                 _newValue    = _spinner ? _spinner.getValue() : 0,
                 // specific for horizontal padding ??
-                _cmpValue    = ( name == 'padding-left' || name == 'padding-right' ) ? _newValue / 2 : _newValue,
+                _cmpValue    = ( name === 'padding-left' || name === 'padding-right' ) ? _newValue / 2 : _newValue,
                 _maxDict     = _spinner ? this._panel.updateSpinnerMaxWidth() : 0,
                 _max         = _maxDict[ name ]; // update spinner max value
 

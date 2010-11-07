@@ -126,9 +126,6 @@
                 // udpate parent node propertie
                 _contentNode.layoutDesignerContent.set( 'parentNode', _dropNode );
 
-                // refresh old parent
-                // _parentHost.layoutDesignerTarget.refresh();
-
                 // refresh new parent
                 _forceWidth  = _dropNode.layoutDesignerPlaces.getMaxWidth();
                 _dropNode.layoutDesignerTarget.refresh( _forceWidth );

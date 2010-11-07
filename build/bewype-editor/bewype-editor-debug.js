@@ -548,10 +548,11 @@ YUI.add('bewype-editor-panel', function(Y) {
                 _valueWidth      = _spinnerWidth ? _spinnerWidth.getValue() : 0,   
                 _maxLeft         = _spinnerWidth ? _spinnerMaxWidth - _valueWidth - _valueRight  : _spinnerMaxWidth,    
                 _maxRight        = _spinnerWidth ? _spinnerMaxWidth - _valueWidth - _valueLeft   : _spinnerMaxWidth,    
-                _maxWidth        = _spinnerLeft  ? _spinnerMaxWidth - _valueLeft  - _valueRight  : _spinnerMaxWidth;
+                _maxWidth        = _spinnerWidth ? _spinnerMaxWidth - _valueLeft  - _valueRight  : _spinnerMaxWidth;
 
             if ( _spinnerLeft  ) { _spinnerLeft.set(  'max', _maxLeft  ); }
             if ( _spinnerWidth ) { _spinnerWidth.set( 'max', _maxWidth ); }
+            if ( _spinnerRight ) { _spinnerRight.set( 'max', _maxRight ); }
 
             return {
                 'padding-left'  : _maxLeft,       
@@ -819,7 +820,7 @@ YUI.add('bewype-editor-base', function(Y) {
                 // ensure new value - should not happen
                 _newValue    = _spinner ? _spinner.getValue() : 0,
                 // specific for horizontal padding ??
-                _cmpValue    = ( name == 'padding-left' || name == 'padding-right' ) ? _newValue / 2 : _newValue,
+                _cmpValue    = ( name === 'padding-left' || name === 'padding-right' ) ? _newValue / 2 : _newValue,
                 _maxDict     = _spinner ? this._panel.updateSpinnerMaxWidth() : 0,
                 _max         = _maxDict[ name ]; // update spinner max value
 
