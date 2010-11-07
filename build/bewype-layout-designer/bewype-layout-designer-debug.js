@@ -488,9 +488,9 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
                 _editPanClass    = this.get( 'designerClass' ) + '-edit-panel',
                 _sourcesNode     = _bNode.one( 'div.' + _sourcesClass ),
                 _editPanNode     = _bNode.one( 'div.' + _editPanClass ),
-                _availableWidth  = _pNode.layoutDesignerPlaces.getAvailablePlace(),
-                _editorClass     = this.get(  'contentType' ) === 'image' ? Y.Bewype.EditorTag : Y.Bewype.EditorText,
-                _activeButtons   = this.get(  'contentType' ) === 'image' ? 'editorImageButtons' : 'editorTextButtons',
+                _placesType      = _pNode.layoutDesignerPlaces.get( 'placesType' ),
+                _editorClass     = this.get( 'contentType' ) === 'image' ? Y.Bewype.EditorTag : Y.Bewype.EditorText,
+                _activeButtons   = this.get( 'contentType' ) === 'image' ? 'editorImageButtons' : 'editorTextButtons',
                 _contentNode     = this.getContentNode(),
                 _conf            = null,
                 _maxWidth        = null;
@@ -500,8 +500,12 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
             _editPanNode.setStyle( 'display', 'block' );
 
             // compute max width
-            _maxWidth =  _availableWidth ? _availableWidth : 0;
-            _maxWidth += this.getContentWidth();
+            if (  _placesType === 'vertical' ) {
+                _maxWidth = _pNode.layoutDesignerPlaces.getMaxWidth();
+            } else {
+                _maxWidth = _pNode.layoutDesignerPlaces.getAvailablePlace();
+                _maxWidth += this.getContentWidth();
+            }
 
             // update conf
             _conf = {
@@ -961,7 +965,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             // first remove all the children
             Y.Object.each( this.contents, function( v, k ) {
                 if ( v.layoutDesignerPlaces ) {
-                    v.layoutDesignerPlaces.remove();
+                    v.layoutDesignerPlaces.destroy();
                 } else {
                     this.removeContent( v );
                 }
@@ -988,13 +992,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
         },
 
         getMaxWidth : function () {
-            // get the target node
-            var _parentNode = this.get( 'parentNode' ) || this.placesNode.ancestor( 'div' ),
-                _placesType = this.get( 'placesType' ),
-                _pPlaces    = this.get( 'parentNode' ) ? _parentNode.layoutDesignerPlaces : null,
-                _pNodeWidth = Y.Bewype.Utils.getWidth( _parentNode );
-                
-            return _pPlaces ? _pPlaces.getAvailablePlace() : _pNodeWidth;
+            return Y.Bewype.Utils.getWidth( this.get( 'host' ) );
         },
 
         /**
@@ -1254,16 +1252,18 @@ YUI.add('bewype-layout-designer-places', function(Y) {
         addContent : function ( contentType ) {
 
             // add dest node
-            var _destNode    = this.addDestNode(),
+            var _placesType  = this.get( 'placesType' ),
+                _destNode    = this.addDestNode(),
                 _pluginClass = null,
                 _config      = this.getAttrs(),
-                _forceWidth  = this.hasPlace() ? null : this.getMaxWidth();
+                _maxWidth    = this.getMaxWidth(),
+                _forceWidth  = this.hasPlace() ? null : _maxWidth;
 
             // prepare config
             _config.contentType  = contentType;
             _config.parentNode   = this.get( 'host' );
             // set max available width
-            _config.contentWidth = this.getAvailablePlace();
+            _config.contentWidth = _placesType === 'vertical' ? _maxWidth : this.getAvailablePlace();
 
             // content type factory
             switch( contentType ) {

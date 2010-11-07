@@ -102,7 +102,7 @@
             // first remove all the children
             Y.Object.each( this.contents, function( v, k ) {
                 if ( v.layoutDesignerPlaces ) {
-                    v.layoutDesignerPlaces.remove();
+                    v.layoutDesignerPlaces.destroy();
                 } else {
                     this.removeContent( v );
                 }
@@ -129,13 +129,7 @@
         },
 
         getMaxWidth : function () {
-            // get the target node
-            var _parentNode = this.get( 'parentNode' ) || this.placesNode.ancestor( 'div' ),
-                _placesType = this.get( 'placesType' ),
-                _pPlaces    = this.get( 'parentNode' ) ? _parentNode.layoutDesignerPlaces : null,
-                _pNodeWidth = Y.Bewype.Utils.getWidth( _parentNode );
-                
-            return _pPlaces ? _pPlaces.getAvailablePlace() : _pNodeWidth;
+            return Y.Bewype.Utils.getWidth( this.get( 'host' ) );
         },
 
         /**
@@ -395,16 +389,18 @@
         addContent : function ( contentType ) {
 
             // add dest node
-            var _destNode    = this.addDestNode(),
+            var _placesType  = this.get( 'placesType' ),
+                _destNode    = this.addDestNode(),
                 _pluginClass = null,
                 _config      = this.getAttrs(),
-                _forceWidth  = this.hasPlace() ? null : this.getMaxWidth();
+                _maxWidth    = this.getMaxWidth(),
+                _forceWidth  = this.hasPlace() ? null : _maxWidth;
 
             // prepare config
             _config.contentType  = contentType;
             _config.parentNode   = this.get( 'host' );
             // set max available width
-            _config.contentWidth = this.getAvailablePlace();
+            _config.contentWidth = _placesType === 'vertical' ? _maxWidth : this.getAvailablePlace();
 
             // content type factory
             switch( contentType ) {

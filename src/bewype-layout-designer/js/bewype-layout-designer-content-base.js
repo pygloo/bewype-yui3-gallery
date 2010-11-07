@@ -157,9 +157,9 @@
                 _editPanClass    = this.get( 'designerClass' ) + '-edit-panel',
                 _sourcesNode     = _bNode.one( 'div.' + _sourcesClass ),
                 _editPanNode     = _bNode.one( 'div.' + _editPanClass ),
-                _availableWidth  = _pNode.layoutDesignerPlaces.getAvailablePlace(),
-                _editorClass     = this.get(  'contentType' ) === 'image' ? Y.Bewype.EditorTag : Y.Bewype.EditorText,
-                _activeButtons   = this.get(  'contentType' ) === 'image' ? 'editorImageButtons' : 'editorTextButtons',
+                _placesType      = _pNode.layoutDesignerPlaces.get( 'placesType' ),
+                _editorClass     = this.get( 'contentType' ) === 'image' ? Y.Bewype.EditorTag : Y.Bewype.EditorText,
+                _activeButtons   = this.get( 'contentType' ) === 'image' ? 'editorImageButtons' : 'editorTextButtons',
                 _contentNode     = this.getContentNode(),
                 _conf            = null,
                 _maxWidth        = null;
@@ -169,8 +169,12 @@
             _editPanNode.setStyle( 'display', 'block' );
 
             // compute max width
-            _maxWidth =  _availableWidth ? _availableWidth : 0;
-            _maxWidth += this.getContentWidth();
+            if (  _placesType === 'vertical' ) {
+                _maxWidth = _pNode.layoutDesignerPlaces.getMaxWidth();
+            } else {
+                _maxWidth = _pNode.layoutDesignerPlaces.getAvailablePlace();
+                _maxWidth += this.getContentWidth();
+            }
 
             // update conf
             _conf = {
