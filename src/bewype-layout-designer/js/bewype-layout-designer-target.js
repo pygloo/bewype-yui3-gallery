@@ -104,11 +104,6 @@
             var _host       = this.get( 'host'       ),
                 _parentNode = this.get( 'parentNode' ),
                 _removeNode = this._targetNode.one( 'div' );
-
-            // destroy plugins
-            if ( _host.layoutDesignerPlaces ) {
-                _host.unplug( Y.Bewype.LayoutDesignerPlaces );
-            }
             
             // detatch dd events
             this._dd.detachAll( 'drop:enter' );
@@ -183,17 +178,37 @@
         _onClickRemove: function ( evt ) {
 
             // temp vars
-            var _host = this.get( 'host' );
+            var _host       = this.get( 'host' ),
+                _parentNode = this.get( 'parentNode' ),
+                _placesType = _host.layoutDesignerPlaces.get( 'placesType' ),
+                _placeNode  = _host.layoutDesignerPlaces.placesNode;
+            
+            switch( _placesType ) {
+
+                case 'horizontal':
+                    _host.one( 'table' ).remove();
+                    break;
+
+                case 'vertical':
+                    _host.one( 'ul' ).remove();
+                    break;
+            }
             
             // and destroy itself
             _host.unplug( Y.Bewype.LayoutDesignerTarget );
 
-            // restore start target if necessary
-            if ( !this.get( 'parentNode' ) ) {
+            // destroy plugins
+            _host.unplug( Y.Bewype.LayoutDesignerPlaces );
 
+            // restore start target if necessary
+            if ( _parentNode && _parentNode.layoutDesignerTarget ) {
+                // then remove dest node
+                _host.remove( true );
+                // do refresh after
+                _parentNode.layoutDesignerTarget.refresh();
+            } else {
                 // set start div size
                 _host.setStyle( 'height' , this.get( 'targetMinHeight' ) );
-
                 // add start target
                 this._addTarget( _host, 'start' );
             }
@@ -330,6 +345,11 @@
                 }
                 // destroy plugins to add places
                 _host.unplug( Y.Bewype.LayoutDesignerTarget );
+
+                // destroy plugins
+                if ( _host.layoutDesignerPlaces ) {
+                    _host.unplug( Y.Bewype.LayoutDesignerPlaces );
+                }
             }
 
             if ( _hitType === _targetType ) {
@@ -430,7 +450,7 @@
                     return;
             }
 
-            if ( _parentNode != _host && !forcedWidth ) {
+            if ( _parentNode.layoutDesignerTarget && _parentNode != _host && !forcedWidth ) {
                 _parentNode.layoutDesignerTarget.refresh();
             }
         }

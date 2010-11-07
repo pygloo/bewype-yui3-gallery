@@ -104,7 +104,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             // first remove all the children
             Y.Object.each( this.contents, function( v, k ) {
                 if ( v.layoutDesignerPlaces ) {
-                    v.layoutDesignerPlaces.destroy();
+                    v.unplug( Y.Bewype.LayoutDesignerPlaces );
                 } else {
                     this.removeContent( v );
                 }
@@ -114,9 +114,6 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             if ( _parentNode ) {
                 _parentNode.layoutDesignerPlaces.unRegisterContent( _host );
             }
-
-            // and remove host
-            this.placesNode.remove();
         },
 
         /**
@@ -456,7 +453,9 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             _destNode.remove( true );
 
             // and refresh
-            _host.layoutDesignerTarget.refresh();
+            if ( _host.layoutDesignerTarget ) {
+                _host.layoutDesignerTarget.refresh();
+            }
         },
 
         getContents : function () {

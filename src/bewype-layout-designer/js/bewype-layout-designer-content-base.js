@@ -93,9 +93,6 @@
             // clean events
             Y.detach( _host );
 
-            // remove content node
-            _contentNode.remove();
-
             // and remove the clone
             if ( _cloneNode ) {
                 // clean events
@@ -104,8 +101,8 @@
                 _cloneNode.remove();
             }
 
-            // remove host
-            _host.remove();
+            // replace host
+            _host.replace( _contentNode );
         },
 
         /**
