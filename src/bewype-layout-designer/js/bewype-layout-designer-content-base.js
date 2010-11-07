@@ -377,11 +377,11 @@
 
             // temp var
             var _parentNode  = this.get( 'parentNode' ),
-                _contentNode = this.getContentNode();
+                _contentNode = forcedWidth ? this.getContentNode() : null;
 
             // force node width
-            if ( _contentNode ) {
-
+            if ( forcedWidth ) {
+                _contentNode.setStyle( 'width',  forcedWidth );
             }
 
             // refresh clone

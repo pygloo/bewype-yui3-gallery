@@ -163,7 +163,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             this.refresh();
         },
 
-        _afterDropExit : function ( evt ) {
+        _afterDropExit : function ( evt, forceWidth ) {
 
             // update target style
             switch( this.get( 'targetType' ) ) {
@@ -179,7 +179,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             }
 
             // keep default position
-            this.refresh();
+            this.refresh( forceWidth );
         },
 
         _onClickRemove: function ( evt ) {
@@ -320,7 +320,9 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             var _host       = this.get( 'host' ),
                 _targetType = this.get( 'targetType' ),
                 _hitType    = this._getHitType( evt ),
-                _destNode   = _targetType === 'start' ? _host : _host.layoutDesignerPlaces.addDestNode();
+                _destNode   = null,
+                _pl         = _host.layoutDesignerPlaces,
+                _forceWidth = null;
 
             // specific for text or image .. nothing to do ..
             if ( _targetType === 'start' ) {
@@ -338,6 +340,12 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 return;
 
             } else if ( _hitType === 'start' || _hitType === 'horizontal' || _hitType === 'vertical' ) {
+                // has place?
+                if ( _pl ) {
+                    _forceWidth  = _pl.hasPlace() ? null : _pl.getMaxWidth();
+                }
+                // get dest node
+                _destNode = _targetType === 'start' ? _host : _pl.addDestNode();
                 // add places and target
                 this._addPlaces( _destNode, _hitType );
                 this._addTarget( _destNode, _hitType );
@@ -347,11 +355,11 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 }
             } else {
                 // default: add content text or image
-                _host.layoutDesignerPlaces.addContent( _hitType );
+                _forceWidth = _pl.addContent( _hitType );
             }
 
             // restore width
-            this._afterDropExit( evt );
+            this._afterDropExit( evt, _forceWidth );
         },
 
         refresh : function ( forcedWidth ) {
@@ -426,7 +434,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                     return;
             }
 
-            if ( _parentNode != _host ) {
+            if ( _parentNode != _host && !forcedWidth ) {
                 _parentNode.layoutDesignerTarget.refresh();
             }
         }
