@@ -43,6 +43,8 @@ YUI.add('bewype-utils', function(Y) {
          */
         getStyleValue : function( node, name, default_ ) {
 
+            if ( !node ) { return; }
+
             // ensure default
             default_ = default_ ? default_ : 0;
 

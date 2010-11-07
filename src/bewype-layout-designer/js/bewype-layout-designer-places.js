@@ -128,6 +128,9 @@
             return _has;
         },
 
+        /**
+         *
+         */
         getMaxWidth : function () {
             return Y.Bewype.Utils.getWidth( this.get( 'host' ) );
         },
@@ -289,7 +292,7 @@
                             }
                         } else {
                             _n = v.layoutDesignerContent.get( 'host' );
-                            if ( forcedWidth ) {
+                            if ( _w ) {
                                 v.layoutDesignerContent.refresh( _w );
                             }
                         }
@@ -300,9 +303,6 @@
             }
 
             // and refresh parent
-            //if ( _parentNode ) {
-            //    _parentNode.layoutDesignerTarget.refresh();
-            //} else {
             if ( !_parentNode ) {
                 this.placesNode.ancestor( 'div' ).setStyle( 'height', _placesHeight );
             }
@@ -393,8 +393,7 @@
                 _destNode    = this.addDestNode(),
                 _pluginClass = null,
                 _config      = this.getAttrs(),
-                _maxWidth    = this.getMaxWidth(),
-                _forceWidth  = this.hasPlace() ? null : _maxWidth;
+                _maxWidth    = this.getMaxWidth();
 
             // prepare config
             _config.contentType  = contentType;
@@ -418,7 +417,7 @@
             _destNode.plug( _pluginClass, _config );
 
             // ..
-            return _forceWidth;
+            return _maxWidth;
         },
 
         /**

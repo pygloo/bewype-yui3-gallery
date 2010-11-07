@@ -81,7 +81,7 @@ YUI.add('bewype-layout-designer-base', function(Y) {
             this.nodeLayout.plug( Y.Bewype.LayoutDesignerTarget, config );
 
             // ... 
-            // Y.DD.DDM.on( 'drop:hit', Y.bind( this._dropHitGotcha, this ) );
+            Y.DD.DDM.on( 'drop:hit', Y.bind( this._dropHitGotcha, this ) );
         },
 
         /**
@@ -96,27 +96,25 @@ YUI.add('bewype-layout-designer-base', function(Y) {
          */
         _dropHitGotcha : function ( evt ) {
             //
-            var _dragNode           = evt.drag.get( 'node' ),
-                _dragTagName        = _dragNode.get( 'tagName' ).toLowerCase(),
-                _placesClass        = '.' + this.get( 'designerClass' ) + '-places',
-                _containerClass     = '.' + this.get( 'designerClass' ) + '-container',
-                _destNode           = _dragNode.one( _containerClass ),
-                _contentNode        = _dragNode.one( _placesClass ) ? _destNode : _dragNode.one( _containerClass ),
-                _contentWidth       = null,
-                _parentHost         = null,
-                _dropTagName        = _dragTagName === 'li' ? 'ul' : 'table',
-                _dropSortNode       = _destNode ? _destNode.ancestor( _dropTagName ) : null,
-                _dropNode           = _dropSortNode ? _dropSortNode.ancestor( 'div' ) : null,
-                _availableWidth     = null;
+            var _dragNode       = evt.drag.get( 'node' ),
+                _dragTagName    = _dragNode.get( 'tagName' ).toLowerCase(),
+                _placesClass    = '.' + this.get( 'designerClass' ) + '-places',
+                _containerClass = '.' + this.get( 'designerClass' ) + '-container',
+                _destNode       = _dragNode.one( _containerClass ),
+                _contentNode    = _dragNode.one( _placesClass ) ? _destNode : _dragNode.one( _containerClass ),
+                _contentWidth   = null,
+                _parentHost     = null,
+                _dropTagName    = _dragTagName === 'li' ? 'ul' : 'table',
+                _dropSortNode   = _destNode ? _destNode.ancestor( _dropTagName ) : null,
+                _dropNode       = _dropSortNode ? _dropSortNode.ancestor( 'div' ) : null,
+                _forceWidth     = null;
 
             if ( !_contentNode || !_dropNode.layoutDesignerPlaces ) {
                 return;
             } else if ( _contentNode.layoutDesignerContent ) {
                 _parentHost = _contentNode.layoutDesignerContent.get( 'parentNode' );
-                _contentWidth = _contentNode.layoutDesignerContent.getContentWidth();
             } else if ( _contentNode.layoutDesignerPlaces  ) {
                 _parentHost = _contentNode.layoutDesignerPlaces.get( 'parentNode' );
-                _contentWidth = _contentNode.layoutDesignerPlaces.getPlacesWidth();
             } else {
                 return;
             }
@@ -130,24 +128,12 @@ YUI.add('bewype-layout-designer-base', function(Y) {
                 // udpate parent node propertie
                 _contentNode.layoutDesignerContent.set( 'parentNode', _dropNode );
 
-                // get new width
-                // _availableWidth = _dropNode.layoutDesignerPlaces.getAvailablePlace();
-
-                // udate content width if needed
-                /*
-                if ( _availableWidth >= _contentWidth ) {
-                } else if ( _contentNode.layoutDesignerContent ) {
-                    Y.log( '_availableWidth1: ' + _availableWidth);
-                    _contentNode.layoutDesignerContent.refresh( _availableWidth );
-                } else if ( _contentNode.layoutDesignerPlaces ) {
-                    Y.log( '_availableWidth2: ' + _availableWidth);
-                    _contentNode.layoutDesignerTarget.refresh( _availableWidth );
-                }
-                */
-
-                // and refresh old parent
+                // refresh old parent
                 // _parentHost.layoutDesignerTarget.refresh();
-                // _dropNode.layoutDesignerTarget.refresh();
+
+                // refresh new parent
+                _forceWidth  = _dropNode.layoutDesignerPlaces.getMaxWidth();
+                _dropNode.layoutDesignerTarget.refresh( _forceWidth );
             }
         },
 

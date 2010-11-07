@@ -30,6 +30,9 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
          */
         editing : false,
 
+        /**
+         *
+         */
         _init: function ( template ) {
             
             // temp var
@@ -120,6 +123,9 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
                 _sourcesNode     = _bNode.one( 'div.' + _sourcesClass ),
                 _editPanNode     = _bNode.one( 'div.' + _editPanClass );
 
+            // set editing flag to false
+            this.editing = false;
+
             if ( _editPanNode.bewypeEditorPanel ) {
 
                 // diconnect
@@ -132,9 +138,6 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
                 // just in case
                 this.refresh();
             }
-
-            // set editing flag to false
-            this.editing = false;
                 
             // show sources
             _editPanNode.setStyle( 'display', 'none'  );
@@ -159,12 +162,15 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
                 _editPanClass    = this.get( 'designerClass' ) + '-edit-panel',
                 _sourcesNode     = _bNode.one( 'div.' + _sourcesClass ),
                 _editPanNode     = _bNode.one( 'div.' + _editPanClass ),
-                _placesType      = _pNode.layoutDesignerPlaces.get( 'placesType' ),
+                _pl              = _pNode.layoutDesignerPlaces,
+                _placesType      = _pl.get( 'placesType' ),
                 _editorClass     = this.get( 'contentType' ) === 'image' ? Y.Bewype.EditorTag : Y.Bewype.EditorText,
                 _activeButtons   = this.get( 'contentType' ) === 'image' ? 'editorImageButtons' : 'editorTextButtons',
                 _contentNode     = this.getContentNode(),
                 _conf            = null,
-                _maxWidth        = null;
+                _maxWidth        = null,
+                _pPn             = ( _placesType === 'vertical' ) ? _pl.get( 'parentNode' ) : null,
+                _pPl             = _pPn ? _pPn.layoutDesignerPlaces : null;
 
             // hide sources
             _sourcesNode.setStyle( 'display', 'none'  );
@@ -172,7 +178,8 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
 
             // compute max width
             if (  _placesType === 'vertical' ) {
-                _maxWidth = _pNode.layoutDesignerPlaces.getMaxWidth();
+                _maxWidth =  _pNode.layoutDesignerPlaces.getMaxWidth();
+                _maxWidth += _pPl ? _pPl.getAvailablePlace() : 0;
             } else {
                 _maxWidth = _pNode.layoutDesignerPlaces.getAvailablePlace();
                 _maxWidth += this.getContentWidth();
@@ -228,6 +235,9 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
             _parentNode.layoutDesignerPlaces.removeContent( _host );
         },
 
+        /**
+         *
+         */
         hideClone : function ( cloneNode ) {
 
             // ensure cloneNode
@@ -249,6 +259,9 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
             }
         },
 
+        /**
+         *
+         */
         _addCloneNode : function () {
             
             // temp var
@@ -334,6 +347,9 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
             this._q.run();
         },
 
+        /**
+         *
+         */
         getContentHeight : function () {
             // temp var
             var _contentNode = this.getContentNode(),
@@ -345,6 +361,9 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
 
         },
 
+        /**
+         *
+         */
         getContentWidth : function () {
             // temp var
             var _contentNode = this.getContentNode(),
@@ -355,6 +374,9 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
             return _cWidth + _pLeft + _pRight;
         },
 
+        /**
+         *
+         */
         getContentNode : function () {
             var _host            = this.get( 'host' ),
                 _contentClass    = this.get( 'designerClass' ) + '-content',
@@ -363,6 +385,9 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
             return _host.one( _contentSelector + _contentClass );
         },
 
+        /**
+         *
+         */
         _refreshCloneNode : function ( forcedWidth ) {
 
             // temp var
@@ -379,6 +404,9 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
             }
         },
 
+        /**
+         *
+         */
         refresh : function ( forcedWidth ) {
 
             // temp var
@@ -386,7 +414,7 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
                 _contentNode = forcedWidth ? this.getContentNode() : null;
 
             // force node width
-            if ( forcedWidth ) {
+            if ( _contentNode ) {
                 _contentNode.setStyle( 'width',  forcedWidth );
             }
 

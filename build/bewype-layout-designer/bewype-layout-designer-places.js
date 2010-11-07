@@ -130,6 +130,9 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             return _has;
         },
 
+        /**
+         *
+         */
         getMaxWidth : function () {
             return Y.Bewype.Utils.getWidth( this.get( 'host' ) );
         },
@@ -291,7 +294,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                             }
                         } else {
                             _n = v.layoutDesignerContent.get( 'host' );
-                            if ( forcedWidth ) {
+                            if ( _w ) {
                                 v.layoutDesignerContent.refresh( _w );
                             }
                         }
@@ -302,9 +305,6 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             }
 
             // and refresh parent
-            //if ( _parentNode ) {
-            //    _parentNode.layoutDesignerTarget.refresh();
-            //} else {
             if ( !_parentNode ) {
                 this.placesNode.ancestor( 'div' ).setStyle( 'height', _placesHeight );
             }
@@ -395,8 +395,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                 _destNode    = this.addDestNode(),
                 _pluginClass = null,
                 _config      = this.getAttrs(),
-                _maxWidth    = this.getMaxWidth(),
-                _forceWidth  = this.hasPlace() ? null : _maxWidth;
+                _maxWidth    = this.getMaxWidth();
 
             // prepare config
             _config.contentType  = contentType;
@@ -420,7 +419,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             _destNode.plug( _pluginClass, _config );
 
             // ..
-            return _forceWidth;
+            return _maxWidth;
         },
 
         /**

@@ -185,7 +185,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
         _onClickRemove: function ( evt ) {
 
             // temp vars
-            var _host     = this.get( 'host' );
+            var _host = this.get( 'host' );
             
             // and destroy itself
             _host.unplug( Y.Bewype.LayoutDesignerTarget );
@@ -342,7 +342,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             } else if ( _hitType === 'start' || _hitType === 'horizontal' || _hitType === 'vertical' ) {
                 // has place?
                 if ( _pl ) {
-                    _forceWidth  = _pl.hasPlace() ? null : _pl.getMaxWidth();
+                    _forceWidth  = _pl.getMaxWidth();
                 }
                 // get dest node
                 _destNode = _targetType === 'start' ? _host : _pl.addDestNode();
@@ -399,7 +399,6 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 case 'vertical':
                     // set host position
                     _pHeight  = Y.Bewype.Utils.getHeight( _parentNode );
-                    // this._targetNode.setY( _parentNode.getY() + _pHeight - _hHeight );
 
                     // set host position
                     if ( _parentNode == _host ) {
@@ -413,8 +412,6 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                     break;
 
                 case 'horizontal':
-                    // etbi way
-                    // _host.setX( _parentNode.getX() + _pWidth );
                     // magic way
                     _pWidth  = Y.Bewype.Utils.getWidth( _parentNode );
                     this._targetNode.setX( _parentNode.getX() + _pWidth - _hWidth );
