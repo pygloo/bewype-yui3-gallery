@@ -339,7 +339,7 @@
 
             } else if ( _hitType === 'start' || _hitType === 'horizontal' || _hitType === 'vertical' ) {
                 // has place?
-                if ( _pl ) {
+                if ( _pl && _pl.get( 'placesType' ) !== 'vertical') {
                     _forceWidth  = _pl.getMaxWidth();
                 }
                 // get dest node
@@ -354,6 +354,7 @@
             } else {
                 // default: add content text or image
                 _forceWidth = _pl.addContent( _hitType );
+                _forceWidth = _pl.get( 'placesType' ) === 'vertical' ? null : _forceWidth;
             }
 
             // restore width

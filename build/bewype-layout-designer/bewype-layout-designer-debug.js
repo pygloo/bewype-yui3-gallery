@@ -286,9 +286,6 @@ YUI.add('bewype-layout-designer-base', function(Y) {
                 // udpate parent node propertie
                 _contentNode.layoutDesignerContent.set( 'parentNode', _dropNode );
 
-                // refresh old parent
-                // _parentHost.layoutDesignerTarget.refresh();
-
                 // refresh new parent
                 _forceWidth  = _dropNode.layoutDesignerPlaces.getMaxWidth();
                 _dropNode.layoutDesignerTarget.refresh( _forceWidth );
@@ -731,6 +728,8 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
             // force node width
             if ( _contentNode ) {
                 _contentNode.setStyle( 'width',  forcedWidth );
+                _contentNode.setStyle( 'paddingLeft',  0 );
+                _contentNode.setStyle( 'paddingRight', 0 );
             }
 
             // refresh clone
@@ -1845,7 +1844,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
 
             } else if ( _hitType === 'start' || _hitType === 'horizontal' || _hitType === 'vertical' ) {
                 // has place?
-                if ( _pl ) {
+                if ( _pl && _pl.get( 'placesType' ) !== 'vertical') {
                     _forceWidth  = _pl.getMaxWidth();
                 }
                 // get dest node
@@ -1860,6 +1859,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             } else {
                 // default: add content text or image
                 _forceWidth = _pl.addContent( _hitType );
+                _forceWidth = _pl.get( 'placesType' ) === 'vertical' ? null : _forceWidth;
             }
 
             // restore width

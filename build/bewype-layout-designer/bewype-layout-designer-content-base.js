@@ -416,6 +416,8 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
             // force node width
             if ( _contentNode ) {
                 _contentNode.setStyle( 'width',  forcedWidth );
+                _contentNode.setStyle( 'paddingLeft',  0 );
+                _contentNode.setStyle( 'paddingRight', 0 );
             }
 
             // refresh clone
