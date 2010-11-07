@@ -119,7 +119,9 @@
                 _sourcesClass    = this.get( 'designerClass' ) + '-sources',
                 _editPanClass    = this.get( 'designerClass' ) + '-edit-panel',
                 _sourcesNode     = _bNode.one( 'div.' + _sourcesClass ),
-                _editPanNode     = _bNode.one( 'div.' + _editPanClass );
+                _editPanNode     = _bNode.one( 'div.' + _editPanClass ),
+                _editorObj       = this.get( 'contentType' ) === 'image' ? Y.Bewype.EditorTag : Y.Bewype.EditorText,
+                _contentNode     = this.getContentNode();
 
             // set editing flag to false
             this.editing = false;
@@ -128,6 +130,7 @@
 
                 // diconnect
                 _editPanNode.unplug( Y.Bewype.EditorPanel );
+                _contentNode.unplug( _editorObj );
 
                 // detach events
                 _host.detachAll( 'bewype-editor:onClose'  );
@@ -162,7 +165,7 @@
                 _editPanNode     = _bNode.one( 'div.' + _editPanClass ),
                 _pl              = _pNode.layoutDesignerPlaces,
                 _placesType      = _pl.get( 'placesType' ),
-                _editorClass     = this.get( 'contentType' ) === 'image' ? Y.Bewype.EditorTag : Y.Bewype.EditorText,
+                _editorObj       = this.get( 'contentType' ) === 'image' ? Y.Bewype.EditorTag : Y.Bewype.EditorText,
                 _activeButtons   = this.get( 'contentType' ) === 'image' ? 'editorImageButtons' : 'editorTextButtons',
                 _contentNode     = this.getContentNode(),
                 _conf            = null,
@@ -191,7 +194,7 @@
             };
 
             // plug
-            _contentNode.plug( _editorClass, _conf );
+            _contentNode.plug( _editorObj, _conf );
             
             // set on close event
             Y.on( 'bewype-editor:onClose',  Y.bind( this._detachEditor, this ), _contentNode );
