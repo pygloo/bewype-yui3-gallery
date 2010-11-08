@@ -103,8 +103,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
         destructor: function () {
 
             // get host
-            var _host       = this.get( 'host'       ),
-                _parentNode = this.get( 'parentNode' ),
+            var _host       = this.get( 'host' ),
                 _removeNode = this._targetNode.one( 'div' );
             
             // detatch dd events
@@ -121,21 +120,8 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             this._targetNode.detachAll( 'mouseleave' );
             this._targetNode.remove();
 
-
-            // restore start target if necessary
-            if ( _parentNode ) {
-
-                // refresh parent
-                _parentNode.layoutDesignerTarget.refresh();
-
-            } else {
-
-                // set start div size
-                _host.setStyle( 'height' , this.get( 'targetMinHeight' ) );
-
-                // add start target
-                this._addTarget( _host, 'start' );
-            }
+            // destroy plugins
+            _host.unplug( Y.Bewype.LayoutDesignerPlaces );
         },
 
         _onDropEnter : function ( evt ) {

@@ -87,7 +87,9 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
                 _cloneNode       = _host.one( 'div.' + _contentClass + '-clone' );
             
             // detach editor
-            this._detachEditor();
+            if ( this.editing === true ) {
+                this._detachEditor();
+            }
                     
             // unregister it
             _parentNode.layoutDesignerPlaces.unRegisterContent( _host );
@@ -97,9 +99,10 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
 
             // and remove the clone
             if ( _cloneNode ) {
-                // clean events
-                Y.Event.purgeElement( _cloneNode, true );
-                // remove
+                // detach events
+                _cloneNode.one( '.' + _contentClass + '-clone-edit'   ).detachAll( 'click' );
+                _cloneNode.one( '.' + _contentClass + '-clone-remove' ).detachAll( 'click' );
+                // remove clone node
                 _cloneNode.remove();
             }
 
@@ -125,7 +128,7 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
             // set editing flag to false
             this.editing = false;
 
-            if ( _editPanNode.bewypeEditorPanel ) {
+            if ( _editPanNode && _editPanNode.bewypeEditorPanel ) {
 
                 // diconnect
                 _editPanNode.unplug( Y.Bewype.EditorPanel );
@@ -140,8 +143,13 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
             }
                 
             // show sources
-            _editPanNode.setStyle( 'display', 'none'  );
-            _sourcesNode.setStyle( 'display', 'block' );
+            if ( _editPanNode ) {
+                _editPanNode.setStyle( 'display', 'none'  );
+            }
+
+            if ( _sourcesNode ) {
+                _sourcesNode.setStyle( 'display', 'block' );
+            }                
 
             // refresh clone
             this._refreshCloneNode();

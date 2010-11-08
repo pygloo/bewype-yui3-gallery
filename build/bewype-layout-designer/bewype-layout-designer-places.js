@@ -104,9 +104,24 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             // first remove all the children
             Y.Object.each( this.contents, function( v, k ) {
                 if ( v.layoutDesignerPlaces ) {
+
+                    // unplug places
                     v.unplug( Y.Bewype.LayoutDesignerPlaces );
+
+                } else if ( v.layoutDesignerContent ) {
+
+                    // get content type for unplug
+                    var _contentType  = v.layoutDesignerContent.get( 'contentType' );
+
+                    // unplug the node
+                    if ( _contentType === 'image' ) {
+                        v.unplug( Y.Bewype.LayoutDesignerContentImage );
+                    } else {
+                        v.unplug( Y.Bewype.LayoutDesignerContentText );
+                    }
+
                 } else {
-                    this.removeContent( v );
+                    // ???
                 }
             }, this );
 
@@ -282,21 +297,27 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                 case 'horizontal':
                     //
                     Y.Object.each( this.contents, function( v, k ) {
-                        var _n = null,
-                            _w = forcedWidth ? ( forcedWidth / this.contents.length ) : null;
+                        var _n  = null,
+                            _w  = forcedWidth ? ( forcedWidth / this.contents.length ) : null,
+                            _td = null;
                         if ( v.layoutDesignerPlaces ) {
                             _n = v.layoutDesignerPlaces.placesNode;
                             if ( _w ) {
                                 v.layoutDesignerTarget.refresh( _w );
                             }
-                        } else {
+                        } else if ( v.layoutDesignerContent ) {
                             _n = v.layoutDesignerContent.get( 'host' );
                             if ( _w ) {
                                 v.layoutDesignerContent.refresh( _w );
                             }
                         }
-                        _n.ancestor( 'td' ).setStyle( 'height' , _placesHeight );
-                        _n.ancestor( 'td' ).setStyle( 'vertical-align', 'top' );
+                        // get parent cell
+                        _td = _n ? _n.ancestor( 'td' ) : null;
+                        // update content style
+                        if(_td) {
+                            _td.setStyle( 'height' , _placesHeight );
+                            _td.setStyle( 'vertical-align', 'top' );
+                        }
                     }, this );
                     break;
             }

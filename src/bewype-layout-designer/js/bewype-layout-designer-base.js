@@ -42,36 +42,38 @@
             this.setAttrs( config );
 
             // tmp vars
-            var _host     = this.get( 'host' ),
-                _nodeSrc  = null,
-                _nodePan  = null;
+            var _host          = this.get( 'host' ),
+                _nodeSrc       = null,
+                _nodePan       = null,
+                _designerClass = this.get( 'designerClass' ),
+                _layoutWidth   = this.get( 'layoutWidth' );
 
             // create source node
             _nodeSrc = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_SRC_TEMPLATE, {
-                designerClass : this.get( 'designerClass' )
+                designerClass : _designerClass
             } ) );
             // attach src parent to widget
             _host.append( _nodeSrc );
             // plug source bar
             _nodeSrc.plug( Y.Bewype.LayoutDesignerSources, {
-                layoutWidth : this.get( 'layoutWidth' )
+                layoutWidth : _layoutWidth
             } );
 
             // create edit panel node
             _nodePan = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_PAN_TEMPLATE, {
-                designerClass : this.get( 'designerClass' )
+                designerClass : _designerClass
             } ) );
             // attach src parent to widget
             _host.append( _nodePan );
 
             // create dest layout
             this.nodeLayout = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_LAYOUT_TEMPLATE, {
-                designerClass : this.get( 'designerClass' )
+                designerClass : _designerClass
             } ) );
             // attach layout node to main node
             _host.append( this.nodeLayout );
             //
-            this.nodeLayout.setStyle( 'width', this.get( 'layoutWidth' ) );
+            this.nodeLayout.setStyle( 'width', _layoutWidth );
 
             // plug target
             config.baseNode   = _host;
@@ -86,7 +88,26 @@
          *
          */
         destructor: function () { 
+
+            var _host          = this.get( 'host' ),
+                _designerClass = this.get( 'designerClass' ),
+                _srcNode       = _host.one( '.' + _designerClass + '-sources' ),
+                _panNode       = _host.one( '.' + _designerClass + '-edit-panel' ),
+                _tableOrUl     = this.nodeLayout.one( 'table' ) || this.nodeLayout.one( 'ul' );
+
+            // remove our designer specific nodes
+            _srcNode.remove();
+            _panNode.remove();
+
+            // unplug all
             this.nodeLayout.unplug( Y.Bewype.LayoutDesignerTarget );
+
+            // move layout table to top
+            if ( _tableOrUl ) {
+                this.nodeLayout.replace( _tableOrUl );
+            } else {
+                this.nodeLayout.remove();
+            }
         },
 
         /**
