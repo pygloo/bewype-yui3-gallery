@@ -106,10 +106,18 @@
 
                         // update file src after upload
                         _host.setAttribute( 'src', _filePath );
+                        
+                        // get current css - do not work yet
+                        // _cssDict = Y.Bewype.Utils.getCssDict( _host );
+                        // remove previous height and width
+                        // delete( _cssDict.height );
+                        // delete( _cssDict.width );
+                        // apply cleared dict
+                        // Y.Bewype.Utils.setCssDict( _host, _cssDict );
 
                         // clear previous                        
-                        _host.setStyle( 'height', '' );
-                        _host.setStyle( 'width',  '' );       
+                        _host.setStyle( 'height', 'auto' );
+                        _host.setStyle( 'width',  'auto' );
 
                         // refresh buttons
                         this._panel.refreshButtons( _host, false, name );  
