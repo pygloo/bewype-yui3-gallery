@@ -95,7 +95,7 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
             _parentNode.layoutDesignerPlaces.unRegisterContent( _host );
 
             // clean events
-            Y.detach( _host );
+            _host.detachAll( 'mouseenter' );
 
             // and remove the clone
             if ( _cloneNode ) {

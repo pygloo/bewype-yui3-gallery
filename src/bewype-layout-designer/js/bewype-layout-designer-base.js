@@ -19,7 +19,7 @@
     /**
      *
      */
-    LayoutDesigner.NODE_LAYOUT_TEMPLATE = '<div class="{designerClass}-layout"></div>';
+    LayoutDesigner.NODE_LAYOUT_TEMPLATE = '<div class="{designerClass}-layout {designerClass}-places"></div>';
 
 
     LayoutDesigner.NAME = 'layout-designer';
@@ -55,9 +55,7 @@
             // attach src parent to widget
             _host.append( _nodeSrc );
             // plug source bar
-            _nodeSrc.plug( Y.Bewype.LayoutDesignerSources, {
-                layoutWidth : _layoutWidth
-            } );
+            _nodeSrc.plug( Y.Bewype.LayoutDesignerSources, config );
 
             // create edit panel node
             _nodePan = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_PAN_TEMPLATE, {
@@ -75,10 +73,15 @@
             //
             this.nodeLayout.setStyle( 'width', _layoutWidth );
 
-            // plug target
             config.baseNode   = _host;
-            config.targetType = 'start';
+            config.targetType = this.get( 'startingTargetType' );
+            // plug places
+            this.nodeLayout.plug( Y.Bewype.LayoutDesignerPlaces, config );
+            // plug target
             this.nodeLayout.plug( Y.Bewype.LayoutDesignerTarget, config );
+
+            // refresh at start
+            this.nodeLayout.layoutDesignerTarget.refresh();
 
             // ... 
             Y.DD.DDM.on( 'drop:hit', Y.bind( this._dropHitGotcha, this ) );
@@ -121,7 +124,6 @@
                 _containerClass = '.' + this.get( 'designerClass' ) + '-container',
                 _destNode       = _dragNode.one( _containerClass ),
                 _contentNode    = _dragNode.one( _placesClass ) ? _destNode : _dragNode.one( _containerClass ),
-                _contentWidth   = null,
                 _parentHost     = null,
                 _dropTagName    = _dragTagName === 'li' ? 'ul' : 'table',
                 _dropSortNode   = _destNode ? _destNode.ancestor( _dropTagName ) : null,

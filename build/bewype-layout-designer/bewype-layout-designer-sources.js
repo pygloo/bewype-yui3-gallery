@@ -17,54 +17,27 @@ YUI.add('bewype-layout-designer-sources', function(Y) {
      */
     LayoutDesignerSources.ITEM_SRC_TEMPLATE = '<div class="{designerClass}-src {designerClass}-src-{itemType}">{itemLabel}</div>';
 
-    /**
-     *
-     */
-    LayoutDesignerSources.ATTRS = {
-        designerClass : {
-            value : 'layout-designer',
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isString( val );
-            }
-        },
-        sourceHeight : {
-            value : 40,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        sourceWidth : {
-            value : 140,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        }
-    };
-
-    Y.extend( LayoutDesignerSources, Y.Plugin.Base, {
-
-        /**
-         *
-         */
-        _groups : [ 'horizontal', 'vertical', 'text', 'image' ],
-
-        /**
-         *
-         */
-        _labels: [ 'Layout Horizontal', 'Layout Vertical', 'Text', 'Image' ],
+    Y.extend( LayoutDesignerSources, Y.Bewype.LayoutDesignerConfig, {
 
         /**
          *
          */
         initializer: function( config ) {
 
+            // ??
+            this.setAttrs( config );
+
             // create table for sources and attach it
-            var _tableSrc = new Y.Node.create( '<table><tr /></table>' );
-            this.get( 'host' ).append( _tableSrc );
+            var _host     = this.get( 'host' ),
+                _groups   = this.get( 'sourceGroups' ),
+                _labels   = this.get( 'sourceLabels' ),
+                _tableSrc = new Y.Node.create( '<table><tr /></table>' );
+
+            //
+            _host.append( _tableSrc );
 
             // add sources
-            Y.Object.each(this._groups, function( v, k ) {
+            Y.Object.each(_groups, function( v, k ) {
                 var _n      = null,
                     _td     = null,
                     _drag   = null;
@@ -73,7 +46,7 @@ YUI.add('bewype-layout-designer-sources', function(Y) {
                 _n = new Y.Node.create( Y.substitute( LayoutDesignerSources.ITEM_SRC_TEMPLATE, {
                     itemType      : v,
                     designerClass : this.get( 'designerClass' ),
-                    itemLabel     : this._labels[ k ]
+                    itemLabel     : _labels[ k ]
                 } ) );
 
                 // prepare td for the source item
@@ -90,18 +63,18 @@ YUI.add('bewype-layout-designer-sources', function(Y) {
                 _drag = new Y.DD.Drag( {
                     node    : _n,
                     groups  : [ v ],
-                    dragMode: 'intersect'
+                    dragMode: 'point'
                 } );
                 // additionnal drag features
                 _drag.plug( Y.Plugin.DDProxy, {
                     moveOnEnd : false
                 } );
                 _drag.plug( Y.Plugin.DDConstrained, {
-                    constrain2node  : [ this.get( 'host' ), this.get( 'host' ).next() ]
+                    constrain2node  : [ _host, _host.next() ]
                 } );
                 // set drag events
-                _drag.on( 'drag:start', Y.bind( this._onDragStart,   this, _drag ) );
-                _drag.on( 'drag:end'  , Y.bind( this._onDragEnd  ,   this, _drag ) );
+                _drag.on( 'drag:start', Y.bind( this._onDragStart, this, _drag ) );
+                _drag.on( 'drag:end'  , Y.bind( this._onDragEnd  , this, _drag ) );
 
             }, this );
         },

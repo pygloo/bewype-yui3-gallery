@@ -19,6 +19,26 @@ YUI.add('bewype-layout-designer-config', function(Y) {
                 return Y.Lang.isString( val );
             }
         },
+        sourceHeight : {
+            value : 40,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
+        },
+        sourceWidth : {
+            value : 140,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
+        },
+        sourceGroups: {
+            value : [ 'horizontal', 'text', 'image' ], // not used: vertical
+            writeOnce : true
+        },
+        sourceLabels: {
+            value : [ 'Layout Horizontal', 'Text', 'Image' ], // not used: Layout Vertical
+            writeOnce : true
+        },
         targetOverHeight : {
             value : 20,
             validator : function( val ) {
@@ -145,6 +165,21 @@ YUI.add('bewype-layout-designer-config', function(Y) {
                     'reset',
                     'apply'
                     ]
+        },
+        useBorder : {
+            value: true, 
+            writeOnce : true
+        },
+        boderStyle : {
+            value: '1px dashed grey', 
+            writeOnce : true
+        },
+        startingTargetType : {
+            value: 'vertical', 
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
         }
     };
 

@@ -166,8 +166,7 @@
             // temp vars
             var _host       = this.get( 'host' ),
                 _parentNode = this.get( 'parentNode' ),
-                _placesType = _host.layoutDesignerPlaces.get( 'placesType' ),
-                _placeNode  = _host.layoutDesignerPlaces.placesNode;
+                _placesType = _host.layoutDesignerPlaces.get( 'placesType' );
             
             switch( _placesType ) {
 
