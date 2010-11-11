@@ -14,24 +14,11 @@
                 ], 
                 "skinnable": true
             },
-            "bewype-layout-designer-content-base": {
+            "bewype-layout-designer-content": {
                 "requires": [
                     "substitute",
                     "async-queue",
-                    "bewype-layout-designer-config"
-                ], 
-                "skinnable": true
-            },
-            "bewype-layout-designer-content-image": {
-                "requires": [
-                    "bewype-layout-designer-content-base",
-                    "bewype-editor"
-                ], 
-                "skinnable": true
-            },
-            "bewype-layout-designer-content-text": {
-                "requires": [
-                    "bewype-layout-designer-content-base",
+                    "bewype-layout-designer-config",
                     "bewype-editor"
                 ], 
                 "skinnable": true
@@ -40,13 +27,7 @@
                 "requires": [
                     "sortable",
                     "dd-constrain",
-                    "bewype-layout-designer-content-text"
-                ], 
-                "skinnable": true
-            },
-            "bewype-layout-designer-target": {
-                "requires": [
-                    "bewype-layout-designer-places"
+                    "bewype-layout-designer-content"
                 ], 
                 "skinnable": true
             },

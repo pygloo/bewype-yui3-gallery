@@ -1,11 +1,12 @@
 
-.layout-designer-container {
-    position            : relative;
+.layout-designer-content {
+    border: 1px dashed grey;
 }
 
 .layout-designer-content-clone {
     background-color    : grey;
     opacity             : 0.4;
+    border              : 1px dashed transparent;
 }
 
 .layout-designer-content-clone:hover {

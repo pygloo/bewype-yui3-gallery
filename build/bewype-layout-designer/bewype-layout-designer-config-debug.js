@@ -174,7 +174,7 @@ YUI.add('bewype-layout-designer-config', function(Y) {
             value: '1px dashed grey', 
             writeOnce : true
         },
-        startingTargetType : {
+        startingType : {
             value: 'vertical', 
             writeOnce : true,
             validator : function( val ) {
