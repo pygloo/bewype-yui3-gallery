@@ -1,12 +1,33 @@
 
 ul.layout-designer-places ,
 ul.layout-designer-places li  {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
+    border              : none;
+    list-style-type     : none;
+    margin              : 0;
+    padding             : 0;
 }
 
 ul.layout-designer-places {
-    border: none;
+    border              : none;
+    margin              : auto;
+}
+
+ul.layout-designer-places-horizontal { 
+    clear               : both;
+}
+
+ul.layout-designer-places li {
+    float               : left;
+}
+
+div.layout-designer-places-grip {
+    height              : 100%;
+    width               : 4px;
+    background-color    : blue;
+    z-index             : 4;
+}
+
+div.layout-designer-places-grip:hover {
+    width               : 12px;
 }
 

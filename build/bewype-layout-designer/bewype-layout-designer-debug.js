@@ -81,12 +81,6 @@ YUI.add('bewype-layout-designer-config', function(Y) {
                 return Y.Lang.isNumber( val );
             }
         },
-        contentZIndex : {
-            value : 1,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
         defaultContent : {
             value : 'Text..',
             validator : function( val ) {
@@ -180,6 +174,18 @@ YUI.add('bewype-layout-designer-config', function(Y) {
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
+        },
+        cloneZIndex : {
+            value : 2,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
+        },
+        gripZIndex : {
+            value : 4,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
         }
     };
 
@@ -250,7 +256,8 @@ YUI.add('bewype-layout-designer-base', function(Y) {
                 _config         = null,
                 _forceWidth     = null,
                 _cellWidth      = null,
-                _ulNode         = null;
+                _ulNode         = null,
+                _liList         = null;
 
             if ( !_dropNode.layoutDesignerPlaces ) {
                 return;
@@ -259,42 +266,27 @@ YUI.add('bewype-layout-designer-base', function(Y) {
             } else if ( _contentNode.layoutDesignerPlaces  ) {
                 _parentHost = _contentNode.layoutDesignerPlaces.get( 'parentNode' );
             } else {
-                // prepare config
-                _config = this.getAttrs();
-                _config.baseNode = _host;
-                _config.parentNode = _host;
+                // prepare content list for new row
+                _liList = [];
                 // restaure source
                 if ( _contentTag === 'div' ) {
-                    // plug it
-                    _config.contentType = 'text';
-                    _contentNode.plug( Y.Bewype.LayoutDesignerContent, _config );
+                    // ...
+                    _liList.push( _contentNode.cloneNode( true ) );
                     // restore src
                     this.nodeSource.layoutDesignerSources.addTextSource();
                 } else if ( _contentTag === 'img' ) {
-                    // plug it
-                    _config.contentType = 'image';
-                    _contentNode.plug( Y.Bewype.LayoutDesignerContent, _config );
+                    // ...
+                    _liList.push( _contentNode.cloneNode( true ) );
                     // restore src
                     this.nodeSource.layoutDesignerSources.addImageSource();
                 } else if ( _contentTag === 'table' ) {
                     // create ul on fly to avoid conflict
-                    _ulNode = Y.Node.create( '<ul/>' );
-                    //
                     _contentNode.all( 'td' ).each( function( v, k ) {
                         // prepare config
-                        var _config = this.getAttrs(),
-                            _clone  = v.one( 'div' ).cloneNode( true ),
-                            _li     = Y.Node.create( '<li />' );
-                        // update li
-                        _li.append( _clone );
-                        // update ul
-                        _ulNode.append( _li );
+                        var _clone  = v.one( 'div' ) || v.one( 'img' );
+                        // ...
+                        _liList.push( _clone.cloneNode( true ) );
                     }, this );
-                    // remove table
-                    _contentNode.replace( _ulNode );
-                    // plug it
-                    _config.placesType = this.get( 'startingType' ) === 'horizontal' ? 'vertical' : 'horizontal';
-                    _contentNode.plug( Y.Bewype.LayoutDesignerPlaces, _config );
                     // restore src
                     this.nodeSource.layoutDesignerSources.addRowSource();
                 } else {
@@ -302,30 +294,57 @@ YUI.add('bewype-layout-designer-base', function(Y) {
                 }
             }
 
-            if ( _parentHost != _dropNode ) {
+            if ( _liList ) {
 
-                // unregister
-                if ( _parentHost ) {
-                    _parentHost.layoutDesignerPlaces.unRegisterContent( _contentNode );
-                }
+                // ...
+                _ulNode = Y.Node.create( '<ul/>' );
+
+                // ...
+                Y.each( _liList, function ( v, k ) {
+                    var _li = Y.Node.create( '<li />' );
+                    _li.append( v );
+                    _ulNode.append( _li );
+                } );
+
+                // replace table by ul
+                _contentNode.replace( _ulNode );
+                // update the node var
+                _contentNode = _ulNode;
+
+                // prepare config
+                _config = this.getAttrs();
+                _config.baseNode = _host;
+                _config.parentNode = _host;
+
+                // plug it
+                _config.placesType = this.get( 'startingType' ) === 'horizontal' ? 'vertical' : 'horizontal';
+                _contentNode.plug( Y.Bewype.LayoutDesignerPlaces, _config );
+
                 // register
                 _dropNode.layoutDesignerPlaces.registerContent( _contentNode );
 
                 // update parent node propertie
-                if ( _contentNode.layoutDesignerContent ) {
-                    _contentNode.layoutDesignerContent.set( 'parentNode', _dropNode );
-                } else {
-                    _contentNode.layoutDesignerPlaces.set( 'parentNode', _dropNode );
-                }
+                _contentNode.layoutDesignerPlaces.set( 'parentNode', _dropNode );
 
                 // refresh new parent
                 _forceWidth = _dropNode.layoutDesignerPlaces.getMaxWidth();
                 _cellWidth  = _dropNode.layoutDesignerPlaces.refresh( _forceWidth );
 
                 // start width max width
-                if ( _contentNode.layoutDesignerContent ) {
-                    _contentNode.layoutDesignerContent.get( 'host' ).setStyle( 'width', _cellWidth);
+                _contentNode.layoutDesignerPlaces.refresh( _forceWidth, true );
+
+                // get base
+                if ( _placesType === 'vertical' ) {
+                    _srcSortable.join( this.sortable, 'outer' );
                 }
+
+                this.nodeLayout.one( 'ul' ).all( 'ul' ).each( function ( v, k) {
+                    if ( v != _contentNode ) {
+                        v.layoutDesignerPlaces.sortable.join(
+                            _contentNode.layoutDesignerPlaces.sortable, 'full' );
+                    }
+                }, this );
+
             }
         },
 
@@ -378,6 +397,11 @@ YUI.add('bewype-layout-designer-base', function(Y) {
             // refresh at start
             this.nodeLayout.one( 'ul' ).layoutDesignerPlaces.refresh();
 
+            
+            // join main sortables
+            this.nodeSource.layoutDesignerSources.sortable.join(
+                    this.nodeLayout.one( 'ul' ).layoutDesignerPlaces.sortable, 'outer' );
+
             // ... 
             Y.DD.DDM.on( 'drag:end', Y.bind( this._dropHitGotcha, this ) );
         },
@@ -405,17 +429,6 @@ YUI.add('bewype-layout-designer-base', function(Y) {
                 this.nodeLayout.replace( _tableOrUl );
             } else {
                 this.nodeLayout.remove();
-            }
-        },
-
-        /**
-         *
-         */
-        getContents : function () {
-            if (this.nodeLayout.layoutDesignerPlaces) {
-                return this.nodeLayout.layoutDesignerPlaces.getContents();
-            } else {
-                return [];
             }
         }
     } );
@@ -558,6 +571,8 @@ YUI.add('bewype-layout-designer-content', function(Y) {
                 _contentClass   = this.get( 'designerClass' ) + '-content',
                 _cloneNode      = new Y.Node.create( '<div class="' + _contentClass + '-clone" />' ),
                 _callbacksNode  = new Y.Node.create( '<div class="' + _contentClass + '-clone-callbacks" />' ),
+                _dragNode       = null,
+                _dragNodeClass  = _contentClass + '-clone-drag',
                 _editNode       = null,
                 _removeNode     = null;
 
@@ -568,10 +583,15 @@ YUI.add('bewype-layout-designer-content', function(Y) {
             _cloneNode.setStyle( 'bottom',   0 );
             _cloneNode.setStyle( 'left',     1 );
             _cloneNode.setStyle( 'position', 'absolute');
-            _cloneNode.setStyle( 'z-index',  this.get( 'contentZIndex' ));
+            _cloneNode.setStyle( 'z-index',  this.get( 'cloneZIndex' ));
 
             // add to clone
             _cloneNode.append( _callbacksNode );
+
+            // add cb div
+            _dragNode = new Y.Node.create( '<div class="' + _dragNodeClass + '" />' );
+            // add to clone
+            _callbacksNode.append( _dragNode );
 
             // add cb div
             _editNode = new Y.Node.create( '<div class="' + _contentClass + '-clone-edit" />' );
@@ -810,7 +830,7 @@ YUI.add('bewype-layout-designer-content', function(Y) {
         /**
          *
          */
-        refresh : function ( forcedWidth ) {
+        refresh : function ( forcedWidth, justAdded ) {
 
             // temp var
             var _parentNode   = this.get( 'parentNode' ),
@@ -822,15 +842,26 @@ YUI.add('bewype-layout-designer-content', function(Y) {
 
                 // prepare content width
                 _contentWidth = this.getContentWidth();
-                _contentWidth = _contentWidth > forcedWidth ? forcedWidth : _contentWidth;
+                //
+                if ( justAdded ) {
+                    _contentWidth = forcedWidth;
+                } else if ( forcedWidth ) {
+                    _contentWidth = _contentWidth > forcedWidth ? forcedWidth : _contentWidth;
+                }
+                _contentWidth -= 2;
 
                 _host.setStyle( 'width',  _contentWidth );
                 _host.setStyle( 'paddingLeft',  0 );
                 _host.setStyle( 'paddingRight', 0 );
-            }
 
-            // refresh clone
-            this._refreshCloneNode( forcedWidth );
+                // refresh clone
+                this._refreshCloneNode( _contentWidth );
+
+            } else {
+
+                // refresh clone
+                this._refreshCloneNode();
+            }
         }
     } );
 
@@ -864,20 +895,21 @@ YUI.add('bewype-layout-designer-places', function(Y) {
 
         _initSortable: function () {
             // get type                       
-            var _host        = this.get( 'host' ),
-                _baseNode    = this.get( 'baseNode' ),
-                _srcNode     = _baseNode.one( '.' + this.get( 'designerClass' ) + '-sources' ),
-                _srcSortable = _srcNode.layoutDesignerSources.sortable;
+            var _host             = this.get( 'host' ),
+                _baseNode         = this.get( 'baseNode' ),
+                _placesType       = this.get( 'placesType'    ),
+                _srcNode          = _baseNode.one( '.' + this.get( 'designerClass' ) + '-sources' ),
+                _srcSortable      = _srcNode.layoutDesignerSources.sortable,
+                _dragContentClass = '.' + this.get( 'designerClass' ) + '-content-clone-drag',
+                _dragPlacesClass  = '.' + this.get( 'designerClass' ) + '-places-grip';
 
             // make it sortable
             this.sortable = new Y.Sortable( {
                 container   : _host,
                 nodes       : 'li',
-                opacity     : '.2'
+                opacity     : '.2',
+                handles     : _placesType === 'horizontal' ? [ _dragContentClass ] : [ _dragPlacesClass ]
             } );
-
-            // get base
-            _srcSortable.join( this.sortable, 'outer' );
         },
 
         /**
@@ -892,7 +924,8 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             var _host          = this.get( 'host'          ),
                 _designerClass = this.get( 'designerClass' ),
                 _placesType    = this.get( 'placesType'    ),
-                _srcClass      = '.' + _designerClass + '-src';
+                _srcClass      = '.' + _designerClass + '-src',
+                _parentNode    = this.get( 'parentNode' );
 
             // init content list
             this.contents = [];
@@ -909,7 +942,8 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             _host.all( _srcClass ).each( function( v, k ) {
                 // prepare config
                 var _config = this.getAttrs();
-                _config.parentNode = _host;
+                _config.parentNode  = _host;
+                _config.contentType = v.one( 'img' ) ? 'image' : 'text';
                 // plug
                 v.plug( Y.Bewype.LayoutDesignerContent, _config );
                 // register
@@ -918,6 +952,11 @@ YUI.add('bewype-layout-designer-places', function(Y) {
 
             // make it sortable
             this._initSortable();
+
+            // ...
+            if ( _parentNode ) {
+                this._addGripNode();
+            }
         },
 
         /**
@@ -955,7 +994,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
         /**
          *
          */
-        refresh : function ( forcedWidth ) {
+        refresh : function ( forcedWidth, justAdded ) {
 
             // get the target node
             var _host         = this.get( 'host' ),
@@ -968,30 +1007,31 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             // prepare place height
             _placesHeight = _placesHeight === 0 ? this.get( 'contentHeight' ) : _placesHeight;
 
-            // prepare place width
-            _placesWidth = _placesWidth > forcedWidth ? forcedWidth              : _placesWidth;
-            _placesWidth = _placesWidth === 0         ? this.getAvailablePlace() : _placesWidth;
-
             // ...
             _host.setStyle( 'height', _placesHeight );
-            _host.setStyle( 'width' , _placesWidth  );
+            _host.setStyle( 'width' , forcedWidth || _placesWidth );
 
             // update target style
             switch( _placesType ) {
 
                 case 'vertical':
                     // set cell width
-                    _cellWidth = _placesWidth;
+                    if ( justAdded ) {
+                        _cellWidth = forcedWidth ? forcedWidth : _placesWidth;
+                    } else {
+                        _cellWidth = _placesWidth > forcedWidth ? forcedWidth : _placesWidth;
+                        _cellWidth = _placesWidth === 0 ? this.getAvailablePlace() : _placesWidth;
+                    }
                     Y.each( this.contents, function( v, k ) {
                         var _n = null;
                         if ( v.layoutDesignerPlaces ) {
                             _n = v.layoutDesignerPlaces.get( 'host' );
-                            _n.setStyle( 'width' , _cellWidth  );
+                            _n.setStyle( 'width' , _cellWidth );
                             if ( forcedWidth ) {
-                                v.layoutDesignerPlaces.refresh( _cellWidth );
+                                v.layoutDesignerPlaces.refresh( _cellWidth, justAdded );
                             }
                         } else if ( forcedWidth ) {
-                            v.layoutDesignerContent.refresh( _cellWidth );
+                            v.layoutDesignerContent.refresh( _cellWidth, justAdded );
                         }
                     } );
                     break;
@@ -1003,16 +1043,10 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                     Y.Object.each( this.contents, function( v, k ) {
                         var _n  = null,
                             _li = null;
-
-                        if ( v.layoutDesignerPlaces ) {
-                            _n = v.layoutDesignerPlaces.get( 'host' );
-                            if ( _cellWidth ) {
-                                v.layoutDesignerPlaces.refresh( _cellWidth );
-                            }
-                        } else if ( v.layoutDesignerContent ) {
+                        if ( v.layoutDesignerContent ) {
                             _n = v.layoutDesignerContent.get( 'host' );
                             if ( _cellWidth ) {
-                                v.layoutDesignerContent.refresh( _cellWidth );
+                                v.layoutDesignerContent.refresh( _cellWidth, justAdded );
                             }
                         }
                         // get parent cell
@@ -1025,9 +1059,39 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                     }, this );
                     break;
             }
-
             // ...
             return _cellWidth;
+        },
+
+        /**
+         *
+         */
+        _addGripNode : function () {
+            
+            // temp var
+            var _host           = this.get( 'host' ),
+                _div            = _host.ancestor( 'div' ),
+                _placesClass = this.get( 'designerClass' ) + '-places',
+                _gripNode       = new Y.Node.create( '<div class="' + _placesClass + '-grip" />' );
+
+            // add clone
+            _div.insertBefore( _gripNode, _host );
+
+            // setStyle
+            _gripNode.setStyle( 'bottom',   0 );
+            _gripNode.setStyle( 'left',     0 );
+            _gripNode.setStyle( 'position', 'absolute');
+        },
+
+        /**
+         *
+         */
+        _getGripNode : function () {
+            var _host        = this.get( 'host' ),
+                _div         = _host.ancestor( 'div' ),
+                _placesClass = this.get( 'designerClass' ) + '-places';
+
+            return _div.one( 'div.' + _placesClass + '-grip' );
         },
 
         /**
@@ -1093,7 +1157,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
 
             } else {
                 // simple diff
-                return _maxWidth - _currentWidth;
+                return _maxWidth - _currentWidth - 2;
             }
         },
 
@@ -1121,7 +1185,6 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                         }
                         if ( _w > _cWidth ) { _cWidth = _w; }
                     } );
-                    // _cWidth = _cWidth === 0 ? 0 : _cWidth + 2;
                     break;
 
                 case 'horizontal':
@@ -1165,7 +1228,6 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                         }
                         if ( _h > _cHeight ) { _cHeight = _h; }
                     } );
-                    // _cHeight = ( _cHeight === 0 ) ? this.get( 'contentHeight' ) : _cHeight + 2;
                     break;
             }
             return _cHeight;
@@ -1223,7 +1285,8 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                 _host          = this.get( 'host' ),
                 _baseNode      = this.get( 'baseNode' ),
                 _designerClass = this.get( 'designerClass' ),
-                _nodeLayout    = _baseNode.one( '.' + _designerClass + '-layout ul' );
+                _nodeLayout    = _baseNode.one( '.' + _designerClass + '-layout ul' ),
+                _forceWidth    = null;
 
             // unregister
             this.unRegisterContent( contentNode );
@@ -1238,7 +1301,10 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             if ( this.contents.length === 0 && _host != _nodeLayout ) {
                 _host.unplug( Y.Bewype.LayoutDesignerPlaces );
             } else if ( _host.layoutDesignerPlaces ) {
-                _host.layoutDesignerPlaces.refresh();
+                // get max width
+                _forceWidth = this.getMaxWidth();
+                // refresh
+                this.refresh( _forceWidth );
             }
         }
     } );

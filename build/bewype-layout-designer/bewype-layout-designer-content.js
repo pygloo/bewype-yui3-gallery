@@ -130,6 +130,8 @@ YUI.add('bewype-layout-designer-content', function(Y) {
                 _contentClass   = this.get( 'designerClass' ) + '-content',
                 _cloneNode      = new Y.Node.create( '<div class="' + _contentClass + '-clone" />' ),
                 _callbacksNode  = new Y.Node.create( '<div class="' + _contentClass + '-clone-callbacks" />' ),
+                _dragNode       = null,
+                _dragNodeClass  = _contentClass + '-clone-drag',
                 _editNode       = null,
                 _removeNode     = null;
 
@@ -140,10 +142,15 @@ YUI.add('bewype-layout-designer-content', function(Y) {
             _cloneNode.setStyle( 'bottom',   0 );
             _cloneNode.setStyle( 'left',     1 );
             _cloneNode.setStyle( 'position', 'absolute');
-            _cloneNode.setStyle( 'z-index',  this.get( 'contentZIndex' ));
+            _cloneNode.setStyle( 'z-index',  this.get( 'cloneZIndex' ));
 
             // add to clone
             _cloneNode.append( _callbacksNode );
+
+            // add cb div
+            _dragNode = new Y.Node.create( '<div class="' + _dragNodeClass + '" />' );
+            // add to clone
+            _callbacksNode.append( _dragNode );
 
             // add cb div
             _editNode = new Y.Node.create( '<div class="' + _contentClass + '-clone-edit" />' );
@@ -382,7 +389,7 @@ YUI.add('bewype-layout-designer-content', function(Y) {
         /**
          *
          */
-        refresh : function ( forcedWidth ) {
+        refresh : function ( forcedWidth, justAdded ) {
 
             // temp var
             var _parentNode   = this.get( 'parentNode' ),
@@ -394,15 +401,26 @@ YUI.add('bewype-layout-designer-content', function(Y) {
 
                 // prepare content width
                 _contentWidth = this.getContentWidth();
-                _contentWidth = _contentWidth > forcedWidth ? forcedWidth : _contentWidth;
+                //
+                if ( justAdded ) {
+                    _contentWidth = forcedWidth;
+                } else if ( forcedWidth ) {
+                    _contentWidth = _contentWidth > forcedWidth ? forcedWidth : _contentWidth;
+                }
+                _contentWidth -= 2;
 
                 _host.setStyle( 'width',  _contentWidth );
                 _host.setStyle( 'paddingLeft',  0 );
                 _host.setStyle( 'paddingRight', 0 );
-            }
 
-            // refresh clone
-            this._refreshCloneNode( forcedWidth );
+                // refresh clone
+                this._refreshCloneNode( _contentWidth );
+
+            } else {
+
+                // refresh clone
+                this._refreshCloneNode();
+            }
         }
     } );
 
