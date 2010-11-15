@@ -77,8 +77,12 @@ YUI.add('bewype-layout-designer-places', function(Y) {
 
         _initSortable: function () {
             // get type                       
-            var _placesType = this.get( 'placesType' ),
-                _nodes = ( _placesType === 'horizontal' ) ? 'td' : 'li';
+            var _placesType         = this.get( 'placesType' ),
+                _nodes              = ( _placesType === 'horizontal' ) ? 'td' : 'li',
+                _designerClass      = this.get( 'designerClass' ),
+                _dragContentClass   = '.' + _designerClass + '-content-clone-drag',
+                _parentNode         = this.get( 'parentNode' ),
+                _granParentNode     = null;
 
             if ( this.sortable ) {
                 this.sortable.destroy();
@@ -88,8 +92,17 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             this.sortable = new Y.Sortable( {
                 container   : this.placesNode,
                 nodes       : _nodes,
-                opacity     : '.2'
+                opacity     : '.2',
+                handles     : [ _dragContentClass ]
             } );
+
+            if ( _parentNode ) {
+                _granParentNode = _parentNode.layoutDesignerPlaces.get( 'parentNode' );
+                if ( _granParentNode ) {
+                    _granParentNode.layoutDesignerPlaces.sortable.join( this.sortable, 'full' );
+                }
+            }
+
         },
 
         /**
