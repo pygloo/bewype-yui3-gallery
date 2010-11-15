@@ -1,17 +1,10 @@
 
 ul.layout-designer-places ,
 ul.layout-designer-places li  {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
-
-ul.layout-designer-places {
-    border: none;
-}
-
-ul.layout-designer-places li {
-    border: 1px dashed transparent;
+    border              : none;
+    list-style-type     : none;
+    margin              : 0;
+    padding             : 0;
 }
 
 table.layout-designer-places {
@@ -25,12 +18,3 @@ table.layout-designer-places td {
     padding             : 0;
     border              : none;
 }
-
-table.layout-designer-places {
-    border: none;
-}
-
-table.layout-designer-places td {
-    border: 1px dashed transparent;
-}
-

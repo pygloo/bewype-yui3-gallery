@@ -361,7 +361,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             } else {
                 // default: add content text or image
                 _forceWidth = _pl.addContent( _hitType );
-                _forceWidth = _pl.get( 'placesType' ) === 'vertical' ? null : _forceWidth;
+                // _forceWidth = _pl.get( 'placesType' ) === 'vertical' ? null : _forceWidth;
             }
 
             // restore width

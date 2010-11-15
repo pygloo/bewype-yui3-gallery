@@ -4,33 +4,46 @@
 }
 
 .layout-designer-content-clone {
-    background-color    : grey;
-    opacity             : 0.4;
+    background-color    : #eee;
+    border              : 1px dashed grey;
+    opacity             : 0.0;
 }
 
 .layout-designer-content-clone:hover {
-    background-color    : grey;
-    opacity             : 0.4;
+    opacity             : 0.2;
 }
 
 .layout-designer-content-clone-callbacks {
     margin              : auto;
     height              : 20px;
-    width               : 40px;
+    width               : 60px;
     float               : right;
 }
 
+.layout-designer-content-clone-drag,
+.layout-designer-content-clone-edit,
 .layout-designer-content-clone-remove {
-    background-color    : red;
     height              : 20px;
     width               : 20px;
-    float               : right;
+    float               : left;
+    opacity             : 0.5;
+}
+
+.layout-designer-content-clone-drag:hover,
+.layout-designer-content-clone-edit:hover,
+.layout-designer-content-clone-remove:hover {
+    opacity             : 1.0;
+}
+
+.layout-designer-content-clone-drag {
+    background-color    : green;
 }
 
 .layout-designer-content-clone-edit {
     background-color    : blue;
-    height              : 20px;
-    width               : 20px;
-    float               : left;
+}
+
+.layout-designer-content-clone-remove {
+    background-color    : red;
 }
 

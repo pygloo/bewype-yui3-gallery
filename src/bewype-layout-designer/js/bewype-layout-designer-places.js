@@ -373,11 +373,6 @@
                     break;
             }
 
-            // set border
-            if ( this.get( 'useBorder' ) ) {
-                _destNode.setStyle( 'border', this.get( 'boderStyle' ) );
-            }
-
             // return it
             return _destNode.one('div');
         },

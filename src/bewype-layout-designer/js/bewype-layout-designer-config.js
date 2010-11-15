@@ -30,11 +30,11 @@
             }
         },
         sourceGroups: {
-            value : [ 'horizontal', 'text', 'image' ], // not used: vertical
+            value : [ 'horizontal', 'vertical', 'text', 'image' ],
             writeOnce : true
         },
         sourceLabels: {
-            value : [ 'Layout Horizontal', 'Text', 'Image' ], // not used: Layout Vertical
+            value : [ 'Layout Horizontal', 'Layout Vertical', 'Text', 'Image' ],
             writeOnce : true
         },
         targetOverHeight : {
@@ -163,14 +163,6 @@
                     'reset',
                     'apply'
                     ]
-        },
-        useBorder : {
-            value: true, 
-            writeOnce : true
-        },
-        boderStyle : {
-            value: '1px dashed grey', 
-            writeOnce : true
         },
         startingTargetType : {
             value: 'vertical', 
