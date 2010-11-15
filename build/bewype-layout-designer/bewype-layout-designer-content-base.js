@@ -11,6 +11,20 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
     /**
      *
      */
+    LayoutDesignerContentText.C_TEXT_TEMPLATE =  '<div class="{designerClass}-content ';
+    LayoutDesignerContentText.C_TEXT_TEMPLATE += '{designerClass}-content-{contentType}">';
+    LayoutDesignerContentText.C_TEXT_TEMPLATE += '</div>';
+
+    /**
+     *
+     */
+    LayoutDesignerContentImage.C_IMG_TEMPLATE =  '<img class="{designerClass}-content ';
+    LayoutDesignerContentImage.C_IMG_TEMPLATE += '{designerClass}-content-{contentType}" ';
+    LayoutDesignerContentImage.C_IMG_TEMPLATE += 'src="{defaultImg}" />';
+
+    /**
+     *
+     */
     LayoutDesignerContentBase.NAME = 'layout-designer-content';
 
     /**
@@ -23,27 +37,27 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
         /**
          *
          */
-        _q : null,
-
-        /**
-         *
-         */
         editing : false,
 
         /**
          *
          */
-        _init: function ( template ) {
+        initializer : function( config ) {
+            // ??
+            this.setAttrs( config );
             
             // temp var
-            var _host        = this.get( 'host' ),
-                _parentNode  = this.get( 'parentNode' ),
-                _contentNode = null;
+            var _host          = this.get( 'host' ),
+                _parentNode    = this.get( 'parentNode' ),
+                _contentType   = this.get( 'contentType' ),
+                _designerClass = this.get( 'designerClass' ),
+                _contentNode   = null,
+                _template      = _contentType === 'text' ? LayoutDesignerContentBase.C_TEXT_TEMPLATE: LayoutDesignerContentBase.C_IMG_TEMPLATE;
 
             // add dest node
-            _contentNode = new Y.Node.create( Y.substitute( template, {
-                designerClass : this.get( 'designerClass' ),
-                contentType   : this.get( 'contentType' )
+            _contentNode = new Y.Node.create( Y.substitute( _template, {
+                designerClass : _designerClass,
+                contentType   : _contentType
             } ) ); // create content node
             // dom add
             _host.append( _contentNode );
@@ -54,20 +68,6 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
 
             // register it
             _parentNode.layoutDesignerPlaces.registerContent( _host );
-
-            //
-            this._q = new Y.AsyncQueue();
-
-            // return the new content node
-            return _contentNode;
-        },
-
-        /**
-         *
-         */
-        initializer : function( config ) {
-            // ??
-            this.setAttrs( config );
 
             // add clone
             this._addCloneNode();

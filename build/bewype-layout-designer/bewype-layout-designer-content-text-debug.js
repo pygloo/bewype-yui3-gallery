@@ -11,13 +11,6 @@ YUI.add('bewype-layout-designer-content-text', function(Y) {
     /**
      *
      */
-    LayoutDesignerContentText.C_TEMPLATE =  '<div class="{designerClass}-content ';
-    LayoutDesignerContentText.C_TEMPLATE += '{designerClass}-content-{contentType}">';
-    LayoutDesignerContentText.C_TEMPLATE += '</div>';
-
-    /**
-     *
-     */
     LayoutDesignerContentText.NAME = 'layout-designer-content-text';
 
     /**
@@ -25,33 +18,7 @@ YUI.add('bewype-layout-designer-content-text', function(Y) {
      */
     LayoutDesignerContentText.NS   = 'layoutDesignerContent';
 
-    Y.extend( LayoutDesignerContentText, Y.Bewype.LayoutDesignerContentBase, {
-
-        /**
-         *
-         */
-        _q : null,
-
-        /**
-         *
-         */
-        editing : false,
-
-        /**
-         *
-         */
-        initializer : function( config ) {
-
-            // ??
-            this.setAttrs( config );
-
-            // init content  node and plugin content base
-            var _contentNode = this._init( LayoutDesignerContentText.C_TEMPLATE );
-
-            // set default content
-            _contentNode.set( 'innerHTML', this.get( 'defaultText' ) );
-        }
-    } );
+    Y.extend( LayoutDesignerContentText, Y.Bewype.LayoutDesignerContentBase );
 
     Y.namespace('Bewype');
     Y.Bewype.LayoutDesignerContentText = LayoutDesignerContentText;

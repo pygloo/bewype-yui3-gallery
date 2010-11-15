@@ -112,11 +112,7 @@
                     var _contentType  = v.layoutDesignerContent.get( 'contentType' );
 
                     // unplug the node
-                    if ( _contentType === 'image' ) {
-                        v.unplug( Y.Bewype.LayoutDesignerContentImage );
-                    } else {
-                        v.unplug( Y.Bewype.LayoutDesignerContentText );
-                    }
+                    v.unplug( Y.Bewype.LayoutDesignerContent );
 
                 } else {
                     // ???
@@ -419,20 +415,8 @@
             // set max available width
             _config.contentWidth = _placesType === 'vertical' ? _maxWidth : this.getAvailablePlace();
 
-            // content type factory
-            switch( contentType ) {
-                case 'text':
-                    _pluginClass = Y.Bewype.LayoutDesignerContentText;
-                    break;
-                case 'image':
-                    _pluginClass = Y.Bewype.LayoutDesignerContentImage;
-                    break;
-                default:
-                    return;
-            }
-
             // plug node
-            _destNode.plug( _pluginClass, _config );
+            _destNode.plug( Y.Bewype.LayoutDesignerContent, _config );
 
             // ..
             return _maxWidth;
@@ -446,8 +430,7 @@
             // get dest node        
             var _destNode     = null,
                 _host         = this.get( 'host' ),
-                _contentType  = contentNode.layoutDesignerContent.get( 'contentType' ),
-                _contentClass = _contentType === 'image' ?  Y.Bewype.LayoutDesignerContentImage : Y.Bewype.LayoutDesignerContentText;
+                _contentType  = contentNode.layoutDesignerContent.get( 'contentType' );
 
             switch( this.get( 'placesType' ) ) {
 
@@ -466,7 +449,7 @@
             this.unRegisterContent( contentNode );
 
             // unplug the node
-            contentNode.unplug( _contentClass );
+            contentNode.unplug( Y.Bewype.LayoutDesignerContent );
 
             // then remove dest node
             _destNode.remove( true );
