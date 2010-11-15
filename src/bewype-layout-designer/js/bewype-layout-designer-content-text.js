@@ -1,5 +1,3 @@
-YUI.add('bewype-layout-designer-content-text', function(Y) {
-
 
     /**
      *
@@ -56,6 +54,3 @@ YUI.add('bewype-layout-designer-content-text', function(Y) {
     Y.namespace('Bewype');
     Y.Bewype.LayoutDesignerContentText = LayoutDesignerContentText;
 
-
-
-}, '@VERSION@' ,{requires:['bewype-editor', 'bewype-layout-designer-content-base']});

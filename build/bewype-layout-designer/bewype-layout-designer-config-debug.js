@@ -81,6 +81,12 @@ YUI.add('bewype-layout-designer-config', function(Y) {
                 return Y.Lang.isNumber( val );
             }
         },
+        contentZIndex : {
+            value : 1,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
+        },
         defaultContent : {
             value : 'Text..',
             validator : function( val ) {
@@ -168,23 +174,11 @@ YUI.add('bewype-layout-designer-config', function(Y) {
             value: '1px dashed grey', 
             writeOnce : true
         },
-        startingType : {
+        startingTargetType : {
             value: 'vertical', 
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
-            }
-        },
-        cloneZIndex : {
-            value : 2,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        gripZIndex : {
-            value : 4,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
             }
         }
     };

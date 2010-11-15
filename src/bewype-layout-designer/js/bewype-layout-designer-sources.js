@@ -13,92 +13,14 @@
     /**
      *
      */
-    LayoutDesignerSources.TXT_SRC_TEMPLATE =  '<div class="{designerClass}-src" ';
-    LayoutDesignerSources.TXT_SRC_TEMPLATE += 'style="width: 80px; height: 40px">Text</div>';
-
-    /**
-     *
-     */
-    LayoutDesignerSources.IMG_SRC_TEMPLATE =  '<img class="{designerClass}-src" ';
-    LayoutDesignerSources.IMG_SRC_TEMPLATE += 'style="width: 80px; height: 40px" src="{defaultImg}"/>';
-
-    /**
-     *
-     */
-    LayoutDesignerSources.ROW_SRC_TEMPLATE =  '<table class="{designerClass}-src {designerClass}-src-horizontal"><tr>';
-    LayoutDesignerSources.ROW_SRC_TEMPLATE += '<td><div>' + LayoutDesignerSources.TXT_SRC_TEMPLATE + '</div></td>';
-    LayoutDesignerSources.ROW_SRC_TEMPLATE += '<td><div>' + LayoutDesignerSources.TXT_SRC_TEMPLATE + '</div></td>';
-    LayoutDesignerSources.ROW_SRC_TEMPLATE += '</tr></table>';
-
+    LayoutDesignerSources.ITEM_SRC_TEMPLATE = '<div class="{designerClass}-src {designerClass}-src-{itemType}">{itemLabel}</div>';
 
     Y.extend( LayoutDesignerSources, Y.Bewype.LayoutDesignerConfig, {
 
-        sortable : null,
-
         /**
          *
          */
-        _addSourceItem : function ( srcNode ) {
-            var _host = this.get( 'host' ),
-                _ul   = _host.one( 'ul' ),
-                _li   = new Y.Node.create( "<li><div /></li>" ),
-                _div  = _li.one( 'div' );
-
-            // prepare div 
-            _div.setStyle( 'position', 'relative' );
-            _div.append( srcNode );
-
-            // udpate source list
-            _ul.append( _li );
-        },
-
-        /**
-         *
-         */
-        addRowSource : function () {
-
-            // create source components & attach
-            var _n = new Y.Node.create( Y.substitute( LayoutDesignerSources.ROW_SRC_TEMPLATE, {
-                designerClass : this.get( 'designerClass' )
-            } ) );
-
-            // update list
-            this._addSourceItem( _n );
-        },
-
-        /**
-         *
-         */
-        addTextSource : function () {
-
-            // create source components & attach
-            var _n = new Y.Node.create( Y.substitute( LayoutDesignerSources.TXT_SRC_TEMPLATE, {
-                designerClass : this.get( 'designerClass' )
-            } ) );
-
-            // update list
-            this._addSourceItem( _n );
-        },
-
-        /**
-         *
-         */
-        addImageSource : function () {
-
-            // create source components & attach
-            var _n = new Y.Node.create( Y.substitute( LayoutDesignerSources.IMG_SRC_TEMPLATE, {
-                designerClass : this.get( 'designerClass' ),
-                defaultImg    : this.get( 'defaultImg'    )
-            } ) );
-
-            // update list
-            this._addSourceItem( _n );
-        },
-
-        /**
-         *
-         */
-        initializer: function ( config ) {
+        initializer: function( config ) {
 
             // ??
             this.setAttrs( config );
@@ -107,20 +29,52 @@
             var _host     = this.get( 'host' ),
                 _groups   = this.get( 'sourceGroups' ),
                 _labels   = this.get( 'sourceLabels' ),
-                _ulSrc    = new Y.Node.create( '<ul />' );
+                _tableSrc = new Y.Node.create( '<table><tr /></table>' );
 
             //
-            _host.append( _ulSrc );
+            _host.append( _tableSrc );
 
-            this.addRowSource();
-            this.addTextSource();
-            this.addImageSource();
+            // add sources
+            Y.Object.each(_groups, function( v, k ) {
+                var _n      = null,
+                    _td     = null,
+                    _drag   = null;
 
-            this.sortable = new Y.Sortable( {
-                container   : _ulSrc,
-                nodes       : 'li',
-                opacity     : '.2'
-            } );
+                // create source components & attach
+                _n = new Y.Node.create( Y.substitute( LayoutDesignerSources.ITEM_SRC_TEMPLATE, {
+                    itemType      : v,
+                    designerClass : this.get( 'designerClass' ),
+                    itemLabel     : _labels[ k ]
+                } ) );
+
+                // prepare td for the source item
+                _td = new Y.Node.create( "<td />" );
+                _td.append( _n );
+                // udpate source row
+                _tableSrc.append( _td );
+        
+                // common default height
+                _n.setStyle( 'height', this.get( 'sourceHeight' ) );
+                _n.setStyle( 'width' , this.get( 'sourceWidth'  ) );
+
+                // make it draggable
+                _drag = new Y.DD.Drag( {
+                    node    : _n,
+                    groups  : [ v ],
+                    dragMode: 'point'
+                } );
+                // additionnal drag features
+                _drag.plug( Y.Plugin.DDProxy, {
+                    moveOnEnd : false
+                } );
+                _drag.plug( Y.Plugin.DDConstrained, {
+                    constrain2node  : [ _host, _host.next() ]
+                } );
+                // set drag events
+                _drag.on( 'drag:start', Y.bind( this._onDragStart, this, _drag ) );
+                _drag.on( 'drag:end'  , Y.bind( this._onDragEnd  , this, _drag ) );
+
+            }, this );
         },
 
         destructor: function () {

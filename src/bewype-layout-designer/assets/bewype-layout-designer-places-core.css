@@ -1,33 +1,36 @@
 
 ul.layout-designer-places ,
 ul.layout-designer-places li  {
-    border              : none;
-    list-style-type     : none;
-    margin              : 0;
-    padding             : 0;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
 }
 
 ul.layout-designer-places {
-    border              : none;
-    margin              : auto;
-}
-
-ul.layout-designer-places-horizontal { 
-    clear               : both;
+    border: none;
 }
 
 ul.layout-designer-places li {
-    float               : left;
+    border: 1px dashed transparent;
 }
 
-div.layout-designer-places-grip {
-    height              : 100%;
-    width               : 4px;
-    background-color    : blue;
-    z-index             : 4;
+table.layout-designer-places {
+    border-collapse     : collapse;
+    border-spacing      : 0;
 }
 
-div.layout-designer-places-grip:hover {
-    width               : 12px;
+table.layout-designer-places,
+table.layout-designer-places td {
+    margin              : 0;
+    padding             : 0;
+    border              : none;
+}
+
+table.layout-designer-places {
+    border: none;
+}
+
+table.layout-designer-places td {
+    border: 1px dashed transparent;
 }
 

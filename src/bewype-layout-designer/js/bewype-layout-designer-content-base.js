@@ -1,5 +1,3 @@
-YUI.add('bewype-layout-designer-content-base', function(Y) {
-
 
     /**
      *
@@ -439,6 +437,3 @@ YUI.add('bewype-layout-designer-content-base', function(Y) {
     Y.namespace('Bewype');
     Y.Bewype.LayoutDesignerContentBase = LayoutDesignerContentBase;
 
-
-
-}, '@VERSION@' ,{requires:['async-queue', 'plugin', 'substitute']});
