@@ -19,55 +19,17 @@ YUI.add('bewype-layout-designer-config', function(Y) {
                 return Y.Lang.isString( val );
             }
         },
-        sourceHeight : {
-            value : 40,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        sourceWidth : {
-            value : 140,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        sourceGroups: {
-            value : [ 'horizontal', 'vertical', 'text', 'image' ],
+        targetStartActions : {
+            value : [ 'row', 'column' ],
             writeOnce : true
         },
-        sourceLabels: {
-            value : [ 'Layout Horizontal', 'Layout Vertical', 'Text', 'Image' ],
+        targetHorizontalActions : {
+            value : [ 'column', 'text', 'image', 'remove' ],
             writeOnce : true
         },
-        targetOverHeight : {
-            value : 20,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        targetMinHeight : {
-            value : 8,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        targetOverWidth : {
-            value : 20,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        targetMinWidth : {
-            value : 8,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
-        targetZIndex : {
-            value : 1,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
+        targetVerticalActions : {
+            value : [ 'row', 'text', 'image', 'remove' ],
+            writeOnce : true
         },
         contentHeight : {
             value : 40,
@@ -107,7 +69,14 @@ YUI.add('bewype-layout-designer-config', function(Y) {
             }
         },
         placesType : {
-            value : 'vertical',
+            value : 'start',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },
+        targetType : {
+            value : 'start',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -167,7 +136,7 @@ YUI.add('bewype-layout-designer-config', function(Y) {
                     ]
         },
         startingTargetType : {
-            value: 'vertical', 
+            value: 'start', 
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );

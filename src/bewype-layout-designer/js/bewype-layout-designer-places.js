@@ -65,7 +65,7 @@
             this._initSortable();
 
             // register it
-            if ( _parentNode ) {
+            if ( _parentNode && _parentNode.layoutDesignerPlaces ) {
                 _parentNode.layoutDesignerPlaces.registerContent( _host );
             }
             this.contents = [];
@@ -123,10 +123,7 @@
                     v.unplug( Y.Bewype.LayoutDesignerPlaces );
 
                 } else if ( v.layoutDesignerContent ) {
-
-                    // get content type for unplug
-                    var _contentType  = v.layoutDesignerContent.get( 'contentType' );
-
+                
                     // unplug the node
                     v.unplug( Y.Bewype.LayoutDesignerContent );
 
@@ -421,7 +418,6 @@
             // add dest node
             var _placesType  = this.get( 'placesType' ),
                 _destNode    = this.addDestNode(),
-                _pluginClass = null,
                 _config      = this.getAttrs(),
                 _maxWidth    = this.getMaxWidth();
 
@@ -445,8 +441,7 @@
 
             // get dest node        
             var _destNode     = null,
-                _host         = this.get( 'host' ),
-                _contentType  = contentNode.layoutDesignerContent.get( 'contentType' );
+                _host         = this.get( 'host' );
 
             switch( this.get( 'placesType' ) ) {
 
