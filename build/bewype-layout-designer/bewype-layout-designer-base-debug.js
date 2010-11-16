@@ -86,7 +86,7 @@ YUI.add('bewype-layout-designer-base', function(Y) {
             this.nodeLayout.layoutDesignerTarget.refresh();
 
             // ... 
-            Y.DD.DDM.on( 'drop:enter', Y.bind( this._dropHitGotcha, this ) );
+            // Y.DD.DDM.on( 'drop:enter', Y.bind( this._dropHitGotcha, this ) ); // need some cleaning and enhancement ....
             Y.DD.DDM.on( 'drop:hit', Y.bind( this._dropHitGotcha, this ) );
         },
 

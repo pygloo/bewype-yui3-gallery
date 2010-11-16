@@ -34,8 +34,6 @@ YUI.add('bewype-layout-designer-places', function(Y) {
         placesNode : null,
 
         contents   : null,
-        
-        sortable   : null,
 
         /**
          *
@@ -50,7 +48,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                 _placesType     = this.get( 'placesType' ),
                 _hTmpl          = LayoutDesignerPlaces.H_PLACES_TEMPLATE,
                 _vTmpl          = LayoutDesignerPlaces.V_PLACES_TEMPLATE,
-                _placesTempl    = ( _placesType === 'horizontal' ) ? _hTmpl : _vTmpl,
+                _placesTempl    = _placesType === 'horizontal' ? _hTmpl : _vTmpl,
                 _parentNode     = this.get( 'parentNode' );
 
             // add places
@@ -77,32 +75,37 @@ YUI.add('bewype-layout-designer-places', function(Y) {
 
         _initSortable: function () {
             // get type                       
-            var _placesType         = this.get( 'placesType' ),
-                _nodes              = ( _placesType === 'horizontal' ) ? 'td' : 'li',
+            var _host               = this.get( 'host' ),
+                _placesType         = this.get( 'placesType' ),
                 _designerClass      = this.get( 'designerClass' ),
+                _sortTag            = _placesType === 'horizontal' ? 'td'    : 'li',
+                _sortableTag        = _placesType === 'horizontal' ? 'table' : 'ul',
+                _layoutClass        = '.' + _designerClass + '-layout',
                 _dragContentClass   = '.' + _designerClass + '-content-clone-drag',
-                _parentNode         = this.get( 'parentNode' ),
-                _granParentNode     = null;
+                _sortable           = Y.Sortable.getSortable( this.placesNode ),
+                _baseSortableNode   = _host.ancestor( _layoutClass ),
+                _allSortableNodes   = _baseSortableNode ? _baseSortableNode.all( _sortableTag ) : null;
 
-            if ( this.sortable ) {
-                this.sortable.destroy();
+            if ( _sortable ) {
+                _sortable.destroy();
             }
 
             // make it sortable
-            this.sortable = new Y.Sortable( {
+            _sortable = new Y.Sortable( {
                 container   : this.placesNode,
-                nodes       : _nodes,
+                nodes       : _sortTag,
                 opacity     : '.2',
                 handles     : [ _dragContentClass ]
             } );
 
-            if ( _parentNode ) {
-                _granParentNode = _parentNode.layoutDesignerPlaces.get( 'parentNode' );
-                if ( _granParentNode ) {
-                    _granParentNode.layoutDesignerPlaces.sortable.join( this.sortable, 'full' );
-                }
-            }
+            if ( !_allSortableNodes ) { return; }
 
+            _allSortableNodes.each( function ( v, k ) {
+                if ( this.placesNode != v ) {
+                    var _s = Y.Sortable.getSortable( v );
+                    _s.join( _sortable, 'full' );
+                }
+            }, this );
         },
 
         /**
