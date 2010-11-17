@@ -44,14 +44,18 @@ YUI.add('bewype-layout-designer-base', function(Y) {
                 _designerClass = this.get( 'designerClass' ),
                 _layoutWidth   = this.get( 'layoutWidth' );
 
-            // create dest layout
-            this.nodeLayout = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_LAYOUT_TEMPLATE, {
-                designerClass : _designerClass
-            } ) );
-            // attach layout node to main node
-            _host.append( this.nodeLayout );
-            //
-            this.nodeLayout.setStyle( 'width', _layoutWidth );
+            this.nodeLayout = _host.one( 'div.' + _designerClass + '-layout' );
+
+            if ( !this.nodeLayout ) {
+                // create dest layout
+                this.nodeLayout = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_LAYOUT_TEMPLATE, {
+                    designerClass : _designerClass
+                } ) );
+                // attach layout node to main node
+                _host.append( this.nodeLayout );
+                //
+                this.nodeLayout.setStyle( 'width', _layoutWidth );
+            }
 
             config.baseNode   = _host;
             config.targetType = this.get( 'startingTargetType' );
@@ -80,21 +84,13 @@ YUI.add('bewype-layout-designer-base', function(Y) {
 
             var _host          = this.get( 'host' ),
                 _designerClass = this.get( 'designerClass' ),
-                _panNode       = _host.one( '.' + _designerClass + '-edit-panel' ),
-                _tableOrUl     = this.nodeLayout.one( 'table' ) || this.nodeLayout.one( 'ul' );
-
-            // remove our designer specific nodes
-            _panNode.remove();
+                _panNode       = _host.one( '.' + _designerClass + '-edit-panel' );
 
             // unplug all
             this.nodeLayout.unplug( Y.Bewype.LayoutDesignerTarget );
 
-            // move layout table to top
-            if ( _tableOrUl ) {
-                this.nodeLayout.replace( _tableOrUl );
-            } else {
-                this.nodeLayout.remove();
-            }
+            // remove our designer specific nodes
+            _panNode.remove();
         },
 
         /**

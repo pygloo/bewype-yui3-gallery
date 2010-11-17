@@ -46,24 +46,22 @@ YUI.add('bewype-layout-designer-content', function(Y) {
                 _parentNode    = this.get( 'parentNode' ),
                 _contentType   = this.get( 'contentType' ),
                 _designerClass = this.get( 'designerClass' ),
-                _contentNode   = null,
-                _template      = _contentType === 'text' ? LayoutDesignerContent.C_TEXT_TEMPLATE: LayoutDesignerContent.C_IMG_TEMPLATE;
+                _contentNode   = _contentType === 'text' ? _host.one( 'div' ) : _host.one( 'img' ),
+                _template      = _contentType === 'text' ? LayoutDesignerContent.C_TEXT_TEMPLATE : LayoutDesignerContent.C_IMG_TEMPLATE;
 
-            // add dest node
-            _contentNode = new Y.Node.create( Y.substitute( _template, {
-                designerClass  : _designerClass,
-                contentType    : _contentType,
-                defaultContent : _contentType === 'text' ?  this.get( 'defaultText' ) : this.get( 'defaultImg' )
-            } ) ); // create content node
-            // dom add
-            _host.append( _contentNode );
-        
-            // common default height
-            _contentNode.setStyle( 'height', this.get( 'contentHeight' ) );
-            _contentNode.setStyle( 'width',  this.get( 'contentWidth'  ) );
-
-            // register it
-            _parentNode.layoutDesignerPlaces.registerContent( _host );
+            if ( !_contentNode ) {
+                // add dest node
+                _contentNode = new Y.Node.create( Y.substitute( _template, {
+                    designerClass  : _designerClass,
+                    contentType    : _contentType,
+                    defaultContent : _contentType === 'text' ?  this.get( 'defaultText' ) : this.get( 'defaultImg' )
+                } ) ); // create content node
+                // dom add
+                _host.append( _contentNode );
+                // common default height
+                _contentNode.setStyle( 'height', this.get( 'contentHeight' ) );
+                _contentNode.setStyle( 'width',  this.get( 'contentWidth'  ) );
+            }
 
             // add clone
             this._addCloneNode();
@@ -76,17 +74,8 @@ YUI.add('bewype-layout-designer-content', function(Y) {
 
             // temp var
             var _host            = this.get( 'host'          ),
-                _parentNode      = this.get( 'parentNode'    ),
                 _contentClass    = this.get( 'designerClass' ) + '-content',
-                _contentSelector = this.get( 'contentType' ) === 'image' ? 'img.' : 'div.',
-                _contentNode     = _host.one( _contentSelector + _contentClass ),
-                _cloneNode       = _host.one( 'div.' + _contentClass + '-clone' );
-                    
-            // unregister it
-            _parentNode.layoutDesignerPlaces.unRegisterContent( _host );
-
-            // clean events
-            _host.detachAll( 'mouseenter' );
+                _cloneNode       = _host.one( '.' + _contentClass + '-clone' );
 
             // and remove the clone
             if ( _cloneNode ) {
@@ -96,9 +85,6 @@ YUI.add('bewype-layout-designer-content', function(Y) {
                 // remove clone node
                 _cloneNode.remove();
             }
-
-            // replace host
-            _host.replace( _contentNode );
         },
 
         /**

@@ -198,14 +198,18 @@ YUI.add('bewype-layout-designer-base', function(Y) {
                 _designerClass = this.get( 'designerClass' ),
                 _layoutWidth   = this.get( 'layoutWidth' );
 
-            // create dest layout
-            this.nodeLayout = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_LAYOUT_TEMPLATE, {
-                designerClass : _designerClass
-            } ) );
-            // attach layout node to main node
-            _host.append( this.nodeLayout );
-            //
-            this.nodeLayout.setStyle( 'width', _layoutWidth );
+            this.nodeLayout = _host.one( 'div.' + _designerClass + '-layout' );
+
+            if ( !this.nodeLayout ) {
+                // create dest layout
+                this.nodeLayout = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_LAYOUT_TEMPLATE, {
+                    designerClass : _designerClass
+                } ) );
+                // attach layout node to main node
+                _host.append( this.nodeLayout );
+                //
+                this.nodeLayout.setStyle( 'width', _layoutWidth );
+            }
 
             config.baseNode   = _host;
             config.targetType = this.get( 'startingTargetType' );
@@ -234,21 +238,13 @@ YUI.add('bewype-layout-designer-base', function(Y) {
 
             var _host          = this.get( 'host' ),
                 _designerClass = this.get( 'designerClass' ),
-                _panNode       = _host.one( '.' + _designerClass + '-edit-panel' ),
-                _tableOrUl     = this.nodeLayout.one( 'table' ) || this.nodeLayout.one( 'ul' );
-
-            // remove our designer specific nodes
-            _panNode.remove();
+                _panNode       = _host.one( '.' + _designerClass + '-edit-panel' );
 
             // unplug all
             this.nodeLayout.unplug( Y.Bewype.LayoutDesignerTarget );
 
-            // move layout table to top
-            if ( _tableOrUl ) {
-                this.nodeLayout.replace( _tableOrUl );
-            } else {
-                this.nodeLayout.remove();
-            }
+            // remove our designer specific nodes
+            _panNode.remove();
         },
 
         /**
@@ -359,24 +355,22 @@ YUI.add('bewype-layout-designer-content', function(Y) {
                 _parentNode    = this.get( 'parentNode' ),
                 _contentType   = this.get( 'contentType' ),
                 _designerClass = this.get( 'designerClass' ),
-                _contentNode   = null,
-                _template      = _contentType === 'text' ? LayoutDesignerContent.C_TEXT_TEMPLATE: LayoutDesignerContent.C_IMG_TEMPLATE;
+                _contentNode   = _contentType === 'text' ? _host.one( 'div' ) : _host.one( 'img' ),
+                _template      = _contentType === 'text' ? LayoutDesignerContent.C_TEXT_TEMPLATE : LayoutDesignerContent.C_IMG_TEMPLATE;
 
-            // add dest node
-            _contentNode = new Y.Node.create( Y.substitute( _template, {
-                designerClass  : _designerClass,
-                contentType    : _contentType,
-                defaultContent : _contentType === 'text' ?  this.get( 'defaultText' ) : this.get( 'defaultImg' )
-            } ) ); // create content node
-            // dom add
-            _host.append( _contentNode );
-        
-            // common default height
-            _contentNode.setStyle( 'height', this.get( 'contentHeight' ) );
-            _contentNode.setStyle( 'width',  this.get( 'contentWidth'  ) );
-
-            // register it
-            _parentNode.layoutDesignerPlaces.registerContent( _host );
+            if ( !_contentNode ) {
+                // add dest node
+                _contentNode = new Y.Node.create( Y.substitute( _template, {
+                    designerClass  : _designerClass,
+                    contentType    : _contentType,
+                    defaultContent : _contentType === 'text' ?  this.get( 'defaultText' ) : this.get( 'defaultImg' )
+                } ) ); // create content node
+                // dom add
+                _host.append( _contentNode );
+                // common default height
+                _contentNode.setStyle( 'height', this.get( 'contentHeight' ) );
+                _contentNode.setStyle( 'width',  this.get( 'contentWidth'  ) );
+            }
 
             // add clone
             this._addCloneNode();
@@ -389,17 +383,8 @@ YUI.add('bewype-layout-designer-content', function(Y) {
 
             // temp var
             var _host            = this.get( 'host'          ),
-                _parentNode      = this.get( 'parentNode'    ),
                 _contentClass    = this.get( 'designerClass' ) + '-content',
-                _contentSelector = this.get( 'contentType' ) === 'image' ? 'img.' : 'div.',
-                _contentNode     = _host.one( _contentSelector + _contentClass ),
-                _cloneNode       = _host.one( 'div.' + _contentClass + '-clone' );
-                    
-            // unregister it
-            _parentNode.layoutDesignerPlaces.unRegisterContent( _host );
-
-            // clean events
-            _host.detachAll( 'mouseenter' );
+                _cloneNode       = _host.one( '.' + _contentClass + '-clone' );
 
             // and remove the clone
             if ( _cloneNode ) {
@@ -409,9 +394,6 @@ YUI.add('bewype-layout-designer-content', function(Y) {
                 // remove clone node
                 _cloneNode.remove();
             }
-
-            // replace host
-            _host.replace( _contentNode );
         },
 
         /**
@@ -734,24 +716,77 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             this.setAttrs( config );
             
             // temp var
-            var _host           = this.get( 'host'       ),
-                _placesType     = this.get( 'placesType' ),
-                _hTmpl          = LayoutDesignerPlaces.H_PLACES_TEMPLATE,
-                _vTmpl          = LayoutDesignerPlaces.V_PLACES_TEMPLATE,
-                _placesTempl    = _placesType === 'horizontal' ? _hTmpl : _vTmpl,
-                _parentNode     = this.get( 'parentNode' );
+            var _host            = this.get( 'host' ),
+                _children        = _host.get( 'children' ),
+                _placesType      = this.get( 'placesType' ),
+                _designerClass   = this.get( 'designerClass' ),
+                _hTmpl           = LayoutDesignerPlaces.H_PLACES_TEMPLATE,
+                _vTmpl           = LayoutDesignerPlaces.V_PLACES_TEMPLATE,
+                _placesTempl     = _placesType === 'horizontal' ? _hTmpl : _vTmpl,
+                _parentNode      = this.get( 'parentNode' ),
+                _containerTag    = null,
+                _config          = null,
+                _placesChildType = null,
+                _contentType     = null;
 
-            // add places
-            this.placesNode = new Y.Node.create( Y.substitute( _placesTempl, {
-                designerClass : this.get( 'designerClass' )
-            } ) );
+            // init content list
+            this.contents = [];
 
-            // set place content
-            _host.append(this.placesNode);
+            // mount previous
+            this.placesNode = _children ? _children.item( 0 ) : null;
+            // create new
+            if ( this.placesNode ) {
+                // ...
+                if ( this.placesNode.hasClass( '.' + _designerClass + '-places-vertical' ) ) {
+                    // replace table with ul for places
+                    this._tableToUl();
+                    // set container tag
+                    _containerTag = 'li';
+                    // set contentype
+                    _placesChildType = 'horizontal';
+                } else {
+                    // horizontal container tag
+                    _containerTag = 'td';
+                    // set contentype
+                    _placesChildType = 'vertical';
+                }
 
-            // common default height/width
-            this.placesNode.setStyle( 'height', this.get( 'contentHeight' ) );
-            this.placesNode.setStyle( 'width' , this.get( 'contentWidth'  ) );
+                // prepare config
+                _config = this.getAttrs();
+                _config.parentNode = _host;
+
+                // populate ul
+                this.placesNode.all( _containerTag ).each( function ( v, k ) {
+                    var _c = v.get( 'children' ).item( 0 );
+                    if ( _c.get( 'tagName' ).toLowerCase() === 'table' ) {
+                        // ...
+                        _config.targetType = _placesChildType;
+                        _c.plug( Y.Bewype.LayoutDesignerTarget, _config );
+                        // ...
+                        _config.targetType = null;
+                        _config.placesType = _placesChildType;
+                        _c.plug( Y.Bewype.LayoutDesignerPlaces, _config );
+                    } else {
+                        _config.contentType = _c.one( '.' + _designerClass + '-content-text' ) ? 'text' : 'image';
+                        _c.plug( Y.Bewype.LayoutDesignerContent, _config );
+                    }
+                    // register
+                    this.registerContent( _c );
+                }, this );
+
+            } else {            
+                // add places
+                this.placesNode = new Y.Node.create( Y.substitute( _placesTempl, {
+                    designerClass : _designerClass
+                } ) );
+
+                // set place content
+                _host.append(this.placesNode);
+
+                // common default height/width
+                this.placesNode.setStyle( 'height', this.get( 'contentHeight' ) );
+                this.placesNode.setStyle( 'width' , this.get( 'contentWidth'  ) );
+            }
 
             // make it sortable
             this._initSortable();
@@ -760,7 +795,6 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             if ( _parentNode && _parentNode.layoutDesignerPlaces ) {
                 _parentNode.layoutDesignerPlaces.registerContent( _host );
             }
-            this.contents = [];
         },
 
         _initSortable: function () {
@@ -798,21 +832,63 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             }, this );
         },
 
+        _tableToUl : function () {
+            // create ul
+            var _ul            = Y.Node.create( '<ul />' ),
+                _designerClass = this.get( 'designerClass' );
+            // populate ul
+            this.placesNode.all( 'td' ).each( function ( v, k ) {
+                var _li = Y.Node.create( '<li />' );
+                // update class
+                _li.addClass( _designerClass + '-cell' );
+                _li.addClass( _designerClass + '-cell-vertical' );
+                // set inner
+                _li.set( 'innerHTML', v.get( 'innerHTML' ) );
+                // update places
+                _ul.append( _li );
+            } );
+            // replace table for places
+            this.placesNode.replace( _ul );
+        },
+
+        _ulToTable : function () {
+            // create table
+            var _table         = Y.Node.create( '<table />' ),
+                _designerClass = this.get( 'designerClass' );
+            // ...
+            _table.addClass( _designerClass + '-places' );
+            _table.addClass( _designerClass + '-places-vertical' );
+            // populate table
+            this.placesNode.all( 'li' ).each( function ( v, k ) {
+                var _row = Y.Node.create( '<tr />' ),
+                    _cell = Y.Node.create( '<td />' );
+                // update class
+                _cell.addClass( _designerClass + '-cell' );
+                _cell.addClass( _designerClass + '-cell-vertical' );
+                // set inner
+                _cell.set( 'innerHTML', v.get( 'innerHTML' ) );
+                // update table
+                _row.append( _cell );
+                _table.append( _row );
+            } );
+            // replace list
+            this.placesNode.replace( _table );
+        },
+
         /**
          *
          */
         destructor: function () {
 
             // copy contents
-            var _host       = this.get( 'host' ),
-                _parentNode = this.get( 'parentNode' );
+            var _sortable       = Y.Sortable.getSortable( this.placesNode );
             
             // first remove all the children
             Y.Object.each( this.contents, function( v, k ) {
-                if ( v.layoutDesignerPlaces ) {
+                if ( v.layoutDesignerTarget ) {
 
                     // unplug places
-                    v.unplug( Y.Bewype.LayoutDesignerPlaces );
+                    v.unplug( Y.Bewype.LayoutDesignerTarget );
 
                 } else if ( v.layoutDesignerContent ) {
                 
@@ -824,10 +900,11 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                 }
             }, this );
 
-            // unregister it
-            if ( _parentNode ) {
-                _parentNode.layoutDesignerPlaces.unRegisterContent( _host );
-            }
+            // destroy sortable
+            _sortable.destroy();
+
+            // .. serialize ul to table
+            this._ulToTable();
         },
 
         /**
@@ -1121,6 +1198,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
 
             // plug node
             _destNode.plug( Y.Bewype.LayoutDesignerContent, _config );
+            this.registerContent( _destNode );
 
             // ..
             return _maxWidth;
@@ -1223,17 +1301,39 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             this.setAttrs( config );
 
             // temp vars
-            var _host            = this.get( 'host'       ),
-                _type            = this.get( 'targetType' ),
-                _class           = this.get( 'designerClass' ) + '-target',
-                _innerNode       = null;
+            var _host          = this.get( 'host' ),
+                _type          = this.get( 'targetType' ),
+                _designerClass = this.get( 'designerClass' ),
+                _targetClass   = _designerClass + '-target',
+                _children      = _host.get( 'children' ),
+                _placesNode    = _children ? _children.item( 0 ) : null,
+                _innerNode     = null;
+
+            if ( _type !== 'start' || _placesNode ) {
+                // prepare config
+                config.targetType = null;
+                config.parentNode = _host;
+                // on start load found type
+                if ( _placesNode ) {
+                    if ( _placesNode.hasClass( '.' + _designerClass + '-places-vertical' ) ) {                    
+                        config.placesType = 'vertical';
+                    } else {
+                        config.placesType = 'horizontal';
+                    }
+                // use passed type
+                } else {
+                    config.placesType = _type;
+                }
+                // plug places
+                _host.plug( Y.Bewype.LayoutDesignerPlaces, config );
+            }
 
             // add target
-            this._targetNode = new Y.Node.create( '<div class="' + _class + ' ' + _class + '-' + _type + '" />' );
+            this._targetNode = new Y.Node.create( '<div class="' + _targetClass + ' ' + _targetClass + '-' + _type + '" />' );
             _host.append( this._targetNode );
 
             // add target
-            _innerNode = new Y.Node.create( '<div class="' + _class + ' ' + _class + '-inner" />' );
+            _innerNode = new Y.Node.create( '<div class="' + _targetClass + ' ' + _targetClass + '-inner" />' );
             this._targetNode.append( _innerNode );
             
             Y.Object.each( this._getTargetActions(), function ( v, k ) {
@@ -1249,19 +1349,26 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             // get host
             var _host = this.get( 'host' );
 
-            // TODO remove inner and action div
+            // remove actions and inner
+            Y.Object.each( this._getTargetActions(), function ( v, k ) {
+                this._removeTargetAction( v );
+            }, this );
 
             // clean events
             this._targetNode.remove();
 
             // destroy plugins
-            _host.unplug( Y.Bewype.LayoutDesignerPlaces );
+            if ( _host.layoutDesignerPlaces ) {
+                // unplug
+                _host.unplug( Y.Bewype.LayoutDesignerPlaces );
+            }
         },
 
         _addPlaces : function ( action ) {
 
             // temp vars
             var _host       = this.get( 'host' ),
+                _parentNode = this.get( 'parentNode' ),
                 _targetType = this.get( 'targetType' ),
                 _addType    = action === 'column' ? 'vertical' : 'horizontal',
                 _destNode   = null,
@@ -1282,15 +1389,16 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             _destNode = _targetType === 'start' ? _host : _places.addDestNode();
 
             // prepare config
-            _config.placesType = _addType;
             _config.targetType = _addType;
             _config.parentNode = _host;
 
-            // plug places
-            _destNode.plug( Y.Bewype.LayoutDesignerPlaces, _config );
-
             // plug target
             _destNode.plug( Y.Bewype.LayoutDesignerTarget, _config );
+            
+            // register
+            if ( _parentNode && _parentNode.layoutDesignerPlaces ) {
+                _parentNode.layoutDesignerPlaces.registerContent( _destNode );
+            }
 
             // refresh at start
             this.refresh( _forceWidth );
@@ -1320,8 +1428,10 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             _host.unplug( Y.Bewype.LayoutDesignerPlaces );
 
             // restore start target if necessary
-            if ( _parentNode ) {
+            if ( _parentNode && _parentNode.layoutDesignerPlaces ) {
 
+                // unregister
+                _parentNode.layoutDesignerPlaces.unRegisterContent( _host );
                 // then remove dest node
                 _host.remove( true );
                 // do refresh after
@@ -1332,7 +1442,6 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 // prepare config
                 _config            = this.getAttrs();
                 _config.targetType = 'start';
-
                 // plug start target
                 _host.plug( Y.Bewype.LayoutDesignerTarget, _config );
             }
@@ -1396,6 +1505,19 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 innerNode.append( _actionNode );
                 // manage callback on click
                 Y.on( 'click', Y.bind( this._onClickAction, this, action ), _actionNode );
+            }
+        },
+
+        _removeTargetAction : function ( action ) {
+
+            // temp vars
+            var _actionClass = this.get( 'designerClass' ) + '-target-action',
+                _actionNode  = this.get( 'host' ).one( 'div.' + _actionClass + '-' + action );
+
+            // render action button
+            if ( _actionNode ) {
+                _actionNode.detachAll( 'click' );
+                _actionNode.remove();
             }
         },
 

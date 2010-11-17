@@ -68,21 +68,18 @@
         },
         placesType : {
             value : 'start',
-            writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
         },
         targetType : {
             value : 'start',
-            writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
         },
         contentType : {
             value : 'text',
-            writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }

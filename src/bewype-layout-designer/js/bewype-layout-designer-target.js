@@ -31,17 +31,41 @@
             this.setAttrs( config );
 
             // temp vars
-            var _host            = this.get( 'host'       ),
-                _type            = this.get( 'targetType' ),
-                _class           = this.get( 'designerClass' ) + '-target',
-                _innerNode       = null;
+            var _host          = this.get( 'host' ),
+                _type          = this.get( 'targetType' ),
+                _designerClass = this.get( 'designerClass' ),
+                _targetClass   = _designerClass + '-target',
+                _children      = _host.get( 'children' ),
+                _placesNode    = _children ? _children.item( 0 ) : null,
+                _innerNode     = null;
+
+            if ( _type !== 'start' || _placesNode ) {
+                // prepare config
+                config.targetType = null;
+                config.parentNode = _host;
+                // on start load found type
+                if ( _placesNode ) {                    
+                    if ( _placesNode.hasClass( '.' + _designerClass + '-places-vertical' ) ) {                    
+                        config.placesType = 'vertical';
+                    } else {
+                        config.placesType = 'horizontal';
+                    }
+                // use passed type
+                } else {
+                    config.placesType = _type;
+                }
+                // override starting type
+                this.set( 'targetType', config.placesType );
+                // plug places
+                _host.plug( Y.Bewype.LayoutDesignerPlaces, config );
+            }
 
             // add target
-            this._targetNode = new Y.Node.create( '<div class="' + _class + ' ' + _class + '-' + _type + '" />' );
+            this._targetNode = new Y.Node.create( '<div class="' + _targetClass + ' ' + _targetClass + '-' + _type + '" />' );
             _host.append( this._targetNode );
 
             // add target
-            _innerNode = new Y.Node.create( '<div class="' + _class + ' ' + _class + '-inner" />' );
+            _innerNode = new Y.Node.create( '<div class="' + _targetClass + ' ' + _targetClass + '-inner" />' );
             this._targetNode.append( _innerNode );
             
             Y.Object.each( this._getTargetActions(), function ( v, k ) {
@@ -57,19 +81,26 @@
             // get host
             var _host = this.get( 'host' );
 
-            // TODO remove inner and action div
+            // remove actions and inner
+            Y.Object.each( this._getTargetActions(), function ( v, k ) {
+                this._removeTargetAction( v );
+            }, this );
 
             // clean events
             this._targetNode.remove();
 
             // destroy plugins
-            _host.unplug( Y.Bewype.LayoutDesignerPlaces );
+            if ( _host.layoutDesignerPlaces ) {
+                // unplug
+                _host.unplug( Y.Bewype.LayoutDesignerPlaces );
+            }
         },
 
         _addPlaces : function ( action ) {
 
             // temp vars
             var _host       = this.get( 'host' ),
+                _parentNode = this.get( 'parentNode' ),
                 _targetType = this.get( 'targetType' ),
                 _addType    = action === 'column' ? 'vertical' : 'horizontal',
                 _destNode   = null,
@@ -90,15 +121,16 @@
             _destNode = _targetType === 'start' ? _host : _places.addDestNode();
 
             // prepare config
-            _config.placesType = _addType;
             _config.targetType = _addType;
             _config.parentNode = _host;
 
-            // plug places
-            _destNode.plug( Y.Bewype.LayoutDesignerPlaces, _config );
-
             // plug target
             _destNode.plug( Y.Bewype.LayoutDesignerTarget, _config );
+            
+            // register
+            if ( _parentNode && _parentNode.layoutDesignerPlaces ) {
+                _parentNode.layoutDesignerPlaces.registerContent( _destNode );
+            }
 
             // refresh at start
             this.refresh( _forceWidth );
@@ -128,8 +160,10 @@
             _host.unplug( Y.Bewype.LayoutDesignerPlaces );
 
             // restore start target if necessary
-            if ( _parentNode ) {
+            if ( _parentNode && _parentNode.layoutDesignerPlaces ) {
 
+                // unregister
+                _parentNode.layoutDesignerPlaces.unRegisterContent( _host );
                 // then remove dest node
                 _host.remove( true );
                 // do refresh after
@@ -140,7 +174,6 @@
                 // prepare config
                 _config            = this.getAttrs();
                 _config.targetType = 'start';
-
                 // plug start target
                 _host.plug( Y.Bewype.LayoutDesignerTarget, _config );
             }
@@ -204,6 +237,19 @@
                 innerNode.append( _actionNode );
                 // manage callback on click
                 Y.on( 'click', Y.bind( this._onClickAction, this, action ), _actionNode );
+            }
+        },
+
+        _removeTargetAction : function ( action ) {
+
+            // temp vars
+            var _actionClass = this.get( 'designerClass' ) + '-target-action',
+                _actionNode  = this.get( 'host' ).one( 'div.' + _actionClass + '-' + action );
+
+            // render action button
+            if ( _actionNode ) {
+                _actionNode.detachAll( 'click' );
+                _actionNode.remove();
             }
         },
 
