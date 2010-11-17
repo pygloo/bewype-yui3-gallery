@@ -20,11 +20,6 @@
         /**
          *
          */
-        _groups : [ 'horizontal', 'vertical', 'text', 'image' ],
-
-        /**
-         *
-         */
         initializer: function( config ) {
 
             // ??
@@ -42,10 +37,9 @@
             if ( _type !== 'start' || _placesNode ) {
                 // prepare config
                 config.targetType = null;
-                config.parentNode = _host;
                 // on start load found type
                 if ( _placesNode ) {                    
-                    if ( _placesNode.hasClass( '.' + _designerClass + '-places-vertical' ) ) {                    
+                    if ( _placesNode.hasClass( _designerClass + '-places-vertical' ) ) {                    
                         config.placesType = 'vertical';
                     } else {
                         config.placesType = 'horizontal';
@@ -56,6 +50,7 @@
                 }
                 // override starting type
                 this.set( 'targetType', config.placesType );
+                _type = config.placesType;
                 // plug places
                 _host.plug( Y.Bewype.LayoutDesignerPlaces, config );
             }
@@ -122,14 +117,12 @@
 
             // prepare config
             _config.targetType = _addType;
-            _config.parentNode = _host;
+            _config.parentNode = _targetType === 'start' ? null : _host;
 
             // plug target
             _destNode.plug( Y.Bewype.LayoutDesignerTarget, _config );
-            
-            // register
-            if ( _parentNode && _parentNode.layoutDesignerPlaces ) {
-                _parentNode.layoutDesignerPlaces.registerContent( _destNode );
+            if ( _places ) {
+                _places.registerContent( _destNode );
             }
 
             // refresh at start
@@ -144,23 +137,13 @@
                 _placesType = _host.layoutDesignerPlaces.get( 'placesType' ),
                 _config     = null;
             
-            switch( _placesType ) {
-
-                case 'horizontal':
-                    _host.one( 'table' ).remove();
-                    break;
-
-                case 'vertical':
-                    _host.one( 'ul' ).remove();
-                    break;
-            }
-            
             // destroy plugins
             _host.unplug( Y.Bewype.LayoutDesignerTarget );
-            _host.unplug( Y.Bewype.LayoutDesignerPlaces );
+            // remove dom node too
+            _host.one( 'table' ).remove();
 
             // restore start target if necessary
-            if ( _parentNode && _parentNode.layoutDesignerPlaces ) {
+            if ( _parentNode ) {
 
                 // unregister
                 _parentNode.layoutDesignerPlaces.unRegisterContent( _host );
