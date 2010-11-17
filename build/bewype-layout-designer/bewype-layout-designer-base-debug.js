@@ -131,7 +131,10 @@ YUI.add('bewype-layout-designer-base', function(Y) {
 
                 // refresh new parent
                 _forceWidth  = _dropNode.layoutDesignerPlaces.getMaxWidth();
+
+                // refresh updated places
                 _dropNode.layoutDesignerTarget.refresh( _forceWidth );
+                _parentHost.layoutDesignerTarget.refresh();
             }
         },
 

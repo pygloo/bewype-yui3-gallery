@@ -132,10 +132,12 @@
         _onClickRemove: function () {
 
             // temp vars
-            var _host       = this.get( 'host' ),
-                _parentNode = this.get( 'parentNode' ),
-                _placesType = _host.layoutDesignerPlaces.get( 'placesType' ),
-                _config     = null;
+            var _host         = this.get( 'host' ),
+                _parentNode   = this.get( 'parentNode' ),
+                _parentPlaces = _parentNode ? _parentNode.layoutDesignerPlaces : null,
+                _placesType   = _host.layoutDesignerPlaces.get( 'placesType' ),
+                _config       = null,
+                _forceWidth   = null;
             
             // destroy plugins
             _host.unplug( Y.Bewype.LayoutDesignerTarget );
@@ -146,11 +148,12 @@
             if ( _parentNode ) {
 
                 // unregister
-                _parentNode.layoutDesignerPlaces.unRegisterContent( _host );
+                _parentPlaces.unRegisterContent( _host );
                 // then remove dest node
                 _host.remove( true );
                 // do refresh after
-                _parentNode.layoutDesignerTarget.refresh();
+                _forceWidth = _parentPlaces.getMaxWidth();
+                _parentNode.layoutDesignerTarget.refresh( _forceWidth );
 
             } else {
 

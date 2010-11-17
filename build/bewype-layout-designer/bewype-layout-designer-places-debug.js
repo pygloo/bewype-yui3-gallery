@@ -213,7 +213,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                 _li.set( 'innerHTML', v.get( 'innerHTML' ) );
                 // update places
                 _ul.append( _li );
-            } );
+            }, this );
             // replace table for places
             this.placesNode.replace( _ul );
             this.placesNode = _ul;
@@ -240,7 +240,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                 // update table
                 _row.append( _cell );
                 _table.append( _row );
-            } );
+            }, this );
             // replace list
             this.placesNode.replace( _table );
             this.placesNode = _table;
@@ -613,7 +613,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
 
             // and refresh
             if ( _host.layoutDesignerTarget ) {
-                _host.layoutDesignerTarget.refresh();
+                _host.layoutDesignerTarget.refresh( this.getMaxWidth() );
             }
         },
 

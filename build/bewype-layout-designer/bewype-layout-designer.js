@@ -282,7 +282,10 @@ YUI.add('bewype-layout-designer-base', function(Y) {
 
                 // refresh new parent
                 _forceWidth  = _dropNode.layoutDesignerPlaces.getMaxWidth();
+
+                // refresh updated places
                 _dropNode.layoutDesignerTarget.refresh( _forceWidth );
+                _parentHost.layoutDesignerTarget.refresh();
             }
         },
 
@@ -882,7 +885,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                 _li.set( 'innerHTML', v.get( 'innerHTML' ) );
                 // update places
                 _ul.append( _li );
-            } );
+            }, this );
             // replace table for places
             this.placesNode.replace( _ul );
             this.placesNode = _ul;
@@ -909,7 +912,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                 // update table
                 _row.append( _cell );
                 _table.append( _row );
-            } );
+            }, this );
             // replace list
             this.placesNode.replace( _table );
             this.placesNode = _table;
@@ -1282,7 +1285,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
 
             // and refresh
             if ( _host.layoutDesignerTarget ) {
-                _host.layoutDesignerTarget.refresh();
+                _host.layoutDesignerTarget.refresh( this.getMaxWidth() );
             }
         },
 
@@ -1447,10 +1450,12 @@ YUI.add('bewype-layout-designer-target', function(Y) {
         _onClickRemove: function () {
 
             // temp vars
-            var _host       = this.get( 'host' ),
-                _parentNode = this.get( 'parentNode' ),
-                _placesType = _host.layoutDesignerPlaces.get( 'placesType' ),
-                _config     = null;
+            var _host         = this.get( 'host' ),
+                _parentNode   = this.get( 'parentNode' ),
+                _parentPlaces = _parentNode ? _parentNode.layoutDesignerPlaces : null,
+                _placesType   = _host.layoutDesignerPlaces.get( 'placesType' ),
+                _config       = null,
+                _forceWidth   = null;
             
             // destroy plugins
             _host.unplug( Y.Bewype.LayoutDesignerTarget );
@@ -1461,11 +1466,12 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             if ( _parentNode ) {
 
                 // unregister
-                _parentNode.layoutDesignerPlaces.unRegisterContent( _host );
+                _parentPlaces.unRegisterContent( _host );
                 // then remove dest node
                 _host.remove( true );
                 // do refresh after
-                _parentNode.layoutDesignerTarget.refresh();
+                _forceWidth = _parentPlaces.getMaxWidth();
+                _parentNode.layoutDesignerTarget.refresh( _forceWidth );
 
             } else {
 

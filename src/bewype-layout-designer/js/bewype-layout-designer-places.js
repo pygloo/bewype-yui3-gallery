@@ -611,7 +611,7 @@
 
             // and refresh
             if ( _host.layoutDesignerTarget ) {
-                _host.layoutDesignerTarget.refresh();
+                _host.layoutDesignerTarget.refresh( this.getMaxWidth() );
             }
         },
 
