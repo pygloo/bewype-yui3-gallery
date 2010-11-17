@@ -136,10 +136,12 @@ YUI.add('bewype-layout-designer-target', function(Y) {
             // temp vars
             var _host         = this.get( 'host' ),
                 _parentNode   = this.get( 'parentNode' ),
+                _targetType   = this.get( 'targetType' ),
                 _parentPlaces = _parentNode ? _parentNode.layoutDesignerPlaces : null,
                 _placesType   = _host.layoutDesignerPlaces.get( 'placesType' ),
-                _config       = null,
-                _forceWidth   = null;
+                _container    = null,
+                _forceWidth   = null,
+                _config       = null;
             
             // destroy plugins
             _host.unplug( Y.Bewype.LayoutDesignerTarget );
@@ -151,8 +153,23 @@ YUI.add('bewype-layout-designer-target', function(Y) {
 
                 // unregister
                 _parentPlaces.unRegisterContent( _host );
-                // then remove dest node
-                _host.remove( true );
+
+                switch( _targetType ) {
+    
+                    case 'horizontal':
+                        // get parent td
+                        _container = _host.ancestor( 'li' );
+                        break;
+
+                    case 'vertical':
+                        // get parent li
+                        _container = _host.ancestor( 'td' );
+                        break;
+                }
+
+                // remove container and all
+                _container.remove( true );
+
                 // do refresh after
                 _forceWidth = _parentPlaces.getMaxWidth();
                 _parentNode.layoutDesignerTarget.refresh( _forceWidth );

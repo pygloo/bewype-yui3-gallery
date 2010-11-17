@@ -60,6 +60,7 @@
                 _vTmpl           = LayoutDesignerPlaces.V_PLACES_TEMPLATE,
                 _placesTempl     = _placesType === 'horizontal' ? _hTmpl : _vTmpl,
                 _parentNode      = this.get( 'parentNode' ),
+                _tbody           = null,
                 _config          = null,
                 _placesChildren  = null,
                 _childType       = null;
@@ -95,13 +96,20 @@
                 if ( _placesType === 'horizontal' ) {
                     _placesChildren = this.placesNode.one( 'tr' ).get( 'children' );
                 } else {
-                    _placesChildren = this.placesNode.get( 'children' );
+                    // ...
+                    _tbody = this.placesNode.get( 'children' ).item( 0 );
+                    // just in case
+                    if ( _tbody.get( 'tagName' ).toLowerCase() !== 'tbody' ) {
+                        _tbody = this.placesNode;
+                    }
+                    _placesChildren =  _tbody.get( 'children' );
                 }
                 _placesChildren.each( function ( v, k ) {
                     // loop vars
                     var _cHost    = v.get( 'children' ).item( '0' ),
-                        _cContent = _cHost.get( 'children' ).item( '0' );
-
+                        _cContent = _cHost ? _cHost.get( 'children' ).item( '0' ) : null;
+                    // nothing to add
+                    if ( !_cHost ) { return; }
                     // mount
                     if ( _cContent.get( 'tagName' ).toLowerCase() === 'table' ) {
                         // ...
@@ -195,20 +203,28 @@
         _tableToUl : function () {
             // create ul
             var _ul            = Y.Node.create( '<ul />' ),
-                _designerClass = this.get( 'designerClass' );
+                _designerClass = this.get( 'designerClass' ),
+                _tbody         = this.placesNode.get( 'children' ).item( 0 );
+            // just in case
+            if ( _tbody.get( 'tagName' ).toLowerCase() !== 'tbody' ) {
+                _tbody = this.placesNode;
+            }
             // ...
             _ul.addClass( _designerClass + '-places' );
             _ul.addClass( _designerClass + '-places-vertical' );
-            _ul.addClass( _designerClass + '-places' + this.level );
-            // populate ul
-            this.placesNode.all( 'td.' + _designerClass + '-cell-vertical' ).each( function ( v, k ) {
-                var _li = Y.Node.create( '<li />' );
+            _ul.addClass( _designerClass + '-places-' + this.level );
+            // populate ul with tr's innerHTML
+            _tbody.get( 'children' ).each( function ( v, k ) {
+                var _li = Y.Node.create( '<li />' ),
+                    _td = v.one( 'td' );
                 // update class
                 _li.addClass( _designerClass + '-cell' );
                 _li.addClass( _designerClass + '-cell-vertical' );
                 _li.addClass( _designerClass + '-cell-' + this.level );
                 // set inner
-                _li.set( 'innerHTML', v.get( 'innerHTML' ) );
+                if ( _td ) {
+                    _li.set( 'innerHTML', _td.get( 'innerHTML' ) );
+                }
                 // update places
                 _ul.append( _li );
             }, this );
@@ -225,8 +241,8 @@
             _table.addClass( _designerClass + '-places' );
             _table.addClass( _designerClass + '-places-vertical' );
             _table.addClass( _designerClass + '-places-' + this.level );
-            // populate table
-            this.placesNode.all( 'li' ).each( function ( v, k ) {
+            // populate table with tr's innerHTML
+            this.placesNode.get( 'children' ).each( function ( v, k ) {
                 var _row = Y.Node.create( '<tr />' ),
                     _cell = Y.Node.create( '<td />' );
                 // update class

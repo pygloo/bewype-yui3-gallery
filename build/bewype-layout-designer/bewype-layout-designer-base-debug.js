@@ -129,13 +129,21 @@ YUI.add('bewype-layout-designer-base', function(Y) {
                 // udpate parent node propertie
                 _contentNode.layoutDesignerContent.set( 'parentNode', _dropNode );
 
-                // refresh new parent
+                // refresh dropNode places
                 _forceWidth  = _dropNode.layoutDesignerPlaces.getMaxWidth();
-
-                // refresh updated places
                 _dropNode.layoutDesignerTarget.refresh( _forceWidth );
-                _parentHost.layoutDesignerTarget.refresh();
+
+                // refresh parent host places
+                _forceWidth  = _parentHost.layoutDesignerPlaces.getMaxWidth();
+                _parentHost.layoutDesignerTarget.refresh( _forceWidth );
             }
+
+            // remove dummies ??
+            this.nodeLayout.all( '.yui3-dd-draggable' ).each( function ( v, k ) {
+                if ( v.getStyle( 'visibility' ) === 'hidden' ) {
+                    v.remove();
+                }
+            } );
         },
 
         /**
