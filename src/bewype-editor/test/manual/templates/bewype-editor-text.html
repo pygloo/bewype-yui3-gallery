@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
+    <head> 
+        {% block head %}
+        <title>Manual Test - Editor Tag</title>
+        <script type="text/javascript" src="static/ybuild/yui/yui.js"></script>    
+        {% endblock %}
+    </head> 
+    <body> 
+        <div id="panel"></div>
+
+        <br />
+        <br />
+        <br />
+
+        <div id="content" style="border: 1px solid black; font-family: arial, sans-serif; font-size: medium; margin: 0; padding: 0; height: 120px; width: 240px;">This is a <b>test</b> ... <i>and</i> another <a href="">cool</a>!</div>
+        <a id="attach">Attach</a> | <a id="detach">Detach</a>
+
+        <script type="text/javascript">
+        <!--
+            YUI( { filter: 'debug' } ).use( 'bewype-editor-text', function ( Y ) {
+
+                var _content   = Y.one( "#content" ),
+                    _panelNode = Y.one( "#panel"   );
+
+                // attach event
+                Y.on( 'click',
+                    function( e ) {
+                        if ( !_content.bewypeEditorText ) {
+                            _content.plug( Y.Bewype.EditorText, {
+                                panelNode     : _panelNode,
+                                activeButtons : [
+                                            'height',
+                                            'width',
+                                            'bold',
+                                            'italic',
+                                            'underline',
+                                            'title',
+                                            'font-family',
+                                            'font-size',
+                                            'text-align',
+                                            'color',
+                                            'background-color',
+                                            'file',
+                                            'reset',
+                                            'apply'
+                                            ]
+                            } );
+                        }
+                    },
+                    Y.one( "#attach" )
+                );
+
+                // detach event
+                Y.on( 'click',
+                    function( e ) {
+                        if ( _content.bewypeEditorText ) {
+                            _panelNode.unplug( Y.Bewype.EditorPanel );
+                        }
+                    },
+                    Y.one( "#detach" )
+                );
+            } );
+        -->
+        </script>
+    </body> 
+</html>
