@@ -11,17 +11,13 @@ YUI.add('bewype-picker-base', function(Y) {
         /**
          *
          */
-        PICKER_TMPL += '<div class="{pickerClass}"><table>';
-        PICKER_TMPL += '</table></div>';
+        PICKER_TMPL += '<div class="{pickerClass}"><table><tbody>';
+        PICKER_TMPL += '</tbody></table></div>';
 
         /**
          *
          */
-        ITEM_TMPL += '<tr>';
-        ITEM_TMPL += '  <td>';
-        ITEM_TMPL += '    <div id="{itemId}" class="{itemClass}" {style}>{text}</div>';
-        ITEM_TMPL += '  </td>';
-        ITEM_TMPL += '</tr>';
+        ITEM_TMPL += '<div id="{itemId}" class="{itemClass}" {style}>{text}</div>';
 
     Picker = function(config) {
         Picker.superclass.constructor.apply( this, arguments );
@@ -89,7 +85,7 @@ YUI.add('bewype-picker-base', function(Y) {
                 _pickerNode  = null;
 
             // create table
-            _pickerNode = new Y.Node.create(
+            _pickerNode = Y.Node.create(
                 Y.substitute( PICKER_TMPL, {
                     pickerClass : _pickerClass
                 } )
@@ -187,12 +183,18 @@ YUI.add('bewype-picker-base', function(Y) {
                 _pClass      = this.get( 'pickerClass' ),
                 _pickerClass = _pClass + '-row',
                 _pickerNode  = _contentBox.one( '.' + _pClass ),
+                _tbody       = _pickerNode.one('tbody'),
+                _tr          = null,
+                _td          = null,
                 _itemNode    = null; 
 
             // little check
             if ( _pickerNode ) {
+                // prepare tr
+                _tr = Y.Node.create( '<tr />' );
+                _td = Y.Node.create( '<td />' );
                 // create row
-                _itemNode = new Y.Node.create(
+                _itemNode = Y.Node.create(
                     Y.substitute( ITEM_TMPL, {
                         itemId    : _pickerClass + '-' + name,
                         itemClass : active ? _pickerClass + '-active' : _pickerClass,
@@ -201,7 +203,9 @@ YUI.add('bewype-picker-base', function(Y) {
                     } )
                 );
                 // do add
-                _pickerNode.one('table').append( _itemNode );
+                _tbody.append( _tr );
+                _tr.append( _td );
+                _td.append( _itemNode );
 
                 // add on click event
                 Y.on( 'yui3-picker-event|click', Y.bind( this._onItemClick, this, name ), _itemNode );

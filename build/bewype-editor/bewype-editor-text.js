@@ -134,14 +134,6 @@ YUI.add('bewype-editor-text', function(Y) {
                 // ensure nice rendering
                 var _t = _host.one( v ) || _inst.one( v );
                 _t.setStyle( 'cssText', 'padding: 0px; margin: 0px; height: 100%; width: 100%;');
-
-                // specific for chrome
-                /*
-                if ( Y.UA.chrome && v === 'iframe' ) {
-                    _t.setStyle( 'margin-top', '-15px' );
-                }
-                */
-
             } );
 
             // separate place and content style
@@ -426,17 +418,21 @@ YUI.add('bewype-editor-text', function(Y) {
         _insertNodeToSelection : function ( node ) {
 
             var _host      = this.get( 'host' ),
+                _inst      = this._editor.getInstance(),
+                _body      = _inst.one( 'body' ),
                 _window    = Y.Bewype.Utils.getWindow( _host ),
                 _document  = Y.Bewype.Utils.getDocument( _host ),
                 _selection = null, 
                 _range     = null;
             
-            if ( _window._node.getSelection ) { // Firefox, Google Chrome ??? , Safari, Opera
+            if ( _window._node.getSelection ) { // Firefox, Google Chrome, Safari, Opera
                 // ...
                 _selection = _window._node.getSelection();
                 // ...
                 if (_selection.rangeCount > 0) {
                     _range = _selection.getRangeAt (0);
+                    //
+                    _body.append( node );
                     _range.insertNode ( node._node );
                 }
             } else {  // Internet Explorer

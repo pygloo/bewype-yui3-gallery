@@ -416,17 +416,21 @@
         _insertNodeToSelection : function ( node ) {
 
             var _host      = this.get( 'host' ),
+                _inst      = this._editor.getInstance(),
+                _body      = _inst.one( 'body' ),
                 _window    = Y.Bewype.Utils.getWindow( _host ),
                 _document  = Y.Bewype.Utils.getDocument( _host ),
                 _selection = null, 
                 _range     = null;
             
-            if ( _window._node.getSelection ) { // Firefox, Google Chrome ??? , Safari, Opera
+            if ( _window._node.getSelection ) { // Firefox, Google Chrome, Safari, Opera
                 // ...
                 _selection = _window._node.getSelection();
                 // ...
                 if (_selection.rangeCount > 0) {
                     _range = _selection.getRangeAt (0);
+                    //
+                    _body.append( node );
                     _range.insertNode ( node._node );
                 }
             } else {  // Internet Explorer
