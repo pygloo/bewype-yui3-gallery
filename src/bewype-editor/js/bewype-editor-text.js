@@ -132,12 +132,6 @@
                 // ensure nice rendering
                 var _t = _host.one( v ) || _inst.one( v );
                 _t.setStyle( 'cssText', 'padding: 0px; margin: 0px; height: 100%; width: 100%;');
-
-                // specific for chrome
-                if ( Y.UA.chrome && v === 'iframe' ) {
-                    _t.setStyle( 'margin-top', '-15px' );
-                }
-
             } );
 
             // separate place and content style

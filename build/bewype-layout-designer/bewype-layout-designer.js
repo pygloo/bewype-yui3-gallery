@@ -114,6 +114,7 @@ YUI.add('bewype-layout-designer-config', function(Y) {
                     'color',
                     'background-color',
                     'url',
+                    'file',
                     'reset',
                     'apply'
                     ]

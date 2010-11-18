@@ -112,6 +112,7 @@
                     'color',
                     'background-color',
                     'url',
+                    'file',
                     'reset',
                     'apply'
                     ]
