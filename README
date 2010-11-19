@@ -1,3 +1,1 @@
-push master to gh_pages automaticaly
-----
-git config --add remote.origin.push +refs/heads/master:refs/heads/gh-pages
+
