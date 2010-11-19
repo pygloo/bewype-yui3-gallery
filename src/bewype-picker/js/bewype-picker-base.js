@@ -198,7 +198,7 @@
                         style     : style ? 'style="' + style + '"' : ''
                     } )
                 );
-                // do add
+                // do add // won't work with chrome http://yuilibrary.com/projects/yui3/ticket/2529368 :(
                 _pickerNode.one('table').append( _itemNode );
 
                 // add on click event

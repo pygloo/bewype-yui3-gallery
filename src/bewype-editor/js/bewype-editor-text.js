@@ -3,6 +3,7 @@
      *
      */
     var PLACE_TMPL   = '',
+        IMAGE_TMPL   = '',
         EditorText   = null;
 
     /**
@@ -10,6 +11,11 @@
      */
     PLACE_TMPL += '<div class="{editorClass}-place">';
     PLACE_TMPL += '</div>';
+
+    /**
+     *
+     */
+    IMAGE_TMPL += '<img src="{filePath}" />';
 
     /**
      *
@@ -51,11 +57,12 @@
             var _host        = this.get( 'host'        ),
                 _editorClass = this.get( 'editorClass' ),
                 _cssDict     = Y.Bewype.Utils.getCssDict( _host ),
-                _placeNode   = null,
-                _main        = new Y.Node.create( '<div><div class="main" /></div>' );
+                _innerHTML   = _host.get( 'innerHTML' ),
+                _placeNode   = null;
+                // _main        = new Y.Node.create( '<div><div class="main" /></div>' );
 
             // set content to main
-            _main.one( '.main' ).append( this.getInnerHTML( _host ) );
+            // _main.one( '.main' ).append( this.getInnerHTML( _host ) );
             
             // and empty tag content temporary
             _host.set( 'innerHTML', '' );
@@ -71,7 +78,7 @@
 
             // Create the Base Editor
             this._editor = new Y.EditorBase( {
-                content : _main.get( 'innerHTML' )
+                content : _innerHTML // _main.get( 'innerHTML' )
             } );
 
             // Rendering the Editor
@@ -90,13 +97,10 @@
             var _host          = this.get( 'host' ),
                 _placeClass    = this.get( 'editorClass' ) + '-place',
                 _placeNode     = _host.one( '.' + _placeClass ),
-                _body          = this._editor.getInstance().one( 'body' ),
-                _main          = _body.one( '.main' ),
+                _inst          = this._editor.getInstance(),
+                _body          = _inst.one( 'body' ),
                 _fn            = null,
                 _spinnerValues = {};
-
-            // ensure nice body
-            _body.setStyle( 'cssText', 'padding: 0; margin: 0; height: 100%; width: 100%;');
 
             _fn = function ( key, val ) {
 
@@ -113,7 +117,7 @@
                     _spinnerValues[ key ] = val;
                 } else if ( key ) {
                     // style for the edited content
-                    _main.setStyle( Y.Bewype.Utils.camelize( key ), val );
+                    _body.setStyle( Y.Bewype.Utils.camelize( key ), val );
                 }
 
                 // return something to continue
@@ -123,8 +127,12 @@
             // ensure height width
             this._oMainCssdict.height = '100%';
             this._oMainCssdict.width  = '100%';
-            _main.setStyle( 'height', '100%' );
-            _main.setStyle( 'width' , '100%' );
+
+            Y.each( [ 'iframe', 'html', 'body' ] , function ( v, k ) {
+                // ensure nice rendering
+                var _t = _host.one( v ) || _inst.one( v );
+                _t.setStyle( 'cssText', 'padding: 0px; margin: 0px; height: 100%; width: 100%;');
+            } );
 
             // separate place and content style
             Y.JSON.stringify( cssDict, Y.bind( _fn, this ) );
@@ -163,8 +171,8 @@
                 _placeClass    = '.' + _editorClass + '-place',
                 _placeNode     = _host.one( _placeClass  ),
                 _body          = this._editor.getInstance().one( 'body' ),
-                _main          = _body.one( '.main' ),
-                _selectionNode = _main.one( '.selection' ),
+                // _main          = _body.one( '.main' ),
+                _selectionNode = _body.one( '.selection' ),
                 _fn            = null;
 
             // hide first
@@ -176,7 +184,7 @@
             }
 
             // restore content
-            _host.set( 'innerHTML', _main.get( 'innerHTML' ) );
+            _host.set( 'innerHTML', _body.get( 'innerHTML' ) );
 
             // css spliter
             _fn = function ( type_, key, val ) {
@@ -193,7 +201,7 @@
             };
             // separate place and content style
             Y.JSON.stringify( Y.Bewype.Utils.getCssDict( _placeNode ), Y.bind( _fn, this, 'place'   ) );
-            Y.JSON.stringify( Y.Bewype.Utils.getCssDict( _main      ), Y.bind( _fn, this, 'content' ) );
+            Y.JSON.stringify( Y.Bewype.Utils.getCssDict( _body      ), Y.bind( _fn, this, 'content' ) );
 
             // destroy editor
             this._editor.destroy();
@@ -216,7 +224,7 @@
                 _node = _host.one( '.' + this.get( 'editorClass' ) + '-place' );
             } else {
                 // get content node
-                _node = this._editor.getInstance().one( '.main' );
+                _node = this._editor.getInstance().one( 'body' ); // .one( '.main' );
             }
 
             // do update
@@ -235,16 +243,16 @@
 
             if ( removeSelectionNode !== false ) {
                 var _inst = this._editor.getInstance(),
-                    _main = _inst.one( 'body' ).one( '.main' );
+                    _body = _inst.one( 'body' ); // _main = _inst.one( 'body' ).one( '.main' );
 
-                this.removeTagOrStyle( _main, '.selection' );
+                this.removeTagOrStyle( _body, '.selection' );
             }
         },
 
         _isFocusNodeFisrt : function ( selection ) {
 
             var _inst             = this._editor.getInstance(),
-                _mNode            = _inst.one( 'body' ).one( '.main' )._node,
+                _mNode            = _inst.one( 'body' )._node, // .one( '.main' )
                 _aNode            = selection.anchorNode,
                 _fNode            = selection.focusNode,
                 _aOffset          = selection.anchorOffset,
@@ -273,13 +281,14 @@
         _ensureRangeFirstNode : function ( selection, range, firstNode ) {
 
             var _inst = this._editor.getInstance(),
-                _main     = _inst.one( 'body' ).one( '.main' ),
-                _mainNode = _main._node,
-                _cK       = 0;
+                // _main     = _inst.one( 'body' ).one( '.main' ),
+                _mNode    = _inst.one( 'body' )._node,
+                _cK       = 0,
+                _err      = null;
 
-            if ( firstNode.parentNode != _mainNode ) {
+            if ( firstNode.parentNode != _mNode ) {
                 try {
-                    while ( firstNode.parentNode && firstNode.parentNode != _mainNode ) {
+                    while ( firstNode.parentNode && firstNode.parentNode != _mNode ) {
                         firstNode = firstNode.parentNode;
                         // manage endless case :s
                         _cK += 1;
@@ -289,24 +298,26 @@
                     }
                     range.setStartBefore( firstNode );
                 } catch ( err ) {
+                    _err = err;
                     return this._clearSelection( selection, range );
                 }
             } else if ( selection.anchorOffset === 0 && !selection.anchorNode.previousSibling ) {
-                range.setStart( _mainNode, 0 );
+                range.setStart( _mNode, 0 );
             }
             return true;
         },
 
         _ensureRangeLastNode : function ( selection, range, lastNode ) {
 
-            var _inst     = this._editor.getInstance(),
-                _main     = _inst.one( 'body' ).one( '.main' ),
-                _mainNode = _main._node,
-                _cK       = 0;
+            var _inst   = this._editor.getInstance(),
+                // _main     = _inst.one( 'body' ).one( '.main' ),
+                _mNode  = _inst.one( 'body' )._node,
+                _cK     = 0,
+                _err    = null;
 
-            if ( lastNode.parentNode != _mainNode ) {
+            if ( lastNode.parentNode != _mNode ) {
                 try {
-                    while ( lastNode.parentNode && lastNode.parentNode != _mainNode ) {
+                    while ( lastNode.parentNode && lastNode.parentNode != _mNode ) {
                         lastNode = lastNode.parentNode;
                         // manage endless case :s
                         _cK += 1;
@@ -316,6 +327,7 @@
                     }
                     range.setEndAfter( lastNode );
                 } catch ( err ) {
+                    _err = err;
                     return this._clearSelection( selection, range );
                 }
             }
@@ -341,8 +353,8 @@
             var _host          = this.get( 'host' ),
                 _inst          = this._editor.getInstance(),
                 _body          = _inst.one( 'body'  ),
-                _main          = _body.one( '.main' ),
-                _selectionNode = _main.one( '.selection' ),
+                // _main          = _body.one( '.main' ),
+                _selectionNode = _body.one( '.selection' ),
                 _selection     = Y.Bewype.Utils.getSelection( _host ),
                 _range         = Y.Bewype.Utils.getRange( _selection ),
                 _firstNode     = null,
@@ -379,9 +391,9 @@
                 try {
                     // create new surrounding node                             
                     _selectionNode = Y.Node.create( '<span class="selection"></span>' );
-                    _main.append( _selectionNode );
+                    _body.append( _selectionNode );
                     // set range surrounding node
-                    _range.surroundContents( _main.one( '.selection' )._node );
+                    _range.surroundContents( _body.one( '.selection' )._node );
                 } catch ( err ) {
                     // Oops! clear all
                     return this._clearSelection( _selection, _range );
@@ -391,7 +403,7 @@
                 this._clearSelection( _selection, _range, false );
 
             } else {
-                this.removeTagOrStyle( _main, '.selection' );
+                this.removeTagOrStyle( _body, '.selection' );
             }
 
             // update button status
@@ -401,11 +413,39 @@
             this._refreshSelectionNode();
         },
 
+        _insertNodeToSelection : function ( node ) {
+
+            var _host      = this.get( 'host' ),
+                _inst      = this._editor.getInstance(),
+                _body      = _inst.one( 'body' ),
+                _window    = Y.Bewype.Utils.getWindow( _host ),
+                _document  = Y.Bewype.Utils.getDocument( _host ),
+                _selection = null, 
+                _range     = null;
+            
+            if ( _window._node.getSelection ) { // Firefox, Google Chrome, Safari, Opera
+                // ...
+                _selection = _window._node.getSelection();
+                // ...
+                if (_selection.rangeCount > 0) {
+                    _range = _selection.getRangeAt (0);
+                    //
+                    _body.append( node );
+                    _range.insertNode ( node._node );
+                }
+            } else {  // Internet Explorer
+                // ...
+                _range = _document._node.selection.createRange();
+                _range.collapse (true);
+                _range.pasteHTML ( node._node );
+            }
+        },
+
         _onEditorChange : function ( e ) {
             //
-            if ( e.changedEvent.type == 'dblclick' ) {
+            if ( e.changedEvent.type === 'dblclick' ) {
 
-            } else if ( e.changedEvent.type == 'mouseup' ) {
+            } else if ( e.changedEvent.type === 'mouseup' ) {
                 this._updateSelection();
             }
         },
@@ -423,57 +463,62 @@
 
             var _inst          = this._editor.getInstance(),
                 _body          = _inst.one( 'body'  ),
-                _main          = _body.one( '.main' ),
-                _selectionNode = _main.one( '.selection' ),
+                // _main          = _body.one( '.main' ),
+                _selectionNode = _body.one( '.selection' ),
                 _button        = this._panel.getButton( name ),
                 _value         = _button ? _button.getValue() : null,
+                _img           = null,
                 _tag           = null,
                 _tagNode       = null,
-                _newNode       = null;             
+                _newNode       = null,
+                _caretNode     = null;
 
             if ( !_selectionNode ) {
 
                 if ( this._panel.isCssButton( name ) ) {
-
                     // style update
                     this.updateStyle( name );
+                    // fire custom event
+                    return true;
 
+                }  else if ( name === 'file' ) {
+                    // ...
+                    _img = Y.Node.create( Y.substitute( IMAGE_TMPL, {
+                            filePath : this.get( 'fileStaticPath' ) + _value
+                        } )
+                    );
+                    // ...
+                    this._insertNodeToSelection( _img );
                     // fire custom event
                     return true;
 
                 } else if ( name === 'reset') {
-
                     // reset main node
-                    this.resetStyle( _main );
-
+                    this.resetStyle( _body );
                     // restore original values and quit
-                    Y.Bewype.Utils.setCssDict( _main, this._oMainCssdict );
-
+                    Y.Bewype.Utils.setCssDict( _body, this._oMainCssdict );
                     // fire custom event
                     return true;
                 }
-
+            } else if ( name === 'file' ) {
+                // pass
             } else {
                 // get previous tag
                 _tag = this._panel.getWorkingTagName( name, true );
-
                 // do some cleaning
                 if ( _tag ) {
                     this.removeTagOrStyle( _selectionNode, _tag, name );
                 }
-                
                 // current tag
                 _tag = this._panel.getWorkingTagName( name );
-
+                // ...
                 if ( _value && ( _value === true || _value.trim() !== '' ) ) {
-
                     // create tag node
                     if ( name === 'url' ) {
                         _tagNode = Y.Node.create( '<a href="' + _value + '"></a>' );
                     } else {
                         _tagNode = Y.Node.create( '<' + _tag + '></' + _tag + '>' );
                     }
-
                     // update with css property
                     if ( this._panel.isCssButton( name ) ) {
                         _tagNode.setStyle( Y.Bewype.Utils.camelize( name ), _value);
@@ -481,32 +526,26 @@
                             _tagNode.setStyle( 'display', 'inline-block' );
                         }
                     }
-
                     // create surrounding node
                     _newNode = Y.Node.create( '<span class="selection"></span>' );
                     _newNode.append( _tagNode );
                     //
                     _newNode.one( _tag ).append( this.getInnerHTML( _selectionNode ) );
-
                     // update current selection
                     _selectionNode.replace(_newNode);
 
                 } else if ( name === 'reset' ) {
-                    
                     // do reset
                     this.resetStyle( _selectionNode, true );
-
                     // refresh buttons
                     this._panel.refreshButtons( _selectionNode, true );
                 }
 
                 // custom rendering
                 this._refreshSelectionNode();
-
                 // fire custom event
                 return true;
             }
-
             // default
             return false;
         },

@@ -237,7 +237,6 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         "submodules": {
             "bewype-layout-designer-base": {
                 "requires": [
-                    "bewype-layout-designer-sources", 
                     "bewype-layout-designer-target"
                 ], 
                 "skinnable": true
@@ -247,25 +246,12 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
                     "plugin"
                 ]
             }, 
-            "bewype-layout-designer-content-base": {
+            "bewype-layout-designer-content": {
                 "requires": [
                     "substitute", 
                     "async-queue", 
+                    "bewype-editor", 
                     "bewype-layout-designer-config"
-                ], 
-                "skinnable": true
-            }, 
-            "bewype-layout-designer-content-image": {
-                "requires": [
-                    "bewype-layout-designer-content-base", 
-                    "bewype-editor"
-                ], 
-                "skinnable": true
-            }, 
-            "bewype-layout-designer-content-text": {
-                "requires": [
-                    "bewype-layout-designer-content-base", 
-                    "bewype-editor"
                 ], 
                 "skinnable": true
             }, 
@@ -273,15 +259,7 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
                 "requires": [
                     "sortable", 
                     "dd-constrain", 
-                    "bewype-layout-designer-content-text"
-                ], 
-                "skinnable": true
-            }, 
-            "bewype-layout-designer-sources": {
-                "requires": [
-                    "dd", 
-                    "substitute", 
-                    "bewype-layout-designer-config"
+                    "bewype-layout-designer-content"
                 ], 
                 "skinnable": true
             }, 
@@ -1659,4 +1637,4 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         }
     }
 };
-YUI.Env[Y.version].md5 = '18d9bbdb4267037bee07eff9d2af6181';
+YUI.Env[Y.version].md5 = 'e5dc52176dd2d67b69830a01d3c45f54';

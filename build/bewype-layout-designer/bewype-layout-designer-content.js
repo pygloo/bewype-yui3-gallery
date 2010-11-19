@@ -37,11 +37,6 @@ YUI.add('bewype-layout-designer-content', function(Y) {
         /**
          *
          */
-        editing : false,
-
-        /**
-         *
-         */
         initializer : function( config ) {
             // ??
             this.setAttrs( config );
@@ -51,24 +46,22 @@ YUI.add('bewype-layout-designer-content', function(Y) {
                 _parentNode    = this.get( 'parentNode' ),
                 _contentType   = this.get( 'contentType' ),
                 _designerClass = this.get( 'designerClass' ),
-                _contentNode   = null,
-                _template      = _contentType === 'text' ? LayoutDesignerContent.C_TEXT_TEMPLATE: LayoutDesignerContent.C_IMG_TEMPLATE;
+                _contentNode   = _contentType === 'text' ? _host.one( 'div' ) : _host.one( 'img' ),
+                _template      = _contentType === 'text' ? LayoutDesignerContent.C_TEXT_TEMPLATE : LayoutDesignerContent.C_IMG_TEMPLATE;
 
-            // add dest node
-            _contentNode = new Y.Node.create( Y.substitute( _template, {
-                designerClass  : _designerClass,
-                contentType    : _contentType,
-                defaultContent : _contentType === 'text' ?  this.get( 'defaultText' ) : this.get( 'defaultImg' )
-            } ) ); // create content node
-            // dom add
-            _host.append( _contentNode );
-        
-            // common default height
-            _contentNode.setStyle( 'height', this.get( 'contentHeight' ) );
-            _contentNode.setStyle( 'width',  this.get( 'contentWidth'  ) );
-
-            // register it
-            _parentNode.layoutDesignerPlaces.registerContent( _host );
+            if ( !_contentNode ) {
+                // add dest node
+                _contentNode = new Y.Node.create( Y.substitute( _template, {
+                    designerClass  : _designerClass,
+                    contentType    : _contentType,
+                    defaultContent : _contentType === 'text' ?  this.get( 'defaultText' ) : this.get( 'defaultImg' )
+                } ) ); // create content node
+                // dom add
+                _host.append( _contentNode );
+                // common default height
+                _contentNode.setStyle( 'height', this.get( 'contentHeight' ) );
+                _contentNode.setStyle( 'width',  this.get( 'contentWidth'  ) );
+            }
 
             // add clone
             this._addCloneNode();
@@ -81,22 +74,8 @@ YUI.add('bewype-layout-designer-content', function(Y) {
 
             // temp var
             var _host            = this.get( 'host'          ),
-                _parentNode      = this.get( 'parentNode'    ),
                 _contentClass    = this.get( 'designerClass' ) + '-content',
-                _contentSelector = this.get( 'contentType' ) === 'image' ? 'img.' : 'div.',
-                _contentNode     = _host.one( _contentSelector + _contentClass ),
-                _cloneNode       = _host.one( 'div.' + _contentClass + '-clone' );
-            
-            // detach editor
-            if ( this.editing === true ) {
-                this._detachEditor();
-            }
-                    
-            // unregister it
-            _parentNode.layoutDesignerPlaces.unRegisterContent( _host );
-
-            // clean events
-            _host.detachAll( 'mouseenter' );
+                _cloneNode       = _host.one( '.' + _contentClass + '-clone' );
 
             // and remove the clone
             if ( _cloneNode ) {
@@ -106,9 +85,6 @@ YUI.add('bewype-layout-designer-content', function(Y) {
                 // remove clone node
                 _cloneNode.remove();
             }
-
-            // replace host
-            _host.replace( _contentNode );
         },
 
         /**
@@ -119,16 +95,11 @@ YUI.add('bewype-layout-designer-content', function(Y) {
             // temp var
             var _host            = this.get( 'host' ),
                 _bNode           = this.get( 'baseNode'      ),
-                _sourcesClass    = this.get( 'designerClass' ) + '-sources',
                 _editPanClass    = this.get( 'designerClass' ) + '-edit-panel',
-                _sourcesNode     = _bNode.one( 'div.' + _sourcesClass ),
                 _editPanNode     = _bNode.one( 'div.' + _editPanClass ),
                 _editorObj       = this.get( 'contentType' ) === 'image' ? Y.Bewype.EditorTag : Y.Bewype.EditorText,
                 _contentNode     = this.getContentNode(),
                 _cloneNode       = this.getCloneNode();
-
-            // set editing flag to false
-            this.editing = false;
 
             if ( _editPanNode && _editPanNode.bewypeEditorPanel ) {
 
@@ -144,14 +115,15 @@ YUI.add('bewype-layout-designer-content', function(Y) {
                 this.refresh();
             }
                 
-            // show sources and clone
+            // hide edit panel
             if ( _editPanNode ) {
-                _editPanNode.setStyle( 'display', 'none'  );
+                _editPanNode.setStyle( 'display', 'none' );
             }
-            if ( _sourcesNode ) {
-                _sourcesNode.setStyle( 'display', 'block' );
+
+            // show clone
+            if ( _cloneNode ) {
                 _cloneNode.setStyle( 'display', 'block' );
-            }                
+            }
 
             // refresh clone
             this._refreshCloneNode();
@@ -165,12 +137,9 @@ YUI.add('bewype-layout-designer-content', function(Y) {
         _attachEditor : function () {
 
             //
-            var _host            = this.get( 'host'          ),
-                _bNode           = this.get( 'baseNode'      ),
+            var _bNode           = this.get( 'baseNode'      ),
                 _pNode           = this.get( 'parentNode'    ),
-                _sourcesClass    = this.get( 'designerClass' ) + '-sources',
                 _editPanClass    = this.get( 'designerClass' ) + '-edit-panel',
-                _sourcesNode     = _bNode.one( 'div.' + _sourcesClass ),
                 _editPanNode     = _bNode.one( 'div.' + _editPanClass ),
                 _pl              = _pNode.layoutDesignerPlaces,
                 _placesType      = _pl.get( 'placesType' ),
@@ -185,7 +154,6 @@ YUI.add('bewype-layout-designer-content', function(Y) {
 
             // hide sources and clone
             _cloneNode.setStyle(   'display', 'none'  );
-            _sourcesNode.setStyle( 'display', 'none'  );
             _editPanNode.setStyle( 'display', 'block' );
 
             // compute max width
@@ -212,9 +180,6 @@ YUI.add('bewype-layout-designer-content', function(Y) {
 
             // set on change event
             Y.on( 'bewype-editor:onChange', Y.bind( this.refresh, this ), _contentNode );
-
-            // set editing flag to false
-            this.editing = true;
         },
 
         /**

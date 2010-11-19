@@ -4,9 +4,15 @@ YUI.add('bewype-button-toggle', function(Y) {
     /**
      *
      */
-    var ButtonToggle = function(config) {
+    var CHECK_TMPL = '',
+        ButtonToggle = function(config) {
         ButtonToggle.superclass.constructor.apply( this, arguments );
     };
+
+    /**
+     *
+     */
+    CHECK_TMPL += '<input type="checkbox" class="{buttonClass}-checkbox" />';
 
     /**
      */
@@ -70,6 +76,26 @@ YUI.add('bewype-button-toggle', function(Y) {
 
             // render default
             this._renderBaseUI();
+
+            // append checkbox
+            var _contentBox  = this.get( 'contentBox'  ),
+                _buttonClass = this.get( 'buttonClass' ),
+                _buttonNode  = _contentBox.one( '.' + _buttonClass ),
+                _labelNode   = _contentBox.one( '.' + _buttonClass + '-label' ),
+                _checkNode   = null;
+            
+            // create check box
+            _checkNode = Y.Node.create(
+                Y.substitute( CHECK_TMPL, {
+                    buttonClass : _buttonClass
+                } )
+            );
+                   
+            // insert checkbox
+            _buttonNode.insertBefore( _checkNode, _labelNode );
+            
+            // set handler
+            // _checkNode.on( 'yui3-button-event|click' , Y.bind( this._onClick, this ) );
         },
 
         refresh : function ( buttonNode ) {
@@ -92,13 +118,18 @@ YUI.add('bewype-button-toggle', function(Y) {
 
             // vars
             var _contentBox  = this.get( 'contentBox'  ),
-                _buttonNode  = _contentBox.one( 'div' );
+                _buttonClass = this.get( 'buttonClass' ),
+                _buttonNode  = _contentBox.one( 'div' ),
+                _checkNode   = _contentBox.one( '.' + _buttonClass + '-checkbox' );
 
             // little check
             if (_buttonNode) {
                 
                 // update state
                 this._toggleState = !this._toggleState;
+
+                // ensure checkbox state
+                _checkNode.set( 'checked', this._toggleState );
 
                 // refresh
                 this.refresh( _buttonNode );

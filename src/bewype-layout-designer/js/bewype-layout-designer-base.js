@@ -9,11 +9,6 @@
     /**
      *
      */
-    LayoutDesigner.NODE_SRC_TEMPLATE = '<div class="{designerClass}-sources"></div>';
-
-    /**
-     *
-     */
     LayoutDesigner.NODE_PAN_TEMPLATE = '<div class="{designerClass}-edit-panel"></div>';
 
     /**
@@ -43,19 +38,30 @@
 
             // tmp vars
             var _host          = this.get( 'host' ),
-                _nodeSrc       = null,
                 _nodePan       = null,
                 _designerClass = this.get( 'designerClass' ),
                 _layoutWidth   = this.get( 'layoutWidth' );
 
-            // create source node
-            _nodeSrc = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_SRC_TEMPLATE, {
-                designerClass : _designerClass
-            } ) );
-            // attach src parent to widget
-            _host.append( _nodeSrc );
-            // plug source bar
-            _nodeSrc.plug( Y.Bewype.LayoutDesignerSources, config );
+            this.nodeLayout = _host.one( 'div.' + _designerClass + '-layout' );
+
+            if ( !this.nodeLayout ) {
+                // create dest layout
+                this.nodeLayout = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_LAYOUT_TEMPLATE, {
+                    designerClass : _designerClass
+                } ) );
+                // attach layout node to main node
+                _host.append( this.nodeLayout );
+                //
+                this.nodeLayout.setStyle( 'width', _layoutWidth );
+            }
+
+            config.baseNode   = _host;
+            config.targetType = this.get( 'startingTargetType' );
+            // plug target
+            this.nodeLayout.plug( Y.Bewype.LayoutDesignerTarget, config );
+
+            // refresh at start
+            this.nodeLayout.layoutDesignerTarget.refresh();
 
             // create edit panel node
             _nodePan = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_PAN_TEMPLATE, {
@@ -63,25 +69,6 @@
             } ) );
             // attach src parent to widget
             _host.append( _nodePan );
-
-            // create dest layout
-            this.nodeLayout = new Y.Node.create( Y.substitute( LayoutDesigner.NODE_LAYOUT_TEMPLATE, {
-                designerClass : _designerClass
-            } ) );
-            // attach layout node to main node
-            _host.append( this.nodeLayout );
-            //
-            this.nodeLayout.setStyle( 'width', _layoutWidth );
-
-            config.baseNode   = _host;
-            config.targetType = this.get( 'startingTargetType' );
-            // plug places
-            this.nodeLayout.plug( Y.Bewype.LayoutDesignerPlaces, config );
-            // plug target
-            this.nodeLayout.plug( Y.Bewype.LayoutDesignerTarget, config );
-
-            // refresh at start
-            this.nodeLayout.layoutDesignerTarget.refresh();
 
             // ... 
             // Y.DD.DDM.on( 'drop:enter', Y.bind( this._dropHitGotcha, this ) ); // need some cleaning and enhancement ....
@@ -95,23 +82,13 @@
 
             var _host          = this.get( 'host' ),
                 _designerClass = this.get( 'designerClass' ),
-                _srcNode       = _host.one( '.' + _designerClass + '-sources' ),
-                _panNode       = _host.one( '.' + _designerClass + '-edit-panel' ),
-                _tableOrUl     = this.nodeLayout.one( 'table' ) || this.nodeLayout.one( 'ul' );
-
-            // remove our designer specific nodes
-            _srcNode.remove();
-            _panNode.remove();
+                _panNode       = _host.one( '.' + _designerClass + '-edit-panel' );
 
             // unplug all
             this.nodeLayout.unplug( Y.Bewype.LayoutDesignerTarget );
 
-            // move layout table to top
-            if ( _tableOrUl ) {
-                this.nodeLayout.replace( _tableOrUl );
-            } else {
-                this.nodeLayout.remove();
-            }
+            // remove our designer specific nodes
+            _panNode.remove();
         },
 
         /**
@@ -150,10 +127,21 @@
                 // udpate parent node propertie
                 _contentNode.layoutDesignerContent.set( 'parentNode', _dropNode );
 
-                // refresh new parent
+                // refresh dropNode places
                 _forceWidth  = _dropNode.layoutDesignerPlaces.getMaxWidth();
                 _dropNode.layoutDesignerTarget.refresh( _forceWidth );
+
+                // refresh parent host places
+                _forceWidth  = _parentHost.layoutDesignerPlaces.getMaxWidth();
+                _parentHost.layoutDesignerTarget.refresh( _forceWidth );
             }
+
+            // remove dummies ??
+            this.nodeLayout.all( '.yui3-dd-draggable' ).each( function ( v, k ) {
+                if ( v.getStyle( 'visibility' ) === 'hidden' ) {
+                    v.remove();
+                }
+            } );
         },
 
         /**

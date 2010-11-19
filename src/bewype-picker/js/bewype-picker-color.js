@@ -234,9 +234,20 @@
                 _bNode        = _contentBox.one( '.' + _pickerClass + '-b' );
 
             if ( _targetNode && _targetNode.get( 'className' ) === _pickerClass + '-selector-bg' ) {
+
                 // get picker position
-                _x = evt.pageX - _targetNode.get( 'x' ) - _offsetParent.get( 'offsetLeft' );
-                _y = evt.pageY - _targetNode.get( 'y' ) - _offsetParent.get( 'offsetTop' );
+                _x = evt.pageX - _targetNode.get( 'x' );
+                _y = evt.pageY - _targetNode.get( 'y' );
+                
+                // specific for firefox
+                if ( Y.UA.gecko ) {
+                    _x -= _offsetParent.get( 'offsetLeft' );
+                    _y -= _offsetParent.get( 'offsetTop' );
+                }
+
+                // get picker position
+                _x = evt.pageX - _targetNode.get( 'x' ); // - _offsetParent.get( 'offsetLeft' );
+                _y = evt.pageY - _targetNode.get( 'y' ); // - _offsetParent.get( 'offsetTop' );
                 // manage small picker
                 _x = ( _pickerSize == 180 ) ? _x : _x * 2;
                 _y = ( _pickerSize == 180 ) ? _y : _y * 2;
