@@ -9,15 +9,35 @@
     <body> 
     
     <div id="demo"></div>
+    <p />
+    <a id="attach">Attach</a> | <a id="detach">Detach</a>
 
     <script type="text/javascript">
     <!--
         YUI( { filter: 'debug' } ).use( 'bewype-layout-designer', function ( Y ) {
 
-            var _c = Y.config;                
+            var _demo = Y.one( "#demo" );                
 
-            // get demo node and plug
-            Y.one( "#demo" ).plug( Y.Bewype.LayoutDesigner );
+            // detach event
+            Y.on( 'click',
+                function( e ) {
+                    if ( !_demo.layoutDesigner ) {
+                        _demo.plug( Y.Bewype.LayoutDesigner );
+                    }
+                },
+                Y.one( "#attach" )
+            );
+
+            // detach event
+            Y.on( 'click',
+                function( e ) {
+                    if ( _demo.layoutDesigner ) {
+                        _demo.unplug( Y.Bewype.LayoutDesigner );
+                    }
+                },
+                Y.one( "#detach" )
+            );
+
         } );
     -->
     </script>

@@ -6,14 +6,6 @@
                     "plugin"
                 ]
             },
-            "bewype-layout-designer-sources": {
-                "requires": [
-                    "dd",
-                    "substitute",
-                    "bewype-layout-designer-config"
-                ], 
-                "skinnable": true
-            },
             "bewype-layout-designer-content": {
                 "requires": [
                     "substitute",
@@ -39,7 +31,6 @@
             },
             "bewype-layout-designer-base": {
                 "requires": [
-                    "bewype-layout-designer-sources",
                     "bewype-layout-designer-target"
                 ], 
                 "skinnable": true

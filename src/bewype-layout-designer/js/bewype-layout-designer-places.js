@@ -13,17 +13,25 @@
     /**
      *
      */
-    LayoutDesignerPlaces.H_PLACES_TEMPLATE  =  '<table class="{designerClass}-places {designerClass}-places-horizontal">';
+    LayoutDesignerPlaces.H_PLACES_TEMPLATE  =  '<table class="{designerClass}-places ';
+    LayoutDesignerPlaces.H_PLACES_TEMPLATE  += '{designerClass}-places-horizontal ';
+    LayoutDesignerPlaces.H_PLACES_TEMPLATE  += '{designerClass}-places-{placesLevel}">';
     LayoutDesignerPlaces.H_PLACES_TEMPLATE  += '<tr />';
     LayoutDesignerPlaces.H_PLACES_TEMPLATE  += '</table>';
 
-    LayoutDesignerPlaces.V_PLACES_TEMPLATE  = '<ul class="{designerClass}-places {designerClass}-places-vertical"></ul>';
+    LayoutDesignerPlaces.V_PLACES_TEMPLATE  = '<ul class="{designerClass}-places ';
+    LayoutDesignerPlaces.V_PLACES_TEMPLATE  += '{designerClass}-places-vertical ';
+    LayoutDesignerPlaces.V_PLACES_TEMPLATE  += '{designerClass}-places-{placesLevel}"></ul>';
 
-    LayoutDesignerPlaces.H_DEST_TEMPLATE    =  '<td class="{designerClass}-cell {designerClass}-cell-horizontal">';
+    LayoutDesignerPlaces.H_DEST_TEMPLATE    =  '<td class="{designerClass}-cell ';
+    LayoutDesignerPlaces.H_DEST_TEMPLATE    += '{designerClass}-cell-horizontal ';
+    LayoutDesignerPlaces.H_DEST_TEMPLATE    += '{designerClass}-cell-{placesLevel}">';
     LayoutDesignerPlaces.H_DEST_TEMPLATE    += '<div class="{designerClass}-container"></div>';
     LayoutDesignerPlaces.H_DEST_TEMPLATE    += '</td>';
 
-    LayoutDesignerPlaces.V_DEST_TEMPLATE    =  '<li class="{designerClass}-cell {designerClass}-cell-vertical">';
+    LayoutDesignerPlaces.V_DEST_TEMPLATE    =  '<li class="{designerClass}-cell ';
+    LayoutDesignerPlaces.V_DEST_TEMPLATE    += '{designerClass}-cell-vertical ';
+    LayoutDesignerPlaces.V_DEST_TEMPLATE    += '{designerClass}-cell-{placesLevel}">';
     LayoutDesignerPlaces.V_DEST_TEMPLATE    += '<div class="{designerClass}-container"></div>';
     LayoutDesignerPlaces.V_DEST_TEMPLATE    += '</li>';
 
@@ -32,9 +40,9 @@
         placesNode : null,
 
         contents   : null,
-        
-        sortable   : null,
 
+        level      : null,
+    
         /**
          *
          */
@@ -44,63 +52,212 @@
             this.setAttrs( config );
             
             // temp var
-            var _host           = this.get( 'host'       ),
-                _placesType     = this.get( 'placesType' ),
-                _hTmpl          = LayoutDesignerPlaces.H_PLACES_TEMPLATE,
-                _vTmpl          = LayoutDesignerPlaces.V_PLACES_TEMPLATE,
-                _placesTempl    = ( _placesType === 'horizontal' ) ? _hTmpl : _vTmpl,
-                _parentNode     = this.get( 'parentNode' );
+            var _host            = this.get( 'host' ),
+                _hostChildren    = _host.get( 'children' ),
+                _placesType      = this.get( 'placesType' ),
+                _designerClass   = this.get( 'designerClass' ),
+                _hTmpl           = LayoutDesignerPlaces.H_PLACES_TEMPLATE,
+                _vTmpl           = LayoutDesignerPlaces.V_PLACES_TEMPLATE,
+                _placesTempl     = _placesType === 'horizontal' ? _hTmpl : _vTmpl,
+                _parentNode      = this.get( 'parentNode' ),
+                _tbody           = null,
+                _config          = null,
+                _placesChildren  = null,
+                _childType       = null;
 
-            // add places
-            this.placesNode = new Y.Node.create( Y.substitute( _placesTempl, {
-                designerClass : this.get( 'designerClass' )
-            } ) );
+            // init content list
+            this.contents = [];
 
-            // set place content
-            _host.append(this.placesNode);
+            // init places level
+            this.level = this._getPlacesLevel();
 
-            // common default height/width
-            this.placesNode.setStyle( 'height', this.get( 'contentHeight' ) );
-            this.placesNode.setStyle( 'width' , this.get( 'contentWidth'  ) );
+            // mount previous
+            this.placesNode = _hostChildren ? _hostChildren.item( 0 ) : null;
+            // create new
+            if ( this.placesNode ) {
+                // ...
+                if ( this.placesNode.hasClass( _designerClass + '-places-vertical' ) ) {
+                    // replace table with ul for places
+                    this._tableToUl();
+                    // set contentype
+                    _placesType = 'vertical';
+                    _childType  = 'horizontal';
+                } else {
+                    // set contentype
+                    _placesType = 'horizontal';
+                    _childType  = 'vertical';
+                }
+
+                // prepare config
+                _config = this.getAttrs();
+                _config.parentNode = _host;
+
+                // populate ul
+                if ( _placesType === 'horizontal' ) {
+                    _placesChildren = this.placesNode.one( 'tr' ).get( 'children' );
+                } else {
+                    // ...
+                    _tbody = this.placesNode.get( 'children' ).item( 0 );
+                    // just in case
+                    if ( _tbody.get( 'tagName' ).toLowerCase() !== 'tbody' ) {
+                        _tbody = this.placesNode;
+                    }
+                    _placesChildren =  _tbody.get( 'children' );
+                }
+                _placesChildren.each( function ( v, k ) {
+                    // loop vars
+                    var _cHost    = v.get( 'children' ).item( '0' ),
+                        _cContent = _cHost ? _cHost.get( 'children' ).item( '0' ) : null;
+                    // nothing to add
+                    if ( !_cHost ) { return; }
+                    // mount
+                    if ( _cContent.get( 'tagName' ).toLowerCase() === 'table' ) {
+                        // ...
+                        _config.targetType = _childType;
+                        _cHost.plug( Y.Bewype.LayoutDesignerTarget, _config );
+                        // ...
+                        _config.targetType = null;
+                        _config.placesType = _childType;
+                        _cHost.plug( Y.Bewype.LayoutDesignerPlaces, _config );
+                    } else {
+                        _config.contentType = _cContent.hasClass( _designerClass + '-content-text' ) ? 'text' : 'image';
+                        _cHost.plug( Y.Bewype.LayoutDesignerContent, _config );
+                    }
+                    // register
+                    this.registerContent( _cHost );
+                }, this );
+
+            } else {            
+                // add places
+                this.placesNode = new Y.Node.create( Y.substitute( _placesTempl, {
+                    designerClass : _designerClass,
+                    placesLevel   : this.level
+                } ) );
+
+                // set place content
+                _host.append( this.placesNode );
+
+                // common default height/width
+                this.placesNode.setStyle( 'height', this.get( 'contentHeight' ) );
+                this.placesNode.setStyle( 'width' , this.get( 'contentWidth'  ) );
+            }
 
             // make it sortable
             this._initSortable();
+        },
 
-            // register it
-            if ( _parentNode ) {
-                _parentNode.layoutDesignerPlaces.registerContent( _host );
+        _getPlacesLevel: function () {
+            var _host          = this.get( 'host' ),
+                _designerClass = this.get( 'designerClass' ),
+                _parentNode    = _host.ancestor( '.' + _designerClass + '-places' ),
+                _level = 0;
+
+            while ( _parentNode ) {
+                _parentNode = _parentNode.ancestor( '.' + _designerClass + '-places' );
+                _level += 1;
             }
-            this.contents = [];
+            return 'level' + _level;
         },
 
         _initSortable: function () {
             // get type                       
-            var _placesType         = this.get( 'placesType' ),
-                _nodes              = ( _placesType === 'horizontal' ) ? 'td' : 'li',
+            var _host               = this.get( 'host' ),
+                _placesType         = this.get( 'placesType' ),
                 _designerClass      = this.get( 'designerClass' ),
+                _sortTag            = _placesType === 'horizontal' ? 'td'    : 'li',
+                _sortableTag        = _placesType === 'horizontal' ? 'table' : 'ul',
+                _layoutClass        = '.' + _designerClass + '-layout',
                 _dragContentClass   = '.' + _designerClass + '-content-clone-drag',
-                _parentNode         = this.get( 'parentNode' ),
-                _granParentNode     = null;
+                _sortable           = Y.Sortable.getSortable( this.placesNode ),
+                _baseSortableNode   = _host.ancestor( _layoutClass ),
+                _allSortableNodes   = _baseSortableNode ? _baseSortableNode.all( _sortableTag ) : null,
+                _contentLevelClass  = _designerClass + '-cell-' + this.level,
+                _sortableLevelClass = _designerClass + '-places-' + this.level;
 
-            if ( this.sortable ) {
-                this.sortable.destroy();
+            if ( _sortable ) {
+                Y.Sortable.unreg( _sortable );
             }
 
             // make it sortable
-            this.sortable = new Y.Sortable( {
+            _sortable = new Y.Sortable( {
                 container   : this.placesNode,
-                nodes       : _nodes,
+                nodes       : _sortTag + '.' + _contentLevelClass,
                 opacity     : '.2',
                 handles     : [ _dragContentClass ]
             } );
 
-            if ( _parentNode ) {
-                _granParentNode = _parentNode.layoutDesignerPlaces.get( 'parentNode' );
-                if ( _granParentNode ) {
-                    _granParentNode.layoutDesignerPlaces.sortable.join( this.sortable, 'full' );
-                }
-            }
+            if ( !_allSortableNodes ) { return; }
 
+            // wise join
+            _allSortableNodes.each( function ( v, k ) {
+                if ( this.placesNode != v && v.hasClass( _sortableLevelClass ) ) {
+                    var _s = Y.Sortable.getSortable( v );
+                    // little check
+                    if ( _s ) {
+                        _s.join( _sortable, 'full' );
+                    }
+                }
+            }, this );
+        },
+
+        _tableToUl : function () {
+            // create ul
+            var _ul            = Y.Node.create( '<ul />' ),
+                _designerClass = this.get( 'designerClass' ),
+                _tbody         = this.placesNode.get( 'children' ).item( 0 );
+            // just in case
+            if ( _tbody.get( 'tagName' ).toLowerCase() !== 'tbody' ) {
+                _tbody = this.placesNode;
+            }
+            // ...
+            _ul.addClass( _designerClass + '-places' );
+            _ul.addClass( _designerClass + '-places-vertical' );
+            _ul.addClass( _designerClass + '-places-' + this.level );
+            // populate ul with tr's innerHTML
+            _tbody.get( 'children' ).each( function ( v, k ) {
+                var _li = Y.Node.create( '<li />' ),
+                    _td = v.one( 'td' );
+                // update class
+                _li.addClass( _designerClass + '-cell' );
+                _li.addClass( _designerClass + '-cell-vertical' );
+                _li.addClass( _designerClass + '-cell-' + this.level );
+                // set inner
+                if ( _td ) {
+                    _li.set( 'innerHTML', _td.get( 'innerHTML' ) );
+                }
+                // update places
+                _ul.append( _li );
+            }, this );
+            // replace table for places
+            this.placesNode.replace( _ul );
+            this.placesNode = _ul;
+        },
+
+        _ulToTable : function () {
+            // create table
+            var _table         = Y.Node.create( '<table />' ),
+                _designerClass = this.get( 'designerClass' );
+            // ...
+            _table.addClass( _designerClass + '-places' );
+            _table.addClass( _designerClass + '-places-vertical' );
+            _table.addClass( _designerClass + '-places-' + this.level );
+            // populate table with tr's innerHTML
+            this.placesNode.get( 'children' ).each( function ( v, k ) {
+                var _row = Y.Node.create( '<tr />' ),
+                    _cell = Y.Node.create( '<td />' );
+                // update class
+                _cell.addClass( _designerClass + '-cell' );
+                _cell.addClass( _designerClass + '-cell-vertical' );
+                _cell.addClass( _designerClass + '-cell-' + this.level );
+                // set inner
+                _cell.set( 'innerHTML', v.get( 'innerHTML' ) );
+                // update table
+                _row.append( _cell );
+                _table.append( _row );
+            }, this );
+            // replace list
+            this.placesNode.replace( _table );
+            this.placesNode = _table;
         },
 
         /**
@@ -109,21 +266,18 @@
         destructor: function () {
 
             // copy contents
-            var _host       = this.get( 'host' ),
-                _parentNode = this.get( 'parentNode' );
+            var _sortable   = Y.Sortable.getSortable( this.placesNode ),
+                _placesType = this.get( 'placesType' );
             
             // first remove all the children
             Y.Object.each( this.contents, function( v, k ) {
-                if ( v.layoutDesignerPlaces ) {
+                if ( v.layoutDesignerTarget ) {
 
                     // unplug places
-                    v.unplug( Y.Bewype.LayoutDesignerPlaces );
+                    v.unplug( Y.Bewype.LayoutDesignerTarget );
 
                 } else if ( v.layoutDesignerContent ) {
-
-                    // get content type for unplug
-                    var _contentType  = v.layoutDesignerContent.get( 'contentType' );
-
+                
                     // unplug the node
                     v.unplug( Y.Bewype.LayoutDesignerContent );
 
@@ -132,9 +286,12 @@
                 }
             }, this );
 
-            // unregister it
-            if ( _parentNode ) {
-                _parentNode.layoutDesignerPlaces.unRegisterContent( _host );
+            // destroy sortable
+            Y.Sortable.unreg( _sortable );
+
+            // .. serialize ul to table
+            if ( _placesType === 'vertical' ) {
+                this._ulToTable();
             }
         },
 
@@ -356,7 +513,7 @@
          */
         addDestNode : function () {
 
-            var _destNode   = null;
+            var _destNode    = null;
 
             // add
             switch( this.get( 'placesType' ) ) {
@@ -364,7 +521,8 @@
                 case 'horizontal':
                     // create dest node
                     _destNode = new Y.Node.create( Y.substitute( LayoutDesignerPlaces.H_DEST_TEMPLATE, {
-                        designerClass : this.get( 'designerClass' )
+                        designerClass : this.get( 'designerClass' ),
+                        placesLevel   : this.level
                     } ) );
 
                     // dom add
@@ -374,7 +532,8 @@
                 case 'vertical':
                     // create dest node
                     _destNode = new Y.Node.create( Y.substitute( LayoutDesignerPlaces.V_DEST_TEMPLATE, {
-                        designerClass : this.get( 'designerClass' )
+                        designerClass : this.get( 'designerClass' ),
+                        placesLevel   : this.level
                     } ) );
 
                     // dom add
@@ -393,6 +552,9 @@
 
             // add to contents
             this.contents.push( content );
+            
+            // re-init sortable
+            this._initSortable();
         },
 
         /**
@@ -418,7 +580,6 @@
             // add dest node
             var _placesType  = this.get( 'placesType' ),
                 _destNode    = this.addDestNode(),
-                _pluginClass = null,
                 _config      = this.getAttrs(),
                 _maxWidth    = this.getMaxWidth();
 
@@ -430,9 +591,7 @@
 
             // plug node
             _destNode.plug( Y.Bewype.LayoutDesignerContent, _config );
-
-            // ..
-            return _maxWidth;
+            this.registerContent( _destNode );
         },
 
         /**
@@ -442,8 +601,7 @@
 
             // get dest node        
             var _destNode     = null,
-                _host         = this.get( 'host' ),
-                _contentType  = contentNode.layoutDesignerContent.get( 'contentType' );
+                _host         = this.get( 'host' );
 
             switch( this.get( 'placesType' ) ) {
 
@@ -469,7 +627,7 @@
 
             // and refresh
             if ( _host.layoutDesignerTarget ) {
-                _host.layoutDesignerTarget.refresh();
+                _host.layoutDesignerTarget.refresh( this.getMaxWidth() );
             }
         },
 

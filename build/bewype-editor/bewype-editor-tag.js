@@ -95,7 +95,6 @@ YUI.add('bewype-editor-tag', function(Y) {
                 _button      = this._panel.getButton( name ),
                 _value       = _button ? _button.getValue() : null,
                 _filePath    = ( name === 'file' ) ? ( this.get( 'fileStaticPath' ) + _value ) : null,
-                _cssDict     = null,
                 _tag         = null,
                 _tagNode     = null;
 
@@ -111,16 +110,16 @@ YUI.add('bewype-editor-tag', function(Y) {
                         _host.setAttribute( 'src', _filePath );
                         
                         // get current css - do not work yet
-                        _cssDict = Y.Bewype.Utils.getCssDict( _host );
+                        // _cssDict = Y.Bewype.Utils.getCssDict( _host );
                         // remove previous height and width
-                        delete( _cssDict.height );
-                        delete( _cssDict.width );
+                        // delete( _cssDict.height );
+                        // delete( _cssDict.width );
                         // apply cleared dict
-                        Y.Bewype.Utils.setCssDict( _host, _cssDict );
+                        // Y.Bewype.Utils.setCssDict( _host, _cssDict );
 
                         // clear previous                        
-                        // _host.setStyle( 'height', 'auto' );
-                        // _host.setStyle( 'width',  'auto' );
+                        _host.setStyle( 'height', 'auto' );
+                        _host.setStyle( 'width',  'auto' );
 
                         // refresh buttons
                         this._panel.refreshButtons( _host, false, name );  

@@ -14,10 +14,12 @@
 }
 
 .layout-designer-content-clone-callbacks {
+    bottom              : 0;
     margin              : auto;
     height              : 20px;
+    right               : 0;
+    position            : absolute;
     width               : 60px;
-    float               : right;
 }
 
 .layout-designer-content-clone-drag,

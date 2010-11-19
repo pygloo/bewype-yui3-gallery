@@ -2,6 +2,7 @@
 .layout-designer-layout {
     margin              : 0 auto;
     background-color    : #ddd;
+    position            : relative;
 }
 
 .layout-designer-layout table {
@@ -18,5 +19,13 @@
 
 .layout-designer-layout td {
     vertical-align      : top;
+}
+
+.layout-designer-edit-panel {
+    position            : absolute;
+    top                 : 0;
+    right               : 0;
+    width               : 240px;
+    height              : 100%;
 }
 
