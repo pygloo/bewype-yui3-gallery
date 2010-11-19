@@ -1,0 +1,7 @@
+{
+    "bewype-color": {
+        "requires": [
+            "yui-base"
+        ]
+    }
+}

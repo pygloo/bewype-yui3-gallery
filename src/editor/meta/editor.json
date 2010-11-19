@@ -1,0 +1,55 @@
+{
+    "editor": {
+        "submodules": {
+            "frame": {
+                "requires": [
+                    "base",
+                    "node",
+                    "selector-css3",
+                    "substitute"
+                ]
+            },
+            "editor-base": {
+                "requires": [
+                    "base",
+                    "frame",
+                    "node",
+                    "exec-command",
+                    "selection",
+                    "editor-para"
+                ]
+            },
+            "selection": {
+                "requires": [
+                    "node"
+                ]
+            },
+            "exec-command": {
+                "requires": [
+                    "frame"
+                ]
+            },
+            "editor-lists": {
+                "requires": [
+                    "editor-base"
+                ]
+            },
+            "editor-bidi": {
+                "requires": [
+                    "editor-base"
+                ]
+            },
+            "editor-para": {
+                "requires": [
+                    "editor-base"
+                ]
+            },
+            "createlink-base": {
+                "requires": [
+                    "editor-base"
+                ]
+            }
+        }
+    }
+}
+

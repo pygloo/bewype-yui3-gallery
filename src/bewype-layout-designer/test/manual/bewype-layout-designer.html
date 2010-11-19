@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
+<head> 
+    <title>Simple YUI3 Layout Designer</title> 
+    <script type="text/javascript" src="../../../../build/yui/yui.js"></script>
+</head> 
+<body>
+    
+    <div id="demo"></div>
+    <p />
+    <a id="attach" href="#">Attach</a> | <a id="detach" href="#">Detach</a>
+
+    <script type="text/javascript">
+    <!--
+        YUI( { filter: 'debug' } ).use( 'bewype-layout-designer', function ( Y ) {
+
+            var _demo = Y.one( "#demo" );                
+
+            // detach event
+            Y.on( 'click',
+                function( e ) {
+                    if ( !_demo.layoutDesigner ) {
+                        _demo.plug( Y.Bewype.LayoutDesigner );
+                    }
+                },
+                Y.one( "#attach" )
+            );
+
+            // detach event
+            Y.on( 'click',
+                function( e ) {
+                    if ( _demo.layoutDesigner ) {
+                        _demo.unplug( Y.Bewype.LayoutDesigner );
+                    }
+                },
+                Y.one( "#detach" )
+            );
+
+        } );
+    -->
+    </script>
+</body> 
+</html> 

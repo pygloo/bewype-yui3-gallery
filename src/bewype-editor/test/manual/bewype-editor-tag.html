@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
+    <head> 
+        <title>Manual Test - Editor Tag</title>
+        <script type="text/javascript" src="../../../../build/yui/yui.js"></script>    
+    </head> 
+    <body> 
+        <div id="panel"></div>
+
+        <br />
+        <br />
+        <br />
+
+        <div id="content" style="border: solid 1px black; width: 150px">This is a test</div>    
+
+        <p />
+
+        <a id="attach" href="#">Attach</a> | <a id="detach" href="#">Detach</a>
+
+        <script type="text/javascript">
+        <!--
+            YUI( { filter: 'debug' } ).use( 'bewype-editor-tag', function ( Y ) {
+
+                var _content   = Y.one( "#content" ),
+                    _panelNode = Y.one( "#panel"   );
+
+                // attach event
+                Y.on( 'click',
+                    function( e ) {
+                        if ( !_content.bewypeEditorTag ) {
+                            _content.plug( Y.Bewype.EditorTag, {
+                                panelNode : Y.one( "#panel" ),
+                                activeButtons : [
+                                            'height',
+                                            'width',
+                                            'bold',
+                                            'italic',
+                                            'underline',
+                                            'title',
+                                            'font-family',
+                                            'font-size',
+                                            'text-align',
+                                            'color',
+                                            'background-color',
+                                            'url',
+                                            'reset',
+                                            'apply'
+                                            ]
+                            } );
+                        }
+                    },
+                    Y.one( "#attach" )
+                );
+
+                // detach event
+                Y.on( 'click',
+                    function( e ) {
+                        if ( _content.bewypeEditorTag ) {
+                            _panelNode.unplug( Y.Bewype.EditorPanel );
+                        }
+                    },
+                    Y.one( "#detach" )
+                );
+
+                Y.on( 'bewype-editor:onClose', function () {
+                    alert( 'Editor Tag Closed!' );
+                } );
+            } );
+        -->
+        </script>
+    </body> 
+</html> 

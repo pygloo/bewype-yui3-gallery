@@ -1,0 +1,8 @@
+{
+    "bewype-utils": {
+        "requires": [
+            "json-stringify",
+            "yui-base"
+        ]
+    }
+}

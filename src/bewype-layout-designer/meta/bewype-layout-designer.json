@@ -1,0 +1,49 @@
+{
+    "bewype-layout-designer": {
+        "submodules": {
+            "bewype-layout-designer-config": {
+                "requires": [
+                    "plugin"
+                ]
+            },
+            "bewype-layout-designer-sources": {
+                "requires": [
+                    "dd",
+                    "substitute",
+                    "bewype-layout-designer-config"
+                ], 
+                "skinnable": true
+            },
+            "bewype-layout-designer-content": {
+                "requires": [
+                    "substitute",
+                    "async-queue",
+                    "bewype-editor",
+                    "bewype-layout-designer-config"
+                ], 
+                "skinnable": true
+            },
+            "bewype-layout-designer-places": {
+                "requires": [
+                    "sortable",
+                    "dd-constrain",
+                    "bewype-layout-designer-content"
+                ], 
+                "skinnable": true
+            },
+            "bewype-layout-designer-target": {
+                "requires": [
+                    "bewype-layout-designer-places"
+                ], 
+                "skinnable": true
+            },
+            "bewype-layout-designer-base": {
+                "requires": [
+                    "bewype-layout-designer-sources",
+                    "bewype-layout-designer-target"
+                ], 
+                "skinnable": true
+            }
+        }
+    }
+}

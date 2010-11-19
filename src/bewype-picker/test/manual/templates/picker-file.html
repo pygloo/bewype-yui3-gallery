@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+    {% block head %}
+    <title>Manual Test - Picker</title>
+    <script type="text/javascript" src="static/ybuild/yui/yui.js"></script>
+    {% endblock %}
+</head>
+<body class="yui3-skin-sam">
+
+    <h2>Picker File</h2>
+    
+    <div id="picker-file"></div>
+
+    <script>
+        <!--
+        YUI( { filter: 'debug' } ).use( 'bewype-picker-file', function( Y ) {
+
+            // picker file manual
+            var _pickerFile = new Y.Bewype.PickerFile( {
+                uploadUrl : 'http://localhost:5000/upload'
+            } );
+            _pickerFile.render( '#picker-file' );
+
+            // add custom event listener
+            _pickerFile.on( 'picker:onChange', function ( e ) {
+            } );
+
+        } );
+        -->
+    </script>
+</body>
+</html>
+

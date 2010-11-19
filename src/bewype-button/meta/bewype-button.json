@@ -1,0 +1,28 @@
+{
+    "bewype-button": {
+        "submodules": {
+            "bewype-button-base": {
+                "requires": [
+                    "stylesheet",
+                    "substitute",
+                    "widget",
+                    "yui-base"
+                ], 
+                "skinnable": true
+            },
+            "bewype-button-toggle": {
+                "requires": [
+                    "bewype-button-base"
+                ], 
+                "skinnable": true
+            },
+            "bewype-button-picker": {
+                "requires": [
+                    "bewype-button-base",
+                    "bewype-picker"
+                ], 
+                "skinnable": true
+            }
+        }
+    }
+}
