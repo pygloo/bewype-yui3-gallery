@@ -15,9 +15,7 @@
         YUI( { filter: 'debug' } ).use( 'bewype-picker-file', function( Y ) {
 
             // picker file manual
-            var _pickerFile = new Y.Bewype.PickerFile( {
-                uploadUrl : 'http://www.bewype.org/upload'
-            } );
+            var _pickerFile = new Y.Bewype.PickerFile();
             _pickerFile.render( '#picker-file' );
 
             // add custom event listener

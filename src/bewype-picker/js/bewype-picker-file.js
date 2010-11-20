@@ -42,7 +42,7 @@
             }
         },
         uploadUrl : {
-            value : '/upload',
+            value : 'http://www.bewype.org/upload',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
