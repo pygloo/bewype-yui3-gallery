@@ -44,7 +44,7 @@ YUI.add('bewype-picker-file', function(Y) {
             }
         },
         uploadUrl : {
-            value : Y.config.doc.location.href + 'upload',
+            value : '/upload',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -205,7 +205,7 @@ YUI.add('bewype-picker-file', function(Y) {
             };
 
     		//A function handler to use for completed requests:
-	    	_handleComplete = function( transactionid, response, args, evt ) {
+	    	_handleComplete = function( transactionid, response, args ) {
                 if ( response.responseText === 'error' ) {  
                     // :(
     			    this._showMessage( 'Upload failed!', true );    
@@ -220,7 +220,7 @@ YUI.add('bewype-picker-file', function(Y) {
             };
  
 	    	//Subscribe our handlers to IO's global custom events:
-		    Y.on('io:start',    Y.bind( _handleStart,    this ) );
+		    Y.on('io:start',    Y.bind( _handleStart, this ) );
 		    Y.on('io:complete', Y.bind( _handleComplete, this ) );
  
     		// Configuration object for POST transaction
