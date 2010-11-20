@@ -103,7 +103,7 @@
             }
         },
         fileStaticPath : {
-            value : Y.config.doc.location.href + 'static/',
+            value : 'http://www.bewype.org/uploads/',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
