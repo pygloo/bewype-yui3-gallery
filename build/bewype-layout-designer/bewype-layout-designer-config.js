@@ -133,6 +133,10 @@ YUI.add('bewype-layout-designer-config', function(Y) {
                     'apply'
                     ]
         },
+        uploadUrl : {
+            value : 'http://www.bewype.org/upload',
+            writeOnce : true
+        },
         startingTargetType : {
             value: 'start', 
             writeOnce : true,

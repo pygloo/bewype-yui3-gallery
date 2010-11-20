@@ -1,10 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
     <head> 
-        {% block head %}
-        <title>Manual Test - Editor Tag</title>
-        <script type="text/javascript" src="static/ybuild/yui/yui.js"></script>    
-        {% endblock %}
+        <title>Manual Test - Editor Img</title>
+        <script type="text/javascript" src="../../../../build/yui/yui.js"></script> 
     </head> 
     <body> 
         <div id="panel"></div>
@@ -13,12 +11,15 @@
         <br />
         <br />
 
-        <div id="content" style="border: 1px solid black; font-family: arial, sans-serif; font-size: medium; margin: 0; padding: 0; height: 120px; width: 240px;">This is a <b>test</b> ... <i>and</i> another <a href="">cool</a>!</div>
+        <img id="content" src="static/logo.gif" />       
+
+        <p />
+
         <a id="attach">Attach</a> | <a id="detach">Detach</a>
 
         <script type="text/javascript">
         <!--
-            YUI( { filter: 'debug' } ).use( 'bewype-editor-text', function ( Y ) {
+            YUI( { filter: 'debug' } ).use( 'bewype-editor-tag', function ( Y ) {
 
                 var _content   = Y.one( "#content" ),
                     _panelNode = Y.one( "#panel"   );
@@ -26,26 +27,23 @@
                 // attach event
                 Y.on( 'click',
                     function( e ) {
-                        if ( !_content.bewypeEditorText ) {
-                            _content.plug( Y.Bewype.EditorText, {
-                                panelNode     : _panelNode,
+                        if ( !_content.bewypeEditorTag ) {
+                            _content.plug( Y.Bewype.EditorTag, {
+                                panelNode : Y.one( "#panel" ),
+                                spinnerMaxWidth : 320,
                                 activeButtons : [
+                                            'file',
+                                            'background-color',
                                             'height',
                                             'width',
-                                            'bold',
-                                            'italic',
-                                            'underline',
-                                            'title',
-                                            'font-family',
-                                            'font-size',
-                                            'text-align',
-                                            'color',
-                                            'background-color',
-                                            'file',
+                                            'padding-top',
+                                            'padding-right',
+                                            'padding-bottom',
+                                            'padding-left',
                                             'reset',
                                             'apply'
                                             ]
-                            } );
+                            } )
                         }
                     },
                     Y.one( "#attach" )
@@ -54,7 +52,7 @@
                 // detach event
                 Y.on( 'click',
                     function( e ) {
-                        if ( _content.bewypeEditorText ) {
+                        if ( _content.bewypeEditorTag ) {
                             _panelNode.unplug( Y.Bewype.EditorPanel );
                         }
                     },
@@ -64,4 +62,4 @@
         -->
         </script>
     </body> 
-</html>
+</html> 

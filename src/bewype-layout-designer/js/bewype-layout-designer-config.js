@@ -131,6 +131,10 @@
                     'apply'
                     ]
         },
+        uploadUrl : {
+            value : 'http://www.bewype.org/upload',
+            writeOnce : true
+        },
         startingTargetType : {
             value: 'start', 
             writeOnce : true,

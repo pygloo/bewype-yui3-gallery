@@ -112,7 +112,7 @@ YUI.add('bewype-editor-config', function(Y) {
             }
         },
         uploadUrl : {
-            value : Y.config.doc.location.href + 'upload',
+            value : 'http://www.bewype.org/upload',
             writeOnce : true
         },
         panelNode : {

@@ -169,7 +169,8 @@ YUI.add('bewype-layout-designer-content', function(Y) {
             _conf = {
                 panelNode       : _editPanNode,
                 spinnerMaxWidth : _maxWidth,
-                activeButtons   : this.get( _activeButtons )
+                activeButtons   : this.get( _activeButtons ),
+                uploadUrl       : this.get( 'uploadUrl' )
             };
 
             // plug

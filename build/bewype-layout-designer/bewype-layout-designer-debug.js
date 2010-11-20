@@ -133,6 +133,10 @@ YUI.add('bewype-layout-designer-config', function(Y) {
                     'apply'
                     ]
         },
+        uploadUrl : {
+            value : 'http://www.bewype.org/upload',
+            writeOnce : true
+        },
         startingTargetType : {
             value: 'start', 
             writeOnce : true,
@@ -487,7 +491,8 @@ YUI.add('bewype-layout-designer-content', function(Y) {
             _conf = {
                 panelNode       : _editPanNode,
                 spinnerMaxWidth : _maxWidth,
-                activeButtons   : this.get( _activeButtons )
+                activeButtons   : this.get( _activeButtons ),
+                uploadUrl       : this.get( 'uploadUrl' )
             };
 
             // plug
