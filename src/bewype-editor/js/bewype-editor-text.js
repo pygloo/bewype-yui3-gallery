@@ -125,8 +125,10 @@
             };
 
             // ensure height width
-            this._oMainCssdict.height = '100%';
-            this._oMainCssdict.width  = '100%';
+            this._oMainCssdict.height  = '100%';
+            this._oMainCssdict.width   = '100%';
+            this._oMainCssdict.padding = '0';
+            this._oMainCssdict.margin  = '0';
 
             Y.each( [ 'iframe', 'html', 'body' ] , function ( v, k ) {
                 // ensure nice rendering
@@ -463,7 +465,6 @@
 
             var _inst          = this._editor.getInstance(),
                 _body          = _inst.one( 'body'  ),
-                // _main          = _body.one( '.main' ),
                 _selectionNode = _body.one( '.selection' ),
                 _button        = this._panel.getButton( name ),
                 _value         = _button ? _button.getValue() : null,
