@@ -212,6 +212,18 @@ YUI.add('bewype-picker-color', function(Y) {
             }
         },
 
+        _getNodePosition : function ( node, positionProperty ) {
+
+            var _position = 0;                                
+
+            while( node != null ) {
+                _position += node.get( positionProperty );
+                node = node.get( 'offsetParent' );
+            }
+
+            return _position;
+        },
+
         _onSelectorChange : function ( evt ) {
 
             // vars
@@ -222,6 +234,8 @@ YUI.add('bewype-picker-color', function(Y) {
                 _targetNode   = evt ? evt.target : null,
                 _pThreshO     = this.get( 'pickerThreshold' ),
                 _value        = this._slider ? this._slider.getValue() : 0,
+                _nodeX        = 0,
+                _nodeY        = 0,
                 _x            = 0,
                 _y            = 0,
                 _h            = 0,
@@ -236,20 +250,25 @@ YUI.add('bewype-picker-color', function(Y) {
                 _bNode        = _contentBox.one( '.' + _pickerClass + '-b' );
 
             if ( _targetNode && _targetNode.get( 'className' ) === _pickerClass + '-selector-bg' ) {
-
-                // get picker position
-                _x = evt.pageX - _targetNode.get( 'x' );
-                _y = evt.pageY - _targetNode.get( 'y' );
                 
                 // specific for firefox
                 if ( Y.UA.gecko ) {
-                    _x -= _offsetParent.get( 'offsetLeft' );
-                    _y -= _offsetParent.get( 'offsetTop' );
+
+                    // get picker position
+                    _x = evt.pageX - _targetNode.getX(); 
+                    _y = evt.pageY - _targetNode.getY();
+
+                    // ?? but it works
+                    // _x += _pickerSize / 2;
+
+                } else {
+
+                    // get picker position
+                    _x = evt.clientX - _targetNode.getX();
+                    _y = evt.clientY - _targetNode.getY();
+
                 }
 
-                // get picker position
-                _x = evt.pageX - _targetNode.get( 'x' ); // - _offsetParent.get( 'offsetLeft' );
-                _y = evt.pageY - _targetNode.get( 'y' ); // - _offsetParent.get( 'offsetTop' );
                 // manage small picker
                 _x = ( _pickerSize == 180 ) ? _x : _x * 2;
                 _y = ( _pickerSize == 180 ) ? _y : _y * 2;

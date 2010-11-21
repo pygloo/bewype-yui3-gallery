@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
+    <head> 
+
+        <title>Pygloo's Repos | bewype-yui3-gallery</title>
+
+        <link href="/bewype-yui3-gallery/css/pygloo-repo.css" rel="stylesheet" type="text/css">
+
+        <script type="text/javascript" src="../../../../build/yui/yui.js"></script>
+
+    </head>
+    <body>
+
+        <div class="title">
+            <h1><a href="http://pygloo.github.com/">Pygloo's Repos</a></h1>
+            <span>
+                | 
+                bewype-yui3-gallery
+                <a href="/bewype-yui3-gallery">&#182;</a>
+            </span>
+        </div>
+
+        <h2 class="para-title">
+            Layout Designer <em>(demo)</em>
+            <a href="/bewype-yui3-gallery/src/bewype-layout-designer/test/manual/#layout-designer-demo" name="layout-designer-demo">&#182;</a>
+        </h2>
+
+        <p class="para-text">
+            <a id="attach" href="#">Attach</a> | <a id="detach" href="#">Detach</a>
+        </p>
+
+        <p />
+
+        <div id="demo"></div>
+
+        <script type="text/javascript">
+        <!--
+            YUI( { filter: 'debug' } ).use( 'bewype-layout-designer', function ( Y ) {
+
+                var _demo = Y.one( "#demo" );                
+
+                // detach event
+                Y.on( 'click',
+                    function( e ) {
+                        if ( !_demo.layoutDesigner ) {
+                            _demo.plug( Y.Bewype.LayoutDesigner );
+                        }
+                    },
+                    Y.one( "#attach" )
+                );
+
+                // detach event
+                Y.on( 'click',
+                    function( e ) {
+                        if ( _demo.layoutDesigner ) {
+                            _demo.unplug( Y.Bewype.LayoutDesigner );
+                        }
+                    },
+                    Y.one( "#detach" )
+                );
+            } );
+        -->
+        </script>
+    </body> 
+</html> 

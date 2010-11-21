@@ -1,0 +1,104 @@
+body {
+    background-color        : #f5f5f5;
+    margin                  : 0;
+    padding                 : 0;
+}
+
+.title {
+    filter                  : progid:DXImageTransform.Microsoft.gradient(startColorstr='#cccccc', endColorstr='#888'); /* for IE */
+    background              : -webkit-gradient(linear, left top, left bottom, from(#ccc), to(#888)); /* for webkit browsers */
+    background              : -moz-linear-gradient(top,  #ccc,  #888); /* for firefox 3.6+ */
+    color                   : #eee;
+    display                 : block;
+    font-family             : verdana, helvetica, arial, sans-serif;
+    margin                  : 0;
+    padding                 : 6px 12px 12px;
+    width                   : auto;
+    background-color        : black;
+    -moz-box-shadow         : -4px 5px 4px #aaa;
+    -webkit-box-shadow      : -4px 5px 4px #aaa;
+    box-shadow              : -4px 5px 4px #aaa;
+}
+
+.title span {
+    font-size               : 24px;
+    font-weight             : 400;
+}
+
+.title h1 {
+    display                 : inline-block;
+    font-size               : 36px;
+    font-weight             : 600;
+    margin                  : 0;
+}
+
+h2.para-title {
+    color                   : #19d;
+    display                 : block;
+    font-family             : verdana, helvetica, arial, sans-serif;
+    font-size               : 28px;
+    font-weight             : lighter;
+    border-bottom           : 1px solid #aaa;
+    margin                  : 30px auto;
+    padding                 : 4px;
+    width                   : 820px;
+}
+
+p.para-text {
+    color                   : #357;
+    margin                  : 34px auto;
+    font-family             : "Lucida Console", Monaco, monospace;
+    width                   : 800px;
+    text-align              : justify;
+    letter-spacing          : 2px;
+}
+
+a:link,
+a:visited {
+    color                   : inherit;
+    text-decoration         : none;
+}
+
+a.git-link:link,
+a.git-link:visited {
+    filter                  : progid:DXImageTransform.Microsoft.gradient(startColorstr='#cccccc', endColorstr='#888888'); /* for IE */
+    background              : -webkit-gradient(linear, left top, left bottom, from(#ccc), to(#888)); /* for webkit browsers */
+    background              : -moz-linear-gradient(top,  #ccc,  #888); /* for firefox 3.6+ */
+    color                   : #eaeaea;
+    border                  : 1px solid #eaeaea;
+    padding                 : 8px 16px;
+    margin                  : 10px;
+    -webkit-border-radius   : 10px;
+    -moz-border-radius      : 10px;
+    border-radius           : 10px;
+    -moz-box-shadow         : 1px 1px 1px #aaa;
+    -webkit-box-shadow      : 1px 1px 1px #aaa;
+    box-shadow              : 1px 1px 1px #aaa;
+}
+
+a.git-link:link:hover {
+    filter                  : progid:DXImageTransform.Microsoft.gradient(startColorstr='#dddddd', endColorstr='#999999'); /* for IE */
+    background              : -webkit-gradient(linear, left top, left bottom, from(#ddd), to(#999)); /* for webkit browsers */
+    background              : -moz-linear-gradient(top,  #ddd,  #999); /* for firefox 3.6+ */
+    color                   : #f8f8f8;
+    border                  : 1px solid #f8f8f8;
+}
+
+a.yui-link:link,
+a.yui-link:visited {
+    color                   : #89b31f;
+}
+
+a.yui-link:link:hover {
+    text-decoration         : underline;
+}
+
+a.emencia-link:link,
+a.emencia-link:visited {
+    color                   : #e318d0;
+}
+
+a.emencia-link:link:hover {
+    text-decoration         : underline;
+}
+
