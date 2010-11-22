@@ -123,15 +123,19 @@ YUI.add('bewype-layout-designer-config', function(Y) {
             value : [
                     'file',
                     'background-color',
-                    'height',
-                    'width',
                     'padding-top',
-                    'padding-right',
                     'padding-bottom',
-                    'padding-left',
+                    'text-align',
                     'reset',
                     'apply'
                     ]
+        },
+        fileStaticPath : {
+            value : 'http://www.bewype.org/uploads/',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
         },
         uploadUrl : {
             value : 'http://www.bewype.org/upload',
@@ -340,9 +344,10 @@ YUI.add('bewype-layout-designer-content', function(Y) {
     /**
      *
      */
-    LayoutDesignerContent.C_IMG_TEMPLATE =  '<img class="{designerClass}-content ';
-    LayoutDesignerContent.C_IMG_TEMPLATE += '{designerClass}-content-{contentType}" ';
-    LayoutDesignerContent.C_IMG_TEMPLATE += 'src="{defaultContent}" />';
+    LayoutDesignerContent.C_IMG_TEMPLATE =  '<div class="{designerClass}-content ';
+    LayoutDesignerContent.C_IMG_TEMPLATE += '{designerClass}-content-{contentType}">';
+    LayoutDesignerContent.C_IMG_TEMPLATE += '<img src="{defaultContent}" />';
+    LayoutDesignerContent.C_IMG_TEMPLATE += '</div>';
 
     /**
      *
@@ -383,6 +388,12 @@ YUI.add('bewype-layout-designer-content', function(Y) {
                 // common default height
                 _contentNode.setStyle( 'height', this.get( 'contentHeight' ) );
                 _contentNode.setStyle( 'width',  this.get( 'contentWidth'  ) );
+                /* 
+                if ( _contentType === 'image' ) {
+                    _contentNode.one( 'img' ).setStyle( 'height', this.get( 'contentHeight' ) );
+                    _contentNode.one( 'img' ).setStyle( 'width',  this.get( 'contentWidth'  ) );
+                }
+                */
             }
 
             // add clone
@@ -492,6 +503,7 @@ YUI.add('bewype-layout-designer-content', function(Y) {
                 panelNode       : _editPanNode,
                 spinnerMaxWidth : _maxWidth,
                 activeButtons   : this.get( _activeButtons ),
+                fileStaticPath  : this.get( 'fileStaticPath' ),
                 uploadUrl       : this.get( 'uploadUrl' )
             };
 
@@ -619,11 +631,11 @@ YUI.add('bewype-layout-designer-content', function(Y) {
          *
          */
         getContentNode : function () {
+            // ...
             var _host            = this.get( 'host' ),
-                _contentClass    = this.get( 'designerClass' ) + '-content',
-                _contentSelector = this.get( 'contentType' ) === 'image' ? 'img.' : 'div.';
-
-            return _host.one( _contentSelector + _contentClass );
+                _contentClass    = this.get( 'designerClass' ) + '-content';
+            // ...
+            return _host.one( 'div.' + _contentClass );
         },
 
         /**
@@ -1121,7 +1133,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                 _placesWidth    = forcedWidth ? forcedWidth : this.getPlacesWidth(),
                 _parentNode     = this.get( 'parentNode' );
 
-            _placesHeight = _placesHeight === 0 ? this.get( 'contentHeight' ) : _placesHeight;
+            // _placesHeight = _placesHeight === 0 ? this.get( 'contentHeight' ) : _placesHeight;
             _placesWidth  = _placesWidth  === 0 ? this.getAvailablePlace()    : _placesWidth;
 
             this.placesNode.setStyle( 'height', _placesHeight );

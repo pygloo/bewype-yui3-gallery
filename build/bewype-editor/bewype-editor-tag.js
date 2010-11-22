@@ -92,9 +92,10 @@ YUI.add('bewype-editor-tag', function(Y) {
 
             var _host        = this.get( 'host' ),
                 _hostTagName = _host.get( 'tagName' ),
+                _imgNode     = _host.one( 'img' ),
                 _button      = this._panel.getButton( name ),
                 _value       = _button ? _button.getValue() : null,
-                _filePath    = ( name === 'file' ) ? ( this.get( 'fileStaticPath' ) + _value ) : null,
+                _filePath    = ( name === 'file' ) ? ( this.get( 'fileStaticPath' ) + _value.fileName ) : null,
                 _tag         = null,
                 _tagNode     = null;
 
@@ -104,22 +105,22 @@ YUI.add('bewype-editor-tag', function(Y) {
                     break;
 
                 case 'file':
-                    if ( _hostTagName && _hostTagName.toLowerCase() === 'img' ) {
+                    if ( _imgNode ) {
 
                         // update file src after upload
-                        _host.setAttribute( 'src', _filePath );
-                        
-                        // get current css - do not work yet
-                        // _cssDict = Y.Bewype.Utils.getCssDict( _host );
-                        // remove previous height and width
-                        // delete( _cssDict.height );
-                        // delete( _cssDict.width );
-                        // apply cleared dict
-                        // Y.Bewype.Utils.setCssDict( _host, _cssDict );
+                        _imgNode.setAttribute( 'src', _filePath );
 
                         // clear previous                        
-                        _host.setStyle( 'height', 'auto' );
-                        _host.setStyle( 'width',  'auto' );
+                        _imgNode.setStyle( 'height', _value.imgHeight );
+                        _imgNode.setStyle( 'width',  _value.imgWidth );
+
+                        // update host if necessary
+                        if ( _value.imgHeight > Y.Bewype.Utils.getHeight( _host ) ) {
+                            _host.setStyle( 'height', _value.imgHeight );
+                        }
+                        if ( _value.imgWidth > Y.Bewype.Utils.getWidth( _host ) ) {
+                            _host.setStyle( 'width', _value.imgWidth );
+                        }
 
                         // refresh buttons
                         this._panel.refreshButtons( _host, false, name );  

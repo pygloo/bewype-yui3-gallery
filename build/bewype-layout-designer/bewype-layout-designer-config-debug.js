@@ -123,15 +123,19 @@ YUI.add('bewype-layout-designer-config', function(Y) {
             value : [
                     'file',
                     'background-color',
-                    'height',
-                    'width',
                     'padding-top',
-                    'padding-right',
                     'padding-bottom',
-                    'padding-left',
+                    'text-align',
                     'reset',
                     'apply'
                     ]
+        },
+        fileStaticPath : {
+            value : 'http://www.bewype.org/uploads/',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
         },
         uploadUrl : {
             value : 'http://www.bewype.org/upload',

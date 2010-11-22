@@ -251,23 +251,9 @@ YUI.add('bewype-picker-color', function(Y) {
 
             if ( _targetNode && _targetNode.get( 'className' ) === _pickerClass + '-selector-bg' ) {
                 
-                // specific for firefox
-                if ( Y.UA.gecko ) {
-
-                    // get picker position
-                    _x = evt.pageX - _targetNode.getX(); 
-                    _y = evt.pageY - _targetNode.getY();
-
-                    // ?? but it works
-                    // _x += _pickerSize / 2;
-
-                } else {
-
-                    // get picker position
-                    _x = evt.clientX - _targetNode.getX();
-                    _y = evt.clientY - _targetNode.getY();
-
-                }
+                // get picker position
+                _x = evt.pageX - _targetNode.getX();
+                _y = evt.pageY - _targetNode.getY();
 
                 // manage small picker
                 _x = ( _pickerSize == 180 ) ? _x : _x * 2;

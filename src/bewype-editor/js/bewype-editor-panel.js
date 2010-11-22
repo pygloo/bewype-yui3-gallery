@@ -85,7 +85,17 @@
 
         _tagButtons  : [ 'bold', 'italic', 'title', 'underline', 'url' ],
 
-        _cssButtons  : [ 'font-family', 'font-size', 'text-align', 'color', 'background-color' ],
+        _cssButtons  : [
+            'font-family',
+            'font-size',
+            'text-align',
+            'color',
+            'background-color',
+            'padding-top',
+            'padding-right',
+            'padding-bottom',
+            'padding-left'
+            ],
 
         _addSpinnerButton : function ( name, config ) {
 
@@ -188,8 +198,9 @@
 
             // create\render toggle button
             var _button = new Y.Bewype.ButtonPicker( {
-                label     : name,
-                pickerObj :  pickerObj
+                label        : name,
+                pickerObj    : pickerObj,
+                pickerParams : name === 'file' ? { uploadUrl:  this.get( 'uploadUrl' ) } : null
             } );
 
             // do add
@@ -376,8 +387,12 @@
                         return this._buttonDict[ v ].setValue( _value ); 
 
                     case 'file':
-                        this._buttonDict.height.setValue( node._node.height );
-                        this._buttonDict.width.setValue(  node._node.width );
+                        if ( this._buttonDict.height ) {
+                            this._buttonDict.height.setValue( node._node.height );
+                        }
+                        if ( this._buttonDict.width ) {
+                            this._buttonDict.width.setValue(  node._node.width );
+                        }
                         return;
 
                     case 'font-family':

@@ -43,7 +43,10 @@
                 Y.on( 'click',
                     function( e ) {
                         if ( !_demo.layoutDesigner ) {
-                            _demo.plug( Y.Bewype.LayoutDesigner );
+                            _demo.plug( Y.Bewype.LayoutDesigner, {
+                                fileStaticPath : 'http://www.bewype.org/uploads/',
+                                uploadUrl      : 'http://www.bewype.org/upload',
+                            } );
                         }
                     },
                     Y.one( "#attach" )

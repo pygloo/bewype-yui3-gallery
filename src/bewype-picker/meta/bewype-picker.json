@@ -25,6 +25,7 @@
                 "requires": [
                     "async-queue",
                     "io",
+                    "json-parse",
                     "stylesheet",
                     "substitute",
                     "widget",

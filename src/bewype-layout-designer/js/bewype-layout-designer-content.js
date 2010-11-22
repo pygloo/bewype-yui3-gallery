@@ -16,9 +16,10 @@
     /**
      *
      */
-    LayoutDesignerContent.C_IMG_TEMPLATE =  '<img class="{designerClass}-content ';
-    LayoutDesignerContent.C_IMG_TEMPLATE += '{designerClass}-content-{contentType}" ';
-    LayoutDesignerContent.C_IMG_TEMPLATE += 'src="{defaultContent}" />';
+    LayoutDesignerContent.C_IMG_TEMPLATE =  '<div class="{designerClass}-content ';
+    LayoutDesignerContent.C_IMG_TEMPLATE += '{designerClass}-content-{contentType}">';
+    LayoutDesignerContent.C_IMG_TEMPLATE += '<img src="{defaultContent}" />';
+    LayoutDesignerContent.C_IMG_TEMPLATE += '</div>';
 
     /**
      *
@@ -59,6 +60,12 @@
                 // common default height
                 _contentNode.setStyle( 'height', this.get( 'contentHeight' ) );
                 _contentNode.setStyle( 'width',  this.get( 'contentWidth'  ) );
+                /* 
+                if ( _contentType === 'image' ) {
+                    _contentNode.one( 'img' ).setStyle( 'height', this.get( 'contentHeight' ) );
+                    _contentNode.one( 'img' ).setStyle( 'width',  this.get( 'contentWidth'  ) );
+                }
+                */
             }
 
             // add clone
@@ -168,6 +175,7 @@
                 panelNode       : _editPanNode,
                 spinnerMaxWidth : _maxWidth,
                 activeButtons   : this.get( _activeButtons ),
+                fileStaticPath  : this.get( 'fileStaticPath' ),
                 uploadUrl       : this.get( 'uploadUrl' )
             };
 
@@ -295,11 +303,11 @@
          *
          */
         getContentNode : function () {
+            // ...
             var _host            = this.get( 'host' ),
-                _contentClass    = this.get( 'designerClass' ) + '-content',
-                _contentSelector = this.get( 'contentType' ) === 'image' ? 'img.' : 'div.';
-
-            return _host.one( _contentSelector + _contentClass );
+                _contentClass    = this.get( 'designerClass' ) + '-content';
+            // ...
+            return _host.one( 'div.' + _contentClass );
         },
 
         /**

@@ -57,7 +57,7 @@ YUI.add('bewype-picker-file', function(Y) {
         /**
          *
          */
-        _fileName : null,
+        _fileInfo : null,
 
         /**
          *
@@ -98,7 +98,7 @@ YUI.add('bewype-picker-file', function(Y) {
                 _inputNode    = null;
 
             // avoid previous value
-            this._fileName = null;
+            this._fileInfo = null;
 
             // set event callback
             _inputNode = _contentBox.one( '.' + _pickerClass + '-input' );
@@ -131,11 +131,11 @@ YUI.add('bewype-picker-file', function(Y) {
         },
 
         getValue : function() {
-            return this._fileName;
+            return this._fileInfo;
         },
 
-        setValue : function( _fileName ) {
-            this._fileName = _fileName;
+        setValue : function( _fileInfo ) {
+            this._fileInfo = _fileInfo;
         },
 
         _hideMessage : function ( msgNode ) {
@@ -206,14 +206,29 @@ YUI.add('bewype-picker-file', function(Y) {
 
     		//A function handler to use for completed requests:
 	    	_handleComplete = function( transactionid, response, args ) {
+                var _data = null
                 if ( response.responseText === 'error' ) {  
                     // :(
     			    this._showMessage( 'Upload failed!', true );    
-                } else {            
-                    // TODO - may be check the url first ???
-                    this._fileName = response.responseText;   
-                    // :)
-    			    this._showMessage( 'File successfully uploaded' );
+                } else {
+                    // parse data
+                    try {
+                        // server should return some info for about the file it
+                        // just receive, ex. for an image:
+                        //  {
+                        //      'contentType' : <image/png>,
+                        //      'fileName'    : 'myFile.png',
+                        //      'imgHeight'   : 20,
+                        //      'imgWidth'    : 20
+                        //  }
+                        // ... in json string
+                        this._fileInfo = Y.JSON.parse( response.responseText );
+                        // :)
+        			    this._showMessage( 'File successfully uploaded' );
+                    } catch (e) {
+                        // :(
+        			    this._showMessage( 'Upload failed - Invalid Data!', true );
+                    }                     
                     // fire custom event on success
                     this.fire("picker:onChange");
                 }
@@ -253,4 +268,4 @@ YUI.add('bewype-picker-file', function(Y) {
 
 
 
-}, '@VERSION@' ,{requires:['async-queue', 'io', 'stylesheet', 'substitute', 'widget', 'yui-base']});
+}, '@VERSION@' ,{requires:['async-queue', 'io', 'json-parse', 'stylesheet', 'substitute', 'widget', 'yui-base']});

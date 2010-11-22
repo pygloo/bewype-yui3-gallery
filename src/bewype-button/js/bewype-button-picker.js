@@ -82,6 +82,8 @@
          *
          */
         initializer : function( config ) {
+
+            //
             this._init( config );
 
             //
