@@ -1,1 +1,13 @@
 
+.yui3-skin-sam .layout-designer-content-clone-drag {
+    background :  transparent url('anonymous-arrows-move-18.png') no-repeat center center;
+}
+
+.yui3-skin-sam .layout-designer-content-clone-edit {
+    background :  transparent url('barretr-pencil-18.png') no-repeat center center;
+}
+
+.yui3-skin-sam .layout-designer-content-clone-remove {
+    background :  transparent url('kuba-delete-simple-18.png') no-repeat center center;
+}
+

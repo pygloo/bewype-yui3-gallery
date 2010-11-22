@@ -31,11 +31,20 @@
 
         <p />
 
-        <div id="demo"></div>
+        <div id="demo" class="yui3-skin-sam"></div>
 
         <script type="text/javascript">
         <!--
-            YUI( { filter: 'debug' } ).use( 'bewype-layout-designer', function ( Y ) {
+            YUI( {
+                filter: 'debug',
+                skin: {
+                    overrides: {
+                        slider: [
+                            'sam'
+                        ]
+                    }
+                }
+            } ).use( 'bewype-layout-designer', function ( Y ) {
 
                 var _demo = Y.one( "#demo" );                
 

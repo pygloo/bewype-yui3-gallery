@@ -10,7 +10,7 @@
 }
 
 .layout-designer-content-clone:hover {
-    opacity             : 0.2;
+    opacity             : 0.5;
 }
 
 .layout-designer-content-clone-callbacks {
@@ -38,14 +38,11 @@
 }
 
 .layout-designer-content-clone-drag {
-    background-color    : green;
 }
 
 .layout-designer-content-clone-edit {
-    background-color    : blue;
 }
 
 .layout-designer-content-clone-remove {
-    background-color    : red;
 }
 

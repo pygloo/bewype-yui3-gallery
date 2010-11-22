@@ -435,8 +435,8 @@ YUI.add('bewype-layout-designer-places', function(Y) {
                 _placesWidth    = forcedWidth ? forcedWidth : this.getPlacesWidth(),
                 _parentNode     = this.get( 'parentNode' );
 
-            // _placesHeight = _placesHeight === 0 ? this.get( 'contentHeight' ) : _placesHeight;
-            _placesWidth  = _placesWidth  === 0 ? this.getAvailablePlace()    : _placesWidth;
+            // ...
+            _placesWidth  = _placesWidth  === 0 ? this.getAvailablePlace() : _placesWidth;
 
             this.placesNode.setStyle( 'height', _placesHeight );
             this.placesNode.setStyle( 'width' , _placesWidth  );

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   width="128"
+   height="128"
+   id="svg2"
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="text-file-icon.svg">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="846"
+     inkscape:window-height="577"
+     id="namedview15"
+     showgrid="false"
+     inkscape:zoom="2.0859375"
+     inkscape:cx="16.070921"
+     inkscape:cy="64"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg2" />
+  <metadata
+     id="metadata3">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Text File Icon</dc:title>
+        <dc:description>Icon inspired by Awoken gtk icons theme</dc:description>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>icon</rdf:li>
+            <rdf:li>file</rdf:li>
+            <rdf:li>text</rdf:li>
+            <rdf:li>document</rdf:li>
+            <rdf:li>grey</rdf:li>
+            <rdf:li>monoshape</rdf:li>
+            <rdf:li>mono</rdf:li>
+            <rdf:li>shape</rdf:li>
+            <rdf:li>gradient</rdf:li>
+            <rdf:li>AwOken</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+        <dc:publisher>
+          <cc:Agent
+             rdf:about="http://www.openclipart.org">
+            <dc:title>Open Clip Art Library</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Jakub Jankiewicz</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>Jakub Jankiewicz</dc:title>
+          </cc:Agent>
+        </dc:rights>
+        <dc:date />
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <cc:license
+           rdf:resource="http://web.resource.org/cc/PublicDomain" />
+        <dc:language>pl</dc:language>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://web.resource.org/cc/PublicDomain">
+        <cc:permits
+           rdf:resource="http://web.resource.org/cc/Reproduction" />
+        <cc:permits
+           rdf:resource="http://web.resource.org/cc/Distribution" />
+        <cc:permits
+           rdf:resource="http://web.resource.org/cc/DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 64 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="128 : 64 : 1"
+       inkscape:persp3d-origin="64 : 42.666667 : 1"
+       id="perspective17" />
+    <linearGradient
+       id="grey_gradient"
+       gradientTransform="scale(0.87745775,1.139656)"
+       x1="26.639459"
+       y1="9.8587687"
+       x2="119.23651"
+       y2="9.8587687"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         id="stop3630-72-7"
+         style="stop-color:#f3f3f3;stop-opacity:1;"
+         offset="0" />
+      <stop
+         id="stop3632-7-2"
+         style="stop-color:#979797;stop-opacity:1;"
+         offset="1" />
+    </linearGradient>
+    <inkscape:perspective
+       id="perspective2853"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+  </defs>
+  <rect
+     width="128"
+     height="128"
+     rx="0"
+     ry="0"
+     x="0"
+     y="0"
+     id="rect3872"
+     style="opacity: 0; color: rgb(0, 0, 0); fill: url(&quot;#linearGradient2855-7&quot;) rgb(0, 0, 0); fill-opacity: 1; fill-rule: nonzero; stroke: none; stroke-width: 0.963603; marker: none; visibility: visible; display: inline; overflow: visible;" />
+  <path
+     d="m 25.287983,5.4827976 c -3.530928,0 -6.342256,2.8459835 -6.342256,6.3769124 l 0,104.28058 c 0,3.53092 2.811327,6.37691 6.342256,6.37691 l 77.424027,0 c 3.53092,0 6.34225,-2.84599 6.34225,-6.37691 l 0,-78.357046 -23.324239,0 c -4.775595,0 -8.94154,-3.483578 -8.94154,-8.109769 l 0,-24.1906774 z m 55.936611,0 0,24.1906774 c 0,1.90101 1.809898,3.673657 4.505427,3.673657 l 23.324249,0 z"
+     id="rect3034"
+     style="color:#000000;fill:url(#grey_gradient);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.96360302;marker:none;visibility:visible;display:inline;overflow:visible" />
+  <rect
+     width="38.025841"
+     height="6.1854339"
+     rx="1.7672669"
+     ry="1.7672669"
+     x="36.156815"
+     y="29.917282"
+     id="rect2987"
+     style="color:#000000;fill:#4d4d4d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.96360302;marker:none;visibility:visible;display:inline;overflow:visible" />
+  <rect
+     width="59.686375"
+     height="6.1854339"
+     rx="1.7672669"
+     ry="1.7672669"
+     x="36.156815"
+     y="58.746155"
+     id="rect2999"
+     style="color:#000000;fill:#4d4d4d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.96360302;marker:none;visibility:visible;display:inline;overflow:visible" />
+  <rect
+     width="38.025841"
+     height="6.1854339"
+     rx="1.7672669"
+     ry="1.7672669"
+     x="36.156815"
+     y="44.331718"
+     id="rect3001"
+     style="color:#000000;fill:#4d4d4d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.96360302;marker:none;visibility:visible;display:inline;overflow:visible" />
+  <rect
+     width="59.686375"
+     height="6.1854339"
+     rx="1.7672669"
+     ry="1.7672669"
+     x="36.156815"
+     y="73.160591"
+     id="rect3003"
+     style="color:#000000;fill:#4d4d4d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.96360302;marker:none;visibility:visible;display:inline;overflow:visible" />
+  <rect
+     width="59.686375"
+     height="6.1854339"
+     rx="1.7672669"
+     ry="1.7672669"
+     x="36.156815"
+     y="87.575027"
+     id="rect3005"
+     style="color:#000000;fill:#4d4d4d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.96360302;marker:none;visibility:visible;display:inline;overflow:visible" />
+  <path
+     d="m 30.181126,72.839471 c -15.118782,0 -27.3632479,12.017112 -27.3632479,26.855164 0,14.838045 12.2444659,26.896605 27.3632479,26.896605 15.118756,0 27.405486,-12.05856 27.405486,-26.896605 0,-14.838052 -12.28673,-26.855164 -27.405486,-26.855164 z m -4.729451,9.324708 9.458897,0 0,12.930265 13.17491,0 0,9.241826 -13.17491,0 0,12.9717 -9.416669,0 0,-12.93026 -13.217125,0 0,-9.283266 13.174897,0 0,-12.930265 z"
+     id="path3035"
+     style="color:#000000;fill:#00bb00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.96360302;marker:none;visibility:visible;display:inline;overflow:visible" />
+</svg>
