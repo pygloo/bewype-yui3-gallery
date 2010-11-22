@@ -513,7 +513,7 @@
                 // current tag
                 _tag = this._panel.getWorkingTagName( name );
                 // ...
-                if ( _value && ( _value === true || _value.trim() !== '' ) ) {
+                if ( _tag && _value && ( _value === true || _value.trim() !== '' ) ) {
                     // create tag node
                     if ( name === 'url' ) {
                         _tagNode = Y.Node.create( '<a href="' + _value + '"></a>' );
