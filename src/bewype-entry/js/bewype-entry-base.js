@@ -33,7 +33,7 @@
      */
     Entry.ATTRS = {
         entryClass : {
-            value : 'yui3-entry-base',
+            value : 'bewype-entry-base',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );

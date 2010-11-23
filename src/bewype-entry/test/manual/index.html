@@ -1,98 +1,65 @@
-<!doctype html>
-<html>
-<head>
-    <title>Manual Test - Picker</title>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
+<head> 
+
+    <title>Pygloo's Repos | bewype-yui3-gallery</title>
+
+    <link href="/bewype-yui3-gallery/css/pygloo-repo.css" rel="stylesheet" type="text/css">
+
+    <style>
+    <!--
+    -->
+    </style>
+
     <script type="text/javascript" src="../../../../build/yui/yui.js"></script>
+
 </head>
 <body class="yui3-skin-sam">
 
-    <h2>Picker Base</h2>
+    <div class="title">
+        <h1><a href="http://pygloo.github.com/">Pygloo's Repos</a></h1>
+        <span>
+            | 
+            bewype-yui3-gallery
+            <a href="/bewype-yui3-gallery">&#182;</a>
+        </span>
+    </div>
 
-    <div id="picker"></div>
+    <h2 class="para-title">Entry Base <em>(demo)</em></h2>
 
-    <h2>Picker Color Normal</h2>
+    <center>
+        <div id="entry-base" class="yui3-skin-sam"></div>
+    </center>
 
-    <div id="picker-color-normal"></div>
+    <h2 class="para-title">Entry Spinner <em>(demo)</em></h2>
 
-    <h2>Picker Color Small</h2>
-
-    <div id="picker-color-small"></div>
-
-    <h2>Picker Font Family</h2>
-    
-    <div id="picker-font-family"></div>
-
-    <h2>Picker Font Size</h2>
-    
-    <div id="picker-font-size"></div>
-
-    <h2>Picker Url</h2>
-    
-    <div id="picker-url"></div>
+    <center>
+        <div id="entry-spinner" class="yui3-skin-sam"></div>
+    </center>
 
     <script>
         <!--
-        YUI( { filter: 'debug' } ).use( 'bewype-picker', function( Y ) {
-            // picker manual
-            var _picker = new Y.Bewype.Picker();
-            _picker.render( '#picker' );
+        YUI( { filter: 'debug' } ).use( 'bewype-entry', function( Y ) {
 
-            // add rows
-            _picker.append( 'test1', 'Test1' );
-            _picker.append( 'test2', 'Test2' );
-            _picker.append( 'test3', 'Test3' );
+            // picker spinner normal manual
+            var _entryBase = new Y.Bewype.Entry();
+            _entryBase.render( '#entry-base' );
 
             // add custom event listener
-            _picker.on( 'picker:onChange', function ( e ) {
-                alert( 'Picker has changed to: ' + e.target.getValue() );
+            _entryBase.on( 'entry:onChange', function ( e ) {
+                alert( 'Entry has changed to: ' + e.target.getValue() );
             } );
 
-            // picker color normal manual
-            var _pickerColorNormal = new Y.Bewype.PickerColor();
-            _pickerColorNormal.render( '#picker-color-normal' );
-
-            // add custom event listener
-            _pickerColorNormal.on( 'picker:onChange', function ( e ) {
-                alert( 'Picker Color Normal has changed to: ' + e.target.getValue() );
-            } );
-
-            // picker color small manual
-            var _pickerColorSmall = new Y.Bewype.PickerColor( {
-                pickerSize : 90
-            } );
-            _pickerColorSmall.render( '#picker-color-small' );
-
-            // add custom event listener
-            _pickerColorSmall.on( 'picker:onChange', function ( e ) {
-                alert( 'Picker Color Small has changed to: ' + e.target.getValue() );
-            } );
-
-            // picker font family manual
-            var _pickerFontFamily = new Y.Bewype.PickerFontFamily();
-            _pickerFontFamily.render( '#picker-font-family' );
-
-            // add custom event listener
-            _pickerFontFamily.on( 'picker:onChange', function ( e ) {
-                alert( 'Picker Font Family has changed to: ' + e.target.getValue() );
-            } );
-
-            // picker font size manual
-            var _pickerFontSize = new Y.Bewype.PickerFontSize();
-            _pickerFontSize.render( '#picker-font-size' );
-
-            // add custom event listener
-            _pickerFontSize.on( 'picker:onChange', function ( e ) {
-                alert( 'Picker Font Size has changed to: ' + e.target.getValue() );
-            } );
-
-            // picker url manual
-            var _pickerUrl = new Y.Bewype.PickerUrl();
-            _pickerUrl.render( '#picker-url' );
-
-            // add custom event listener
-            _pickerUrl.on( 'picker:onChange', function ( e ) {
-                alert( 'Picker Url has changed to: ' + e.target.getValue() );
-            } );
+            // Create a new Spinner instance, drawing it's 
+            // starting value from an input field already on the 
+            // page (the #entry-spinner text box)
+            var _spinner = new Y.Bewype.EntrySpinner({
+                srcNode: "#entry-spinner",
+                max:100,
+                min:0
+            });
+            _spinner.render();
+            _spinner.focus();
 
         } );
         -->
