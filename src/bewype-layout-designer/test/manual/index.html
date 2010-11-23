@@ -31,7 +31,9 @@
 
         <p />
 
-        <div id="demo" class="yui3-skin-sam"></div>
+        <div class="yui3-skin-sam">
+            <div id="demo" />
+        </div>
 
         <script type="text/javascript">
         <!--
@@ -53,8 +55,12 @@
                     function( e ) {
                         if ( !_demo.layoutDesigner ) {
                             _demo.plug( Y.Bewype.LayoutDesigner, {
-                                fileStaticPath : 'http://localhost:8000/uploads/',
-                                uploadUrl      : 'http://localhost:8000/upload'
+                                fileStaticPath  : 'http://localhost:8000/uploads/',
+                                uploadUrl       : 'http://localhost:8000/upload',
+                                panelPosition   : 'right',
+                                panelOffsetY    : 80,
+                                panelOffsetX    : 40,
+                                pickerColorSize : 90
                             } );
                         }
                     },

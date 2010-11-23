@@ -176,7 +176,11 @@
                 spinnerMaxWidth : _maxWidth,
                 activeButtons   : this.get( _activeButtons ),
                 fileStaticPath  : this.get( 'fileStaticPath' ),
-                uploadUrl       : this.get( 'uploadUrl' )
+                uploadUrl       : this.get( 'uploadUrl' ),
+                panelPosition   : this.get( 'panelPosition' ),
+                panelOffsetY    : this.get( 'panelOffsetY' ),
+                panelOffsetX    : this.get( 'panelOffsetX' ),
+                pickerColorSize : this.get( 'pickerColorSize' )
             };
 
             // plug

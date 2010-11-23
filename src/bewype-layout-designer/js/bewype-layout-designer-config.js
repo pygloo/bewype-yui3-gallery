@@ -85,7 +85,7 @@
             }
         },
         defaultText : {
-            value : 'Text ...',
+            value : '',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -105,7 +105,6 @@
                     'bold',
                     'italic',
                     'underline',
-                    'title',
                     'font-family',
                     'font-size',
                     'text-align',
@@ -119,11 +118,12 @@
         },
         editorImageButtons : {
             value : [
-                    'file',
                     'background-color',
+                    'height',
                     'padding-top',
                     'padding-bottom',
                     'text-align',
+                    'file',
                     'reset',
                     'apply'
                     ]
@@ -144,6 +144,31 @@
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
+            }
+        },
+        panelPosition : {
+            value: 'left', 
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },
+        panelOffsetY : {
+            value : 80,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
+        },
+        panelOffsetX : {
+            value : 20,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
+        },
+        pickerColorSize : {
+            value : 20,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
             }
         }
     };

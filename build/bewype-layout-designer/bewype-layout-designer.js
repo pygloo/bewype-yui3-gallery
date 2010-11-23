@@ -87,7 +87,7 @@ YUI.add('bewype-layout-designer-config', function(Y) {
             }
         },
         defaultText : {
-            value : 'Text ...',
+            value : '',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -107,7 +107,6 @@ YUI.add('bewype-layout-designer-config', function(Y) {
                     'bold',
                     'italic',
                     'underline',
-                    'title',
                     'font-family',
                     'font-size',
                     'text-align',
@@ -121,11 +120,12 @@ YUI.add('bewype-layout-designer-config', function(Y) {
         },
         editorImageButtons : {
             value : [
-                    'file',
                     'background-color',
+                    'height',
                     'padding-top',
                     'padding-bottom',
                     'text-align',
+                    'file',
                     'reset',
                     'apply'
                     ]
@@ -146,6 +146,31 @@ YUI.add('bewype-layout-designer-config', function(Y) {
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
+            }
+        },
+        panelPosition : {
+            value: 'left', 
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },
+        panelOffsetY : {
+            value : 80,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
+        },
+        panelOffsetX : {
+            value : 20,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
+        },
+        pickerColorSize : {
+            value : 20,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
             }
         }
     };
@@ -504,7 +529,11 @@ YUI.add('bewype-layout-designer-content', function(Y) {
                 spinnerMaxWidth : _maxWidth,
                 activeButtons   : this.get( _activeButtons ),
                 fileStaticPath  : this.get( 'fileStaticPath' ),
-                uploadUrl       : this.get( 'uploadUrl' )
+                uploadUrl       : this.get( 'uploadUrl' ),
+                panelPosition   : this.get( 'panelPosition' ),
+                panelOffsetY    : this.get( 'panelOffsetY' ),
+                panelOffsetX    : this.get( 'panelOffsetX' ),
+                pickerColorSize : this.get( 'pickerColorSize' )
             };
 
             // plug
