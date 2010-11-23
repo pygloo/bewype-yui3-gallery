@@ -126,6 +126,41 @@
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
+        },
+        panelPosition : {
+            value : 'left',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },
+        panelOffsetY : {
+            value : 50,
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
+        },
+        panelOffsetX : {
+            value : 50,
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
+        },
+        panelPadding : {
+            value : 10,
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
+        },
+        pickerColorSize : {
+            value : 180, /* can be 180 or 90 */
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
         }
     };
 

@@ -75,12 +75,11 @@
                 function( e ) {
                     if ( !_contentImg.bewypeEditorTag && !_contentTxt.bewypeEditorTag ) {
                         _contentImg.plug( Y.Bewype.EditorTag, {
-                            panelNode : Y.one( "#panel" ),
+                            panelNode       : Y.one( "#panel" ),
                             spinnerMaxWidth : 320,
-                            activeButtons : [
+                            activeButtons   : [
                                         'file',
                                         'background-color',
-                                        'height',
                                         'width',
                                         'padding-top',
                                         'padding-bottom',
@@ -88,8 +87,12 @@
                                         'reset',
                                         'apply'
                                         ],
-                            fileStaticPath : 'http://localhost:8000/uploads/',
-                            uploadUrl : 'http://localhost:8000/upload',
+                            fileStaticPath  : 'http://localhost:8000/uploads/',
+                            uploadUrl       : 'http://localhost:8000/upload',
+                            panelPosition   : 'right',
+                            panelOffsetY    : 80,
+                            panelOffsetX    : 40,
+                            pickerColorSize : 90
                         } )
                     }
                 }
@@ -106,44 +109,49 @@
 
             // TAG EDITOR
 
-                // attach event
-                Y.one( "#attach-editor-tag-txt" ).on( 'click',
-                    function( e ) {
-                        if ( !_contentImg.bewypeEditorTag && !_contentTxt.bewypeEditorText ) {
-                            _contentTxt.plug( Y.Bewype.EditorText, {
-                                panelNode     : _panelNode,
-                                activeButtons : [
-                                            'height',
-                                            'width',
-                                            'bold',
-                                            'italic',
-                                            'underline',
-                                            'title',
-                                            'font-family',
-                                            'font-size',
-                                            'text-align',
-                                            'color',
-                                            'background-color',
-                                            'url',
-                                            'file',
-                                            'reset',
-                                            'apply'
-                                            ]
-                            } );
-                        }
+            // attach event
+            Y.one( "#attach-editor-tag-txt" ).on( 'click',
+                function( e ) {
+                    if ( !_contentImg.bewypeEditorTag && !_contentTxt.bewypeEditorText ) {
+                        _contentTxt.plug( Y.Bewype.EditorText, {
+                            panelNode     : _panelNode,
+                            activeButtons : [
+                                        'height',
+                                        'width',
+                                        'bold',
+                                        'italic',
+                                        'underline',
+                                        'font-family',
+                                        'font-size',
+                                        'text-align',
+                                        'color',
+                                        'background-color',
+                                        'url',
+                                        'file',
+                                        'reset',
+                                        'apply'
+                                        ],
+                            fileStaticPath  : 'http://localhost:8000/uploads/',
+                            uploadUrl       : 'http://localhost:8000/upload',
+                            panelPosition   : 'right',
+                            panelOffsetY    : 80,
+                            panelOffsetX    : 40,
+                            pickerColorSize : 90
+                        } );
                     }
-                );
+                }
+            );
 
-                // detach event
-                Y.one( "#detach-editor-tag-txt" ).on( 'click',
-                    function( e ) {
-                        if ( _contentTxt.bewypeEditorText ) {
-                            _panelNode.unplug( Y.Bewype.EditorPanel );
-                        }
+            // detach event
+            Y.one( "#detach-editor-tag-txt" ).on( 'click',
+                function( e ) {
+                    if ( _contentTxt.bewypeEditorText ) {
+                        _panelNode.unplug( Y.Bewype.EditorPanel );
                     }
-                );
+                }
+            );
 
-            // TEXT EDITOR
+        // TEXT EDITOR
 
 
         } );

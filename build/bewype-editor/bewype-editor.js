@@ -128,6 +128,41 @@ YUI.add('bewype-editor-config', function(Y) {
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
+        },
+        panelPosition : {
+            value : 'left',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
+        },
+        panelOffsetY : {
+            value : 50,
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
+        },
+        panelOffsetX : {
+            value : 50,
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
+        },
+        panelPadding : {
+            value : 10,
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
+        },
+        pickerColorSize : {
+            value : 180, /* can be 180 or 90 */
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isNumber( val );
+            }
         }
     };
 
@@ -158,8 +193,8 @@ YUI.add('bewype-editor-panel', function(Y) {
     /**
      *
      */
-    SPINNER_TMPL += '<div class="{editorClass}">';
-    SPINNER_TMPL += '{label}';
+    SPINNER_TMPL += '<div class="{editorClass} {buttonClass}">';
+    SPINNER_TMPL += '<div class="{editorClass}-label {buttonClass}-label">{label}</div>';
     SPINNER_TMPL += '<div class="{spinnerClass}"></div>';
     SPINNER_TMPL += '</div>';
 
@@ -254,6 +289,7 @@ YUI.add('bewype-editor-panel', function(Y) {
             _spinnerNode = new Y.Node.create(
                 Y.substitute( SPINNER_TMPL, {
                     editorClass  : _editorClass,
+                    buttonClass  : _editorClass + '-button-' + name,
                     label        : this.get( Y.Bewype.Utils.camelize( 'spinner-label-' + name ) ),
                     spinnerClass : _spinnerClass
                 } )
@@ -275,6 +311,12 @@ YUI.add('bewype-editor-panel', function(Y) {
 
             // update button dict
             this._buttonDict[ name ] = _spinner;
+
+            // return height and width
+            return {
+                height : Y.Bewype.Utils.getHeight( _spinnerNode ),
+                width  : Y.Bewype.Utils.getWidth( _spinnerNode )
+            };
         },
 
         __buttonFactory : function ( name, buttonClass, button ) {
@@ -313,6 +355,12 @@ YUI.add('bewype-editor-panel', function(Y) {
 
             // update button dict
             this._buttonDict[ name ] = button;
+
+            // return height and width
+            return {
+                height : Y.Bewype.Utils.getHeight( _buttonNode ),
+                width  : Y.Bewype.Utils.getWidth( _buttonNode )
+            };
         },
 
         _addButton : function ( name ) {
@@ -323,7 +371,7 @@ YUI.add('bewype-editor-panel', function(Y) {
             } );
 
             // do add
-            this.__buttonFactory( name, 'button', _button );
+            return this.__buttonFactory( name, 'button', _button );
         },
 
         _addToggleButton : function ( name ) {
@@ -334,55 +382,108 @@ YUI.add('bewype-editor-panel', function(Y) {
             } );
 
             // do add
-            this.__buttonFactory( name, 'toggle-button', _button );
+            return this.__buttonFactory( name, 'toggle-button', _button );
         },
 
         _addPickerButton : function ( name, pickerObj ) {
 
             // create\render toggle button
-            var _button = new Y.Bewype.ButtonPicker( {
-                label        : name,
-                pickerObj    : pickerObj,
-                pickerParams : name === 'file' ? { uploadUrl:  this.get( 'uploadUrl' ) } : null
-            } );
+            var _pickerColor  = name === 'background-color' || name === 'color',
+                _pickerParams = {
+                    fileStaticPath  : name === 'file' ? this.get( 'fileStaticPath' )  : null,
+                    uploadUrl       : name === 'file' ? this.get( 'uploadUrl' )       : null,
+                    pickerSize      : _pickerColor    ? this.get( 'pickerColorSize' ) : null
+                },
+                _button = new Y.Bewype.ButtonPicker( {
+                    label           : name,
+                    pickerObj       : pickerObj,
+                    pickerParams    : _pickerParams,
+                    pickerPosition  : this.get( 'panelPosition' )
+                } );
 
             // do add
-            this.__buttonFactory( name, 'picker-button', _button );
+            return this.__buttonFactory( name, 'picker-button', _button );
         },
 
         _initPanel : function ( config ) {
 
-            var _activeButtons = this.get( 'activeButtons' );
+            var _host          = this.get( 'host'   ),
+                _editorClass   = this.get( 'editorClass' ),
+                _panelPosition = this.get( 'panelPosition' ),
+                _panelOffsetX  = this.get( 'panelOffsetX' ),
+                _panelOffsetY  = this.get( 'panelOffsetY' ),
+                _activeButtons = this.get( 'activeButtons' ),
+                _bHW           = null,
+                _panelPadding  = this.get( 'panelPadding' ),
+                _panelHeight   = 0,
+                _panelWidth    = 0;
 
             Y.Object.each( this._spinnerButtons, function( v, k ) {
+                var _hW = null;
                 // check active
                 if ( _activeButtons.indexOf( v ) != -1 ) { 
                     // do add
-                    this._addSpinnerButton( v, config );
+                    _hW = this._addSpinnerButton( v, config );
+                    // update width and height
+                    _panelHeight += _hW.height + 4; // + padding
+                    _panelWidth  += _hW.width + 4; // + padding
                 }
             }, this );
             // set max value
             this.updateSpinnerMaxWidth();
 
             Y.Object.each( this._toggleButtons , function( v, k ) {
+                var _hW = null;
                 // check active
                 if ( _activeButtons.indexOf( v ) != -1 ) { 
                     // do add
-                    this._addToggleButton( v );
+                    _hW = this._addToggleButton( v );
+                    // update width and height
+                    _panelHeight += _hW.height + 4; // + padding
+                    _panelWidth  += _hW.width + 4; // + padding
                 }
             }, this );
 
             Y.Object.each( this._pickerButtons , function( v, k ) {
+                var _hW = null;
                 // check active
                 if ( _activeButtons.indexOf( v ) != -1 ) { 
                     // do add
-                    this._addPickerButton( v, this._pickerObjDict[ v ] );
+                    _hW = this._addPickerButton( v, this._pickerObjDict[ v ] );
+                    // update width and height
+                    _panelHeight += _hW.height + 4; // + padding
+                    _panelWidth  += _hW.width + 4; // + padding
                 }
             }, this );
 
-            this._addButton( 'reset' );
+            _bHW = this._addButton( 'reset' );
+            // update width and height
+            _panelHeight += _bHW.height;
+            _panelWidth  += _bHW.width;
 
-            this._addButton( 'apply' );
+            _bHW = this._addButton( 'apply' );
+            // update width and height
+            _panelHeight += _bHW.height;
+            _panelWidth  += _bHW.width;
+            
+            // update width and height
+            _panelHeight += _panelPadding;
+            _panelWidth  += _panelPadding;
+
+            // set panel class
+            _host.addClass( _editorClass );
+            _host.addClass( _editorClass + '-' + _panelPosition );
+            // show
+            _host.setStyle( 'display', 'block' );
+            // set offset
+            _host.setStyle( _panelPosition, _panelOffsetX );
+            _host.setStyle( 'top', _panelOffsetY );
+
+            if ( _panelPosition === 'left' || _panelPosition === 'right') {
+                _host.setStyle( 'height', _panelHeight );
+            } else {
+                _host.setStyle( 'width', _panelWidth );
+            }
         },
 
         /**
@@ -404,8 +505,15 @@ YUI.add('bewype-editor-panel', function(Y) {
         destructor : function () {
     
             // tmp vars
-            var _host        = this.get( 'host' ),
-                _editorClass = this.get( 'editorClass' );
+            var _host          = this.get( 'host' ),
+                _editorClass   = this.get( 'editorClass' ),
+                _panelPosition = this.get( 'panelPosition' );
+
+            // set panel class
+            _host.removeClass( _editorClass );
+            _host.removeClass( _editorClass + '-' + _panelPosition );
+            // hide
+            _host.setStyle( 'display', 'none' );
 
             // remove buttons
             Y.Object.each( this.get( 'activeButtons' ) , function( v, k ) {
@@ -964,7 +1072,6 @@ YUI.add('bewype-editor-tag', function(Y) {
         onButtonChange : function ( name, e ) {
 
             var _host        = this.get( 'host' ),
-                _hostTagName = _host.get( 'tagName' ),
                 _imgNode     = _host.one( 'img' ),
                 _button      = this._panel.getButton( name ),
                 _value       = _button ? _button.getValue() : null,
@@ -1128,10 +1235,6 @@ YUI.add('bewype-editor-text', function(Y) {
                 _cssDict     = Y.Bewype.Utils.getCssDict( _host ),
                 _innerHTML   = _host.get( 'innerHTML' ),
                 _placeNode   = null;
-                // _main        = new Y.Node.create( '<div><div class="main" /></div>' );
-
-            // set content to main
-            // _main.one( '.main' ).append( this.getInnerHTML( _host ) );
             
             // and empty tag content temporary
             _host.set( 'innerHTML', '' );
@@ -1147,7 +1250,7 @@ YUI.add('bewype-editor-text', function(Y) {
 
             // Create the Base Editor
             this._editor = new Y.EditorBase( {
-                content : _innerHTML // _main.get( 'innerHTML' )
+                content : _innerHTML
             } );
 
             // Rendering the Editor
@@ -1540,8 +1643,7 @@ YUI.add('bewype-editor-text', function(Y) {
                 _img           = null,
                 _tag           = null,
                 _tagNode       = null,
-                _newNode       = null,
-                _caretNode     = null;
+                _newNode       = null;
 
             if ( !_selectionNode ) {
 

@@ -58,7 +58,7 @@
             }
         },
         pickerSize : {
-            value : 180, /* can be normal or small */
+            value : 180, /* can be 180 or 90 */
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isNumber( val );

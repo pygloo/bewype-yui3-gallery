@@ -91,7 +91,6 @@ YUI.add('bewype-editor-tag', function(Y) {
         onButtonChange : function ( name, e ) {
 
             var _host        = this.get( 'host' ),
-                _hostTagName = _host.get( 'tagName' ),
                 _imgNode     = _host.one( 'img' ),
                 _button      = this._panel.getButton( name ),
                 _value       = _button ? _button.getValue() : null,

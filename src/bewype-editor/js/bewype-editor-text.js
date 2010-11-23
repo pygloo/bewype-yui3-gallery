@@ -59,10 +59,6 @@
                 _cssDict     = Y.Bewype.Utils.getCssDict( _host ),
                 _innerHTML   = _host.get( 'innerHTML' ),
                 _placeNode   = null;
-                // _main        = new Y.Node.create( '<div><div class="main" /></div>' );
-
-            // set content to main
-            // _main.one( '.main' ).append( this.getInnerHTML( _host ) );
             
             // and empty tag content temporary
             _host.set( 'innerHTML', '' );
@@ -78,7 +74,7 @@
 
             // Create the Base Editor
             this._editor = new Y.EditorBase( {
-                content : _innerHTML // _main.get( 'innerHTML' )
+                content : _innerHTML
             } );
 
             // Rendering the Editor
@@ -471,8 +467,7 @@
                 _img           = null,
                 _tag           = null,
                 _tagNode       = null,
-                _newNode       = null,
-                _caretNode     = null;
+                _newNode       = null;
 
             if ( !_selectionNode ) {
 

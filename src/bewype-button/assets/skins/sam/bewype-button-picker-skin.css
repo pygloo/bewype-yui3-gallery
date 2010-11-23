@@ -1,16 +1,16 @@
 
 .yui3-skin-sam .yui3-button-picker {
     background-color        : #fff;
-    border                  : 1px solid #777;
+    border                  : 1px solid #aaa;
     color                   : #444;
     height                  : 40px;
     width                   : 100%;
-    -webkit-border-radius   : 5px;
-    -moz-border-radius      : 5px;
-    border-radius           : 5px;
-    filter                  : progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#eeeeee'); /* for IE */
-    background              : -webkit-gradient(linear, left top, left bottom, from(#fff), to(#eee)); /* for webkit browsers */
-    background              : -moz-linear-gradient(top,  #fff,  #eee); /* for firefox 3.6+ */
+    -webkit-border-radius   : 2px;
+    -moz-border-radius      : 2px;
+    border-radius           : 2px;
+    filter                  : progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#efefef'); /* for IE */
+    background              : -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#efefef)); /* for webkit browsers */
+    background              : -moz-linear-gradient(top,  #ffffff,  #efefef); /* for firefox 3.6+ */
 }
 
 .yui3-skin-sam .yui3-button-picker:hover {
@@ -27,8 +27,8 @@
 
 .yui3-skin-sam .yui3-button-picker-host {
     background-color      : #fff;
-    -webkit-border-radius : 5px;
-    -moz-border-radius    : 5px;
-    border-radius         : 5px;
+    -webkit-border-radius : 2px;
+    -moz-border-radius    : 2px;
+    border-radius         : 2px;
 }
 
