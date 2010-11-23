@@ -117,8 +117,9 @@
 
             // button manual
             var _buttonColor = new Y.Bewype.ButtonPicker( {
-                label     : 'Color',
-                pickerObj :  Y.Bewype.PickerColor
+                label          : 'Color',
+                pickerObj      :  Y.Bewype.PickerColor,
+                pickerPosition : 'right'
             } );
             _buttonColor.render( '#button-picker-color' );
 
@@ -129,12 +130,13 @@
 
             // button manual
             var _buttonFile = new Y.Bewype.ButtonPicker( {
-                label     : 'File',
-                pickerObj :  Y.Bewype.PickerFile,
-                pickerParams: {
+                label          : 'File',
+                pickerObj      :  Y.Bewype.PickerFile,
+                pickerParams   : {
                     fileStaticPath : 'http://www.bewype.org/uploads/',
                     uploadUrl      : 'http://www.bewype.org/upload'
-                }
+                },
+                pickerPosition : 'right'
             } );
             _buttonFile.render( '#button-picker-file' );
 
@@ -145,8 +147,9 @@
 
             // button manual
             var _buttonFontSize = new Y.Bewype.ButtonPicker( {
-                label     : 'Font Size',
-                pickerObj :  Y.Bewype.PickerFontSize
+                label          : 'Font Size',
+                pickerObj      :  Y.Bewype.PickerFontSize,
+                pickerPosition : 'right'
             } );
             _buttonFontSize.render( '#button-picker-font-size' );
 
@@ -157,8 +160,9 @@
 
             // button manual
             var _buttonFontFamily = new Y.Bewype.ButtonPicker( {
-                label     : 'Font Family',
-                pickerObj :  Y.Bewype.PickerFontFamily
+                label          : 'Font Family',
+                pickerObj      :  Y.Bewype.PickerFontFamily,
+                pickerPosition : 'right'
             } );
             _buttonFontFamily.render( '#button-picker-font-family' );
 
@@ -169,8 +173,9 @@
 
             // button manual
             var _buttonTextAlign = new Y.Bewype.ButtonPicker( {
-                label     : 'Text Align',
-                pickerObj :  Y.Bewype.PickerTextAlign
+                label          : 'Text Align',
+                pickerObj      :  Y.Bewype.PickerTextAlign,
+                pickerPosition : 'right'
             } );
             _buttonTextAlign.render( '#button-picker-text-align' );
 
@@ -181,8 +186,9 @@
 
             // button manual
             var _buttonTitle = new Y.Bewype.ButtonPicker( {
-                label     : 'Title',
-                pickerObj :  Y.Bewype.PickerTitle
+                label          : 'Title',
+                pickerObj      :  Y.Bewype.PickerTitle,
+                pickerPosition : 'right'
             } );
             _buttonTitle.render( '#button-picker-title' );
 
@@ -193,8 +199,9 @@
 
             // button manual
             var _buttonUrl = new Y.Bewype.ButtonPicker( {
-                label     : 'Url',
-                pickerObj :  Y.Bewype.PickerUrl
+                label          : 'Url',
+                pickerObj      :  Y.Bewype.PickerUrl,
+                pickerPosition : 'right'
             } );
             _buttonUrl.render( '#button-picker-url' );
 

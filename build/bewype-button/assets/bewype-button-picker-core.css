@@ -1,23 +1,27 @@
 
 .yui3-button-picker {
-    margin           : auto;
-    text-align       : center;
+    margin          : auto;
+    text-align      : center;
 }
 
 .yui3-button-picker:hover {
-    cursor           : pointer;
+    cursor          : pointer;
 }
 
 .yui3-button-picker-label {
-    margin : auto;
+    margin          : auto;
 }
 
 .yui3-button-picker-host {
-    position : absolute;
-    z-index  : 2;
+    position        : absolute;
+    z-index         : 2;
 }
 
-.yui3-button-picker {
-    position : relative;
+.yui3-button-picker-host-left {
+    left                    : 0;
+}
+
+.yui3-button-picker-host-right {
+    right                   : 0;
 }
 

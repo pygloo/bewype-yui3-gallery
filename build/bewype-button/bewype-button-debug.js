@@ -386,7 +386,8 @@ YUI.add('bewype-button-picker', function(Y) {
     /**
      *
      */
-    ButtonPicker.PICKER_TMPL =  '<div class="{buttonClass}-host">';
+    ButtonPicker.PICKER_TMPL =  '<div class="{buttonClass}-host ';
+    ButtonPicker.PICKER_TMPL += '{buttonClass}-host-{pickerPosition}">';
     ButtonPicker.PICKER_TMPL += '</div>';
 
     /**
@@ -430,6 +431,13 @@ YUI.add('bewype-button-picker', function(Y) {
         pickerParams : {
             value : {},
             writeOnce : true
+        },
+        pickerPosition : {
+            value : 'left',
+            writeOnce : true,
+            validator : function( val ) {
+                return Y.Lang.isString( val );
+            }
         },
         zIndex : {
             value : 4,
@@ -497,7 +505,8 @@ YUI.add('bewype-button-picker', function(Y) {
                 var _contentBox  = this.get( 'contentBox'  ),
                     _buttonClass = this.get( 'buttonClass' ),
                     _pickerClass = this._picker.get( 'pickerClass' ),
-                    _pickerHost  = _contentBox.one( '.' + _buttonClass + '-host');
+                    _pos         = this.get( 'pickerPosition' ),
+                    _pickerHost  = _contentBox.one( '.' + _buttonClass + '-host-' + _pos);
 
                 if ( evt && evt.target.ancestor( '.' + _pickerClass ) ) {
                     // do nothing
@@ -524,11 +533,12 @@ YUI.add('bewype-button-picker', function(Y) {
          */
         showPicker : function () {
             // temp vars
-            var _contentBox   = this.get( 'contentBox'  ),
-                _buttonClass  = this.get( 'buttonClass' ),
-                _pickerObj    = this.get( 'pickerObj'   ),
-                _pickerParams = this.get( 'pickerParams' ),
-                _pickerHost   = null;
+            var _contentBox     = this.get( 'contentBox'  ),
+                _buttonClass    = this.get( 'buttonClass' ),
+                _pickerObj      = this.get( 'pickerObj'   ),
+                _pickerParams   = this.get( 'pickerParams' ),
+                _pickerPosition = this.get( 'pickerPosition' ),
+                _pickerHost     = null;
 
             // little check
             if ( _contentBox && _pickerObj ) {
@@ -536,7 +546,8 @@ YUI.add('bewype-button-picker', function(Y) {
                 // add picker node
                 _pickerHost = new Y.Node.create(
                     Y.substitute( ButtonPicker.PICKER_TMPL, {
-                        buttonClass : _buttonClass
+                        buttonClass    : _buttonClass,
+                        pickerPosition : _pickerPosition
                     } )
                 );
                 _contentBox.append( _pickerHost );
