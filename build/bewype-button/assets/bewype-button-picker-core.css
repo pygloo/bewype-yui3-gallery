@@ -1,4 +1,8 @@
 
+.yui3-buttonpicker-content {
+    position        : relative;
+}
+
 .yui3-button-picker {
     margin          : auto;
     text-align      : center;
