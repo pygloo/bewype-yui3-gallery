@@ -3,29 +3,29 @@
     position        : relative;
 }
 
-.yui3-button-picker {
+.bewype-button-picker {
     margin          : auto;
     text-align      : center;
 }
 
-.yui3-button-picker:hover {
+.bewype-button-picker:hover {
     cursor          : pointer;
 }
 
-.yui3-button-picker-label {
+.bewype-button-picker-label {
     margin          : auto;
 }
 
-.yui3-button-picker-host {
+.bewype-button-picker-host {
     position        : absolute;
     z-index         : 2;
 }
 
-.yui3-button-picker-host-left {
+.bewype-button-picker-host-left {
     left                    : 0;
 }
 
-.yui3-button-picker-host-right {
+.bewype-button-picker-host-right {
     right                   : 0;
 }
 

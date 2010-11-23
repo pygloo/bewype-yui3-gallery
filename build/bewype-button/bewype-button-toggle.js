@@ -28,7 +28,7 @@ YUI.add('bewype-button-toggle', function(Y) {
      */
     ButtonToggle.ATTRS = {
         buttonClass : {
-            value : 'yui3-button-toggle',
+            value : 'bewype-button-toggle',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );
@@ -97,7 +97,11 @@ YUI.add('bewype-button-toggle', function(Y) {
             // little check
             if (_buttonNode) {
                 // update class name
-                _buttonNode.set( 'className', this._toggleState ? _buttonClass + '-active' : _buttonClass );
+                if ( this._toggleState ) {                
+                    _buttonNode.addClass( _buttonClass + '-active' );
+                } else {
+                    _buttonNode.removeClass( _buttonClass + '-active' );
+                }
             }
         },
 

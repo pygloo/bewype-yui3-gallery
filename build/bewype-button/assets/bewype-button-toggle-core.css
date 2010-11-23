@@ -1,15 +1,15 @@
 
-.yui3-button-toggle {
+.bewype-button-toggle {
     margin           : auto;
     text-align       : center;
 }
 
-.yui3-button-toggle:hover
-.yui3-button-toggle-active:hover {
+.bewype-button-toggle:hover,
+.bewype-button-toggle-active:hover {
     cursor           : pointer;
 }
 
-.yui3-button-toggle-label {
+.bewype-button-toggle-label {
     margin : auto;
 }
 

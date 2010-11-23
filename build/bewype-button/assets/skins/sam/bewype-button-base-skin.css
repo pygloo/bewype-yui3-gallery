@@ -1,5 +1,5 @@
 
-.yui3-skin-sam .yui3-button-base {
+.yui3-skin-sam .bewype-button-base {
     background-color        : #fff;
     border                  : 1px solid #aaa;
     color                   : #444;
@@ -13,13 +13,13 @@
     background              : -moz-linear-gradient(top,  #ffffff,  #efefef); /* for firefox 3.6+ */
 }
 
-.yui3-skin-sam .yui3-button-base:hover {
+.yui3-skin-sam .bewype-button-base:hover {
     background-color : #eee;
     border-color     : #999;
     color            : #666;
 }
 
-.yui3-skin-sam .yui3-button-base-label {
+.yui3-skin-sam .bewype-button-base-label {
     font-family      : Arial, Helvetica, sans-serif;
     font-size        : 0.875em;
     padding          : 12px;

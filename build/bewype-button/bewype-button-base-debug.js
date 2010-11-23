@@ -47,7 +47,7 @@ YUI.add('bewype-button-base', function(Y) {
      */
     Button.ATTRS = {
         buttonClass : {
-            value : 'yui3-button-base',
+            value : 'bewype-button-base',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );

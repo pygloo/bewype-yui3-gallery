@@ -27,7 +27,7 @@
      */
     ButtonPicker.ATTRS = {
         buttonClass : {
-            value : 'yui3-button-picker',
+            value : 'bewype-button-picker',
             writeOnce : true,
             validator : function( val ) {
                 return Y.Lang.isString( val );

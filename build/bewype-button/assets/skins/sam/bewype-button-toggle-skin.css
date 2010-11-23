@@ -1,6 +1,6 @@
 
-.yui3-skin-sam .yui3-button-toggle,
-.yui3-skin-sam .yui3-button-toggle-active {
+.yui3-skin-sam .bewype-button-toggle,
+.yui3-skin-sam .bewype-button-toggle-active {
     height                  : 40px;
     width                   : 100%;
     -webkit-border-radius   : 2px;
@@ -8,7 +8,7 @@
     border-radius           : 2px;
 }
 
-.yui3-skin-sam .yui3-button-toggle {
+.yui3-skin-sam .bewype-button-toggle {
     background-color        : #fff;
     border                  : 1px solid #aaa;
     color                   : #444;
@@ -17,7 +17,7 @@
     background              : -moz-linear-gradient(top,  #ffffff,  #efefef); /* for firefox 3.6+ */
 }
 
-.yui3-skin-sam .yui3-button-toggle-active {
+.yui3-skin-sam .bewype-button-toggle-active {
     background-color        : #ddd;
     border                  : 1px solid #777;
     color                   : #333;
@@ -26,19 +26,19 @@
     background              : -moz-linear-gradient(top,  #eee,  #ddd); /* for firefox 3.6+ */
 }
 
-.yui3-skin-sam .yui3-button-toggle:hover,
-.yui3-skin-sam .yui3-button-toggle-active:hover {
+.yui3-skin-sam .bewype-button-toggle:hover,
+.yui3-skin-sam .bewype-button-toggle-active:hover {
     background-color : #eee;
     border-color     : #999;
     color            : #666;
 }
 
-.yui3-skin-sam .yui3-button-toggle-checkbox {
+.yui3-skin-sam .bewype-button-toggle-checkbox {
     float            : left;
     margin           : 14px 8px;
 }
 
-.yui3-skin-sam .yui3-button-toggle-label {
+.yui3-skin-sam .bewype-button-toggle-label {
     float            : left;
     font-family      : Arial, Helvetica, sans-serif;
     font-size        : 0.875em;

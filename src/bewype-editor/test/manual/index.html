@@ -25,26 +25,36 @@
         </span>
     </div>
 
-        <h2 class="para-title">Editor Tag Image<em>(demo)</em></h2>
+        <h2 class="para-title">Editor Img<em>(demo)</em></h2>
 
         <p class="para-text">
             <a id="attach-editor-tag-img" href="#">Attach</a> | <a id="detach-editor-tag-img" href="#">Detach</a>
         </p>
 
         <center>
-            <div id="content-img">
+            <div id="content-tag-img">
                 <img src="static/logo.gif" />
             </div>
         </center>
 
-        <h2 class="para-title">Editor Tag Text<em>(demo)</em></h2>
+        <h2 class="para-title">Editor Tag<em>(demo)</em></h2>
 
         <p class="para-text">
             <a id="attach-editor-tag-txt" href="#">Attach</a> | <a id="detach-editor-tag-txt" href="#">Detach</a>
         </p>
 
         <center>
-            <div id="content-txt" style="border: 1px solid black; font-family: arial, sans-serif; font-size: medium; margin: 0; padding: 0; height: 120px; width: 240px;">This is a <b>test</b> ... <i>and</i> another <a href="">cool</a>!</div>
+            <div id="content-tag-txt" style="border: 1px solid black; font-family: arial, sans-serif; font-size: medium; margin: 0; padding: 0; height: 120px; width: 240px;">This is a test ...</div>
+        </center>
+
+        <h2 class="para-title">Editor Text<em>(demo)</em></h2>
+
+        <p class="para-text">
+            <a id="attach-editor-text-txt" href="#">Attach</a> | <a id="detach-editor-text-txt" href="#">Detach</a>
+        </p>
+
+        <center>
+            <div id="content-text" style="border: 1px solid black; font-family: arial, sans-serif; font-size: medium; margin: 0; padding: 0; height: 120px; width: 240px;">This is a test ...</div>
         </center>
 
         <div id="panel" class="yui3-skin-sam"></div>
@@ -66,15 +76,18 @@
 
             // IMAGE EDITOR
 
-            var _contentImg = Y.one( "#content-img" ),
-                _contentTxt = Y.one( "#content-txt" ),
-                _panelNode  = Y.one( "#panel"   );
+            var _contentTagImg = Y.one( "#content-tag-img" ),
+                _contentTagTxt = Y.one( "#content-tag-txt" ),
+                _contentText   = Y.one( "#content-text" ),
+                _panelNode     = Y.one( "#panel"   );
 
             // attach event
             Y.one( "#attach-editor-tag-img" ).on( 'click',
                 function( e ) {
-                    if ( !_contentImg.bewypeEditorTag && !_contentTxt.bewypeEditorTag ) {
-                        _contentImg.plug( Y.Bewype.EditorTag, {
+                    if ( !_contentTagImg.bewypeEditorTag
+                            && !_contentTagTxt.bewypeEditorTag
+                            && !_contentText.bewypeEditorText ) {
+                        _contentTagImg.plug( Y.Bewype.EditorTag, {
                             panelNode       : Y.one( "#panel" ),
                             spinnerMaxWidth : 320,
                             activeButtons   : [
@@ -101,7 +114,7 @@
             // detach event
             Y.one( "#detach-editor-tag-img" ).on( 'click',
                 function( e ) {
-                    if ( _contentImg.bewypeEditorTag ) {
+                    if ( _contentTagImg.bewypeEditorTag ) {
                         _panelNode.unplug( Y.Bewype.EditorPanel );
                     }
                 }
@@ -112,8 +125,10 @@
             // attach event
             Y.one( "#attach-editor-tag-txt" ).on( 'click',
                 function( e ) {
-                    if ( !_contentImg.bewypeEditorTag && !_contentTxt.bewypeEditorText ) {
-                        _contentTxt.plug( Y.Bewype.EditorText, {
+                    if ( !_contentTagImg.bewypeEditorTag
+                            && !_contentTagTxt.bewypeEditorTag
+                            && !_contentText.bewypeEditorText ) {
+                        _contentTagTxt.plug( Y.Bewype.EditorTag, {
                             panelNode     : _panelNode,
                             activeButtons : [
                                         'height',
@@ -145,13 +160,57 @@
             // detach event
             Y.one( "#detach-editor-tag-txt" ).on( 'click',
                 function( e ) {
-                    if ( _contentTxt.bewypeEditorText ) {
+                    if ( _contentTagTxt.bewypeEditorTag ) {
                         _panelNode.unplug( Y.Bewype.EditorPanel );
                     }
                 }
             );
 
-        // TEXT EDITOR
+            // TEXT EDITOR
+
+            // attach event
+            Y.one( "#attach-editor-text-txt" ).on( 'click',
+                function( e ) {
+                    if ( !_contentTagImg.bewypeEditorTag
+                            && !_contentTagTxt.bewypeEditorTag
+                            && !_contentText.bewypeEditorText ) {
+                        _contentText.plug( Y.Bewype.EditorText, {
+                            panelNode     : _panelNode,
+                            activeButtons : [
+                                        'height',
+                                        'width',
+                                        'bold',
+                                        'italic',
+                                        'underline',
+                                        'font-family',
+                                        'font-size',
+                                        'text-align',
+                                        'color',
+                                        'background-color',
+                                        'url',
+                                        'file',
+                                        'reset',
+                                        'apply'
+                                        ],
+                            fileStaticPath  : 'http://localhost:8000/uploads/',
+                            uploadUrl       : 'http://localhost:8000/upload',
+                            panelPosition   : 'right',
+                            panelOffsetY    : 80,
+                            panelOffsetX    : 40,
+                            pickerColorSize : 90
+                        } );
+                    }
+                }
+            );
+
+            // detach event
+            Y.one( "#detach-editor-text-txt" ).on( 'click',
+                function( e ) {
+                    if ( _contentText.bewypeEditorText ) {
+                        _panelNode.unplug( Y.Bewype.EditorPanel );
+                    }
+                }
+            );
 
 
         } );

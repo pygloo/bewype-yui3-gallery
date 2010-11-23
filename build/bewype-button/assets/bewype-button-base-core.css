@@ -1,14 +1,14 @@
 
-.yui3-button-base {
+.bewype-button-base {
     margin           : auto;
     text-align       : center;
 }
 
-.yui3-button-base:hover {
+.bewype-button-base:hover {
     cursor           : pointer;
 }
 
-.yui3-button-base-label {
+.bewype-button-base-label {
     margin : auto;
 }
 
