@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
+<head> 
+
+    <title>Pygloo's Repos | bewype-yui3-gallery</title>
+
+    <link href="/bewype-yui3-gallery/css/pygloo-repo.css" rel="stylesheet" type="text/css">
+
+    <style>
+    <!--
+    -->
+    </style>
+
+    <script type="text/javascript" src="../../../../build/yui/yui.js"></script>
+
+</head>
+<body class="yui3-skin-sam">
+
+    <div class="title">
+        <h1><a href="http://pygloo.github.com/">Pygloo's Repos</a></h1>
+        <span>
+            | 
+            bewype-yui3-gallery
+            <a href="/bewype-yui3-gallery">&#182;</a>
+        </span>
+    </div>
+
+        <h2 class="para-title">Editor Tag Image<em>(demo)</em></h2>
+
+        <p class="para-text">
+            <a id="attach-editor-tag-img" href="#">Attach</a> | <a id="detach-editor-tag-img" href="#">Detach</a>
+        </p>
+
+        <center>
+            <div id="content-img">
+                <img src="static/logo.gif" />
+            </div>
+        </center>
+
+        <h2 class="para-title">Editor Tag Text<em>(demo)</em></h2>
+
+        <p class="para-text">
+            <a id="attach-editor-tag-txt" href="#">Attach</a> | <a id="detach-editor-tag-txt" href="#">Detach</a>
+        </p>
+
+        <center>
+            <div id="content-txt" style="border: 1px solid black; font-family: arial, sans-serif; font-size: medium; margin: 0; padding: 0; height: 120px; width: 240px;">This is a <b>test</b> ... <i>and</i> another <a href="">cool</a>!</div>
+        </center>
+
+        <div id="panel" class="yui3-skin-sam"></div>
+
+        <p/>
+
+    <script>
+        <!--
+        YUI( {
+            filter: 'debug',
+            skin: {
+                overrides: {
+                    slider: [
+                        'sam'
+                    ]
+                }
+            }
+        } ).use( 'bewype-editor-tag', function( Y ) {
+
+            // IMAGE EDITOR
+
+            var _contentImg = Y.one( "#content-img" ),
+                _contentTxt = Y.one( "#content-txt" ),
+                _panelNode  = Y.one( "#panel"   );
+
+            // attach event
+            Y.one( "#attach-editor-tag-img" ).on( 'click',
+                function( e ) {
+                    if ( !_contentImg.bewypeEditorTag && !_contentTxt.bewypeEditorTag ) {
+                        _contentImg.plug( Y.Bewype.EditorTag, {
+                            panelNode : Y.one( "#panel" ),
+                            spinnerMaxWidth : 320,
+                            activeButtons : [
+                                        'file',
+                                        'background-color',
+                                        'height',
+                                        'width',
+                                        'padding-top',
+                                        'padding-bottom',
+                                        'text-align',
+                                        'reset',
+                                        'apply'
+                                        ],
+                            fileStaticPath : 'http://localhost:8000/uploads/',
+                            uploadUrl : 'http://localhost:8000/upload',
+                        } )
+                    }
+                }
+            );
+
+            // detach event
+            Y.one( "#detach-editor-tag-img" ).on( 'click',
+                function( e ) {
+                    if ( _contentImg.bewypeEditorTag ) {
+                        _panelNode.unplug( Y.Bewype.EditorPanel );
+                    }
+                }
+            );
+
+            // TAG EDITOR
+
+                // attach event
+                Y.one( "#attach-editor-tag-txt" ).on( 'click',
+                    function( e ) {
+                        if ( !_contentImg.bewypeEditorTag && !_contentTxt.bewypeEditorText ) {
+                            _contentTxt.plug( Y.Bewype.EditorText, {
+                                panelNode     : _panelNode,
+                                activeButtons : [
+                                            'height',
+                                            'width',
+                                            'bold',
+                                            'italic',
+                                            'underline',
+                                            'title',
+                                            'font-family',
+                                            'font-size',
+                                            'text-align',
+                                            'color',
+                                            'background-color',
+                                            'url',
+                                            'file',
+                                            'reset',
+                                            'apply'
+                                            ]
+                            } );
+                        }
+                    }
+                );
+
+                // detach event
+                Y.one( "#detach-editor-tag-txt" ).on( 'click',
+                    function( e ) {
+                        if ( _contentTxt.bewypeEditorText ) {
+                            _panelNode.unplug( Y.Bewype.EditorPanel );
+                        }
+                    }
+                );
+
+            // TEXT EDITOR
+
+
+        } );
+        -->
+    </script>
+</body>
+</html>
+
