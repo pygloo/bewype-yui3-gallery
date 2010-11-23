@@ -1,9 +1,5 @@
 
 .bewype-picker-text-align {
-    border      : 1px solid #888;
-    font-family : Arial, Helvetica, sans-serif;
-    font-size   : 0.875em;
-    width       : 64px;
 }
 
 .bewype-picker-text-align table {
@@ -18,16 +14,13 @@
 }
 
 .bewype-picker-text-align td {
-    padding        : 2px 4px;
     vertical-align : middle;
 }
 
 .bewype-picker-text-align td:hover {
-    background-color : #ddd;
     cursor           : pointer;
 }
 
 .bewype-picker-text-align-row {
 }
-
 

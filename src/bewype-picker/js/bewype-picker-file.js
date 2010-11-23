@@ -204,7 +204,6 @@
 
     		//A function handler to use for completed requests:
 	    	_handleComplete = function( transactionid, response, args ) {
-                var _data = null
                 if ( response.responseText === 'error' ) {  
                     // :(
     			    this._showMessage( 'Upload failed!', true );    

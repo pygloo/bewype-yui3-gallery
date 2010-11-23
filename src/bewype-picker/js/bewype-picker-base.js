@@ -178,7 +178,7 @@
         /**
          *
          */
-        append : function ( name, text, style, active ) {
+        append : function ( name, text, style, active, lastItem ) {
 
             // vars
             var _contentBox  = this.get( 'contentBox'  ),
@@ -200,6 +200,14 @@
                 );
                 // do add // won't work with chrome http://yuilibrary.com/projects/yui3/ticket/2529368 :(
                 _pickerNode.one('table').append( _itemNode );
+
+                if ( _pickerNode.all( 'td' ).size() == 1 ) {
+                    _pickerNode.one( 'td' ).addClass( 'first' );
+                }
+
+                if ( lastItem ) {
+                    _pickerNode.one( 'td' ).addClass( 'last' );
+                }
 
                 // add on click event
                 Y.on( 'yui3-picker-event|click', Y.bind( this._onItemClick, this, name ), _itemNode );

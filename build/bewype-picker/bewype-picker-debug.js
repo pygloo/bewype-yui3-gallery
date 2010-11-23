@@ -180,7 +180,7 @@ YUI.add('bewype-picker-base', function(Y) {
         /**
          *
          */
-        append : function ( name, text, style, active ) {
+        append : function ( name, text, style, active, lastItem ) {
 
             // vars
             var _contentBox  = this.get( 'contentBox'  ),
@@ -202,6 +202,14 @@ YUI.add('bewype-picker-base', function(Y) {
                 );
                 // do add // won't work with chrome http://yuilibrary.com/projects/yui3/ticket/2529368 :(
                 _pickerNode.one('table').append( _itemNode );
+
+                if ( _pickerNode.all( 'td' ).size() == 1 ) {
+                    _pickerNode.one( 'td' ).addClass( 'first' );
+                }
+
+                if ( lastItem ) {
+                    _pickerNode.one( 'td' ).addClass( 'last' );
+                }
 
                 // add on click event
                 Y.on( 'yui3-picker-event|click', Y.bind( this._onItemClick, this, name ), _itemNode );
@@ -460,7 +468,7 @@ YUI.add('bewype-picker-color', function(Y) {
 
             var _position = 0;                                
 
-            while( node != null ) {
+            while( node !== null ) {
                 _position += node.get( positionProperty );
                 node = node.get( 'offsetParent' );
             }
@@ -478,8 +486,6 @@ YUI.add('bewype-picker-color', function(Y) {
                 _targetNode   = evt ? evt.target : null,
                 _pThreshO     = this.get( 'pickerThreshold' ),
                 _value        = this._slider ? this._slider.getValue() : 0,
-                _nodeX        = 0,
-                _nodeY        = 0,
                 _x            = 0,
                 _y            = 0,
                 _h            = 0,
@@ -487,7 +493,6 @@ YUI.add('bewype-picker-color', function(Y) {
                 _v            = 0,
                 _rgb          = [],
                 _bgVal        = '',
-                _offsetParent = _contentBox.get( 'offsetParent' ),
                 _previewNode  = _contentBox.one( '.' + _pickerClass + '-preview' ),
                 _rNode        = _contentBox.one( '.' + _pickerClass + '-r' ),
                 _gNode        = _contentBox.one( '.' + _pickerClass + '-g' ),
@@ -785,7 +790,6 @@ YUI.add('bewype-picker-file', function(Y) {
 
     		//A function handler to use for completed requests:
 	    	_handleComplete = function( transactionid, response, args ) {
-                var _data = null
                 if ( response.responseText === 'error' ) {  
                     // :(
     			    this._showMessage( 'Upload failed!', true );    
@@ -1085,8 +1089,9 @@ YUI.add('bewype-picker-text-align', function(Y) {
 
             // add sizes
             Y.Object.each( this.get( 'alignProps' ), function (v, k) {
-                var _style = 'text-align: ' + v + ';';
-                this.append( v,  v, _style);
+                var _style = 'text-align: ' + v + ';',
+                    _last  = k == ( this.get( 'alignProps' ).length - 1 );
+                this.append( v,  v, _style, null, _last);
             }, this );
         }
     } );

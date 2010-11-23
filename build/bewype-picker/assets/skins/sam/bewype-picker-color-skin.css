@@ -1,1 +1,22 @@
 
+.yui3-skin-sam .bewype-picker-color,
+.yui3-skin-sam .bewype-picker-color-small {
+    border                : 1px solid #888;
+    font-family           : Arial, Helvetica, sans-serif;
+    font-size             : 0.875em;
+    -webkit-border-radius : 4px;
+    -moz-border-radius    : 4px;
+    border-radius         : 4px;
+    -moz-box-shadow       : 2px 2px 2px #bbb;
+    -webkit-box-shadow    : 2px 2px 2px #bbb;
+    box-shadow            : 2px 2px 2px #bbb;
+}
+
+.bewype-picker-color {
+    width : 280px;
+}
+
+.bewype-picker-color-small {
+    width : 180px;
+}
+

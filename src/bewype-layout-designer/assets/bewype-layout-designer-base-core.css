@@ -22,10 +22,9 @@
 }
 
 .layout-designer-edit-panel {
-    position            : absolute;
-    top                 : 0;
-    right               : 0;
-    width               : 240px;
+    position            : fixed;
+    right               : 20px;
+    width               : 80px;
     height              : 100%;
 }
 

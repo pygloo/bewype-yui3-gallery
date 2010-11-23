@@ -66,13 +66,6 @@ YUI.add('bewype-button-base', function(Y) {
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
-        },
-        width : {
-            value : 80,
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
         }
     };
 
@@ -268,13 +261,6 @@ YUI.add('bewype-button-toggle', function(Y) {
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
-        },
-        width : {
-            value : 80,
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
         }
     };
 
@@ -314,9 +300,6 @@ YUI.add('bewype-button-toggle', function(Y) {
                    
             // insert checkbox
             _buttonNode.insertBefore( _checkNode, _labelNode );
-            
-            // set handler
-            // _checkNode.on( 'yui3-button-event|click' , Y.bind( this._onClick, this ) );
         },
 
         refresh : function ( buttonNode ) {
@@ -440,13 +423,6 @@ YUI.add('bewype-button-picker', function(Y) {
                 return Y.Lang.isString( val );
             }
         },
-        width : {
-            value : 80,
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
         pickerObj : {
             value : null,
             writeOnce : true
@@ -476,6 +452,8 @@ YUI.add('bewype-button-picker', function(Y) {
          *
          */
         initializer : function( config ) {
+
+            //
             this._init( config );
 
             //

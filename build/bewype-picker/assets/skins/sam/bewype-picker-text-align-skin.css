@@ -1,1 +1,40 @@
 
+.yui3-skin-sam .bewype-picker-text-align {
+    border                : 1px solid #888;
+    font-family           : Arial, Helvetica, sans-serif;
+    font-size             : 0.875em;
+    width                 : 42px;
+    -webkit-border-radius : 4px;
+    -moz-border-radius    : 4px;
+    border-radius         : 4px;
+    -moz-box-shadow       : 2px 2px 2px #bbb;
+    -webkit-box-shadow    : 2px 2px 2px #bbb;
+    box-shadow            : 2px 2px 2px #bbb;
+}
+
+.yui3-skin-sam .bewype-picker-text-align td div {
+    color                 : transparent;
+    padding               : 7px 0;
+    -webkit-border-radius : 3px;
+    -moz-border-radius    : 3px;
+    border-radius         : 3px;
+}
+
+.yui3-skin-sam #bewype-picker-text-align-row-left {
+    background            : transparent url('anonymous-text-align-left-18.png') no-repeat center center;
+}
+
+.yui3-skin-sam #bewype-picker-text-align-row-center {
+    background            : transparent url('anonymous-text-align-center-18.png') no-repeat center center;
+}
+
+.yui3-skin-sam #bewype-picker-text-align-row-right {
+    background            : transparent url('anonymous-text-align-right-18.png') no-repeat center center;
+}
+
+.yui3-skin-sam #bewype-picker-text-align-row-left:hover,
+.yui3-skin-sam #bewype-picker-text-align-row-center:hover,
+.yui3-skin-sam #bewype-picker-text-align-row-right:hover {
+    background-color      : #ddd;
+}
+

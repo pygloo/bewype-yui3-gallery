@@ -1,9 +1,5 @@
 
 .bewype-picker-base {
-    border      : 1px solid #888;
-    font-family : Arial, Helvetica, sans-serif;
-    font-size   : 0.875em;
-    width       : 120px;
 }
 
 .bewype-picker-base table {
@@ -18,13 +14,11 @@
 }
 
 .bewype-picker-base td {
-    padding        : 2px 4px;
     text-align     : left;
     vertical-align : middle;
 }
 
 .bewype-picker-base td:hover {
-    background-color : #ddd;
     cursor           : pointer;
 }
 

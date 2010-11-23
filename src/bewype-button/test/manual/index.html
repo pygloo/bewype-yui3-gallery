@@ -1,46 +1,93 @@
-<!doctype html>
-<html>
-<head>
-    <title>Manual Test - Button</title>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
+<head> 
+
+    <title>Pygloo's Repos | bewype-yui3-gallery</title>
+
+    <link href="/bewype-yui3-gallery/css/pygloo-repo.css" rel="stylesheet" type="text/css">
+
+    <style>
+    <!--
+    div.button {
+        width  : 60px;
+        margin : auto;
+    }
+    div.button-toggle {
+        width  : 80px;
+        margin : auto;
+    }
+    div.button-picker {
+        width  : 120px;
+        margin : auto;
+    }
+    -->
+    </style>
+
     <script type="text/javascript" src="../../../../build/yui/yui.js"></script>
+
 </head>
 <body class="yui3-skin-sam">
 
-    <h2>Button Base</h2>
+    <div class="title">
+        <h1><a href="http://pygloo.github.com/">Pygloo's Repos</a></h1>
+        <span>
+            | 
+            bewype-yui3-gallery
+            <a href="/bewype-yui3-gallery">&#182;</a>
+        </span>
+    </div>
 
-    <div id="button-base"></div>
+    <h2 class="para-title">Button Base <em>(demo)</em></h2>
 
-    <h2>Button Toggle</h2>
+    <div id="button-base" class="yui3-skin-sam button"></div>
 
-    <div id="button-toggle"></div>
+    <h2 class="para-title">Button Toggle <em>(demo)</em></h2>
 
-    <h2>Button Picker Color</h2>
+    <div id="button-toggle" class="yui3-skin-sam button-toggle"></div>
 
-    <div id="button-picker-color"></div>
+    <h2 class="para-title">Button Picker Color <em>(demo)</em></h2>
 
-    <h2>Button Picker Font Size</h2>
+    <div id="button-picker-color" class="yui3-skin-sam button-picker"></div>
 
-    <div id="button-picker-font-size"></div>
+    <h2 class="para-title">Button Picker File <em>(demo)</em></h2>
 
-    <h2>Button Picker Font Family</h2>
+    <div id="button-picker-file" class="yui3-skin-sam button-picker"></div>
 
-    <div id="button-picker-font-family"></div>
+    <h2 class="para-title">Button Picker Font Size <em>(demo)</em></h2>
 
-    <h2>Button Picker Text Align</h2>
+    <div id="button-picker-font-size" class="yui3-skin-sam button-picker"></div>
 
-    <div id="button-picker-text-align"></div>
+    <h2 class="para-title">Button Picker Font Family <em>(demo)</em></h2>
 
-    <h2>Button Title</h2>
+    <div id="button-picker-font-family" class="yui3-skin-sam button-picker"></div>
 
-    <div id="button-picker-title"></div>
+    <h2 class="para-title">Button Picker Text Align <em>(demo)</em></h2>
 
-    <h2>Button Picker Url</h2>
+    <div id="button-picker-text-align" class="yui3-skin-sam button-picker"></div>
 
-    <div id="button-picker-url"></div>
+    <h2 class="para-title">Button Title <em>(demo)</em></h2>
+
+    <div id="button-picker-title" class="yui3-skin-sam button-picker"></div>
+
+    <h2 class="para-title">Button Picker Url <em>(demo)</em></h2>
+
+    <div id="button-picker-url" class="yui3-skin-sam button-picker"></div>
+
+    <p/>
 
     <script>
         <!--
-        YUI( { filter: 'debug' } ).use( 'bewype-button', function( Y ) {
+        YUI( {
+                filter: 'debug',
+                skin: {
+                    overrides: {
+                        slider: [
+                            'sam'
+                        ]
+                    }
+                }
+            } ).use( 'bewype-button', function( Y ) {
+
             // button manual
             var _button = new Y.Bewype.Button( {
                 label : 'test'
@@ -78,6 +125,22 @@
             // add custom event listener
             _buttonColor.on( 'button:onChange', function ( e ) {
                 alert( 'Button Picker Color Changed: ' + _buttonColor.getValue() );
+            } );
+
+            // button manual
+            var _buttonFile = new Y.Bewype.ButtonPicker( {
+                label     : 'File',
+                pickerObj :  Y.Bewype.PickerFile,
+                pickerParams: {
+                    fileStaticPath : 'http://www.bewype.org/uploads/',
+                    uploadUrl      : 'http://www.bewype.org/upload'
+                }
+            } );
+            _buttonFile.render( '#button-picker-file' );
+
+            // add custom event listener
+            _buttonFile.on( 'button:onChange', function ( e ) {
+                alert( 'Button Picker File Changed: ' + _buttonFile.getValue().fileName );
             } );
 
             // button manual

@@ -1,9 +1,5 @@
 
 .bewype-picker-title {
-    border      : 1px solid #888;
-    font-family : Arial, Helvetica, sans-serif;
-    font-size   : 0.875em;
-    width       : 100px;
 }
 
 .bewype-picker-title table {
@@ -18,13 +14,11 @@
 }
 
 .bewype-picker-title td {
-    padding        : 2px 4px;
     text-align     : right;
     vertical-align : middle;
 }
 
 .bewype-picker-title td:hover {
-    background-color : #ddd;
     cursor           : pointer;
 }
 

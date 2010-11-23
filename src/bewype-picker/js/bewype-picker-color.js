@@ -214,7 +214,7 @@
 
             var _position = 0;                                
 
-            while( node != null ) {
+            while( node !== null ) {
                 _position += node.get( positionProperty );
                 node = node.get( 'offsetParent' );
             }
@@ -232,8 +232,6 @@
                 _targetNode   = evt ? evt.target : null,
                 _pThreshO     = this.get( 'pickerThreshold' ),
                 _value        = this._slider ? this._slider.getValue() : 0,
-                _nodeX        = 0,
-                _nodeY        = 0,
                 _x            = 0,
                 _y            = 0,
                 _h            = 0,
@@ -241,7 +239,6 @@
                 _v            = 0,
                 _rgb          = [],
                 _bgVal        = '',
-                _offsetParent = _contentBox.get( 'offsetParent' ),
                 _previewNode  = _contentBox.one( '.' + _pickerClass + '-preview' ),
                 _rNode        = _contentBox.one( '.' + _pickerClass + '-r' ),
                 _gNode        = _contentBox.one( '.' + _pickerClass + '-g' ),

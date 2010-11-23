@@ -64,13 +64,6 @@
             validator : function( val ) {
                 return Y.Lang.isString( val );
             }
-        },
-        width : {
-            value : 80,
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
         }
     };
 

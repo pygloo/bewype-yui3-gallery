@@ -48,8 +48,9 @@ YUI.add('bewype-picker-text-align', function(Y) {
 
             // add sizes
             Y.Object.each( this.get( 'alignProps' ), function (v, k) {
-                var _style = 'text-align: ' + v + ';';
-                this.append( v,  v, _style);
+                var _style = 'text-align: ' + v + ';',
+                    _last  = k == ( this.get( 'alignProps' ).length - 1 );
+                this.append( v,  v, _style, null, _last);
             }, this );
         }
     } );

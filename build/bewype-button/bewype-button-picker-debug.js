@@ -48,13 +48,6 @@ YUI.add('bewype-button-picker', function(Y) {
                 return Y.Lang.isString( val );
             }
         },
-        width : {
-            value : 80,
-            writeOnce : true,
-            validator : function( val ) {
-                return Y.Lang.isNumber( val );
-            }
-        },
         pickerObj : {
             value : null,
             writeOnce : true
@@ -84,6 +77,8 @@ YUI.add('bewype-button-picker', function(Y) {
          *
          */
         initializer : function( config ) {
+
+            //
             this._init( config );
 
             //

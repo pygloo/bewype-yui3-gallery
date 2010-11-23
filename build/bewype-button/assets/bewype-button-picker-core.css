@@ -1,29 +1,23 @@
 
 .yui3-button-picker {
-    border           : 1px solid #888;
-    font-family      : Arial, Helvetica, sans-serif;
-    font-size        : 0.875em;
+    margin           : auto;
     text-align       : center;
 }
 
 .yui3-button-picker:hover {
-    background-color : #f8f8f8;
     cursor           : pointer;
 }
 
-.yui3-button-picker-host {
-    background-color : #fff;
-    position : absolute;
-    z-index  : 10;
+.yui3-button-picker-label {
+    margin : auto;
 }
 
-.yui3-button-picker-label {
-    margin   : 10px 0;
+.yui3-button-picker-host {
+    position : absolute;
+    z-index  : 2;
 }
 
 .yui3-button-picker {
     position : relative;
 }
-
-
 
