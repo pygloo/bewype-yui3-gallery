@@ -17,6 +17,17 @@
     width                   : 80px;
 }
 
+.yui3-skin-sam .bewype-button-picker-host-left {
+    top                     : 0;
+    left                    : 80px;
+}
+
+.yui3-skin-sam .bewype-button-picker-host-right {
+    top                     : 0;
+    right                   : 80px;
+}
+
+
 .yui3-skin-sam .bewype-editor-panel-button {
     margin                  : 2px 0;
 }

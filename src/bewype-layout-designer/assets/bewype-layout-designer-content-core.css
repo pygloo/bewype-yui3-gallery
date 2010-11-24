@@ -6,11 +6,11 @@
 .layout-designer-content-clone {
     background-color    : #eee;
     border              : 1px dashed grey;
-    opacity             : 0.0;
+    opacity             : 0.2;
 }
 
 .layout-designer-content-clone:hover {
-    opacity             : 0.5;
+    opacity             : 0.6;
 }
 
 .layout-designer-content-clone-callbacks {
@@ -20,6 +20,7 @@
     right               : 0;
     position            : absolute;
     width               : 60px;
+    cursor              : pointer;
 }
 
 .layout-designer-content-clone-drag,

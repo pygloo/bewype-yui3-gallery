@@ -482,7 +482,7 @@ YUI.add('bewype-editor-text', function(Y) {
                 }  else if ( name === 'file' ) {
                     // ...
                     _img = Y.Node.create( Y.substitute( IMAGE_TMPL, {
-                            filePath : this.get( 'fileStaticPath' ) + _value
+                            filePath : this.get( 'fileStaticPath' ) + _value.fileName
                         } )
                     );
                     // ...

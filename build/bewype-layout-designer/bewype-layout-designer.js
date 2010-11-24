@@ -121,7 +121,6 @@ YUI.add('bewype-layout-designer-config', function(Y) {
         editorImageButtons : {
             value : [
                     'background-color',
-                    'height',
                     'padding-top',
                     'padding-bottom',
                     'text-align',
@@ -1522,6 +1521,7 @@ YUI.add('bewype-layout-designer-target', function(Y) {
 
             // temp vars
             var _host         = this.get( 'host' ),
+                _baseNode     = this.get( 'baseNode' ),
                 _parentNode   = this.get( 'parentNode' ),
                 _targetType   = this.get( 'targetType' ),
                 _parentPlaces = _parentNode ? _parentNode.layoutDesignerPlaces : null,
@@ -1568,6 +1568,8 @@ YUI.add('bewype-layout-designer-target', function(Y) {
                 _config.targetType = 'start';
                 // plug start target
                 _host.plug( Y.Bewype.LayoutDesignerTarget, _config );
+                // refresh at start
+                _baseNode.layoutDesigner.nodeLayout.setStyle( 'height', 0 );
             }
         },
 

@@ -121,7 +121,6 @@ YUI.add('bewype-layout-designer-config', function(Y) {
         editorImageButtons : {
             value : [
                     'background-color',
-                    'height',
                     'padding-top',
                     'padding-bottom',
                     'text-align',
