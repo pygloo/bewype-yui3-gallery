@@ -78,4 +78,5 @@ Y.mix(Y.ArrayList.prototype, {
 });
 
 
+
 }, '@VERSION@' ,{requires:['arraylist']});

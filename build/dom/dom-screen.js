@@ -125,6 +125,7 @@ Y.mix(Y_DOM, {
                     bLeft, bTop,
                     mode,
                     doc,
+                    inDoc,
                     rootNode;
 
                 if (node && node.tagName) {
@@ -399,6 +400,7 @@ Y.mix(Y_DOM, {
 });
 
 })(Y);
+
 (function(Y) {
 var TOP = 'top',
     RIGHT = 'right',
@@ -573,6 +575,7 @@ Y.mix(DOM, {
     }
 });
 })(Y);
+
 
 
 }, '@VERSION@' ,{requires:['dom-base', 'dom-style', 'event-base']});

@@ -63,7 +63,9 @@ Y.namespace("DataSchema").Base = SchemaBase;
 Y.namespace("Parsers");
 
 
+
 }, '@VERSION@' ,{requires:['base']});
+
 YUI.add('dataschema-json', function(Y) {
 
 /**
@@ -266,7 +268,7 @@ var LANG = Y.Lang,
             var results = [],
                 len = fields.length,
                 i, j,
-                field, key, path, parser,
+                field, key, locator, path, parser,
                 simplePaths = [], complexPaths = [], fieldParsers = [],
                 result, record;
 
@@ -274,9 +276,10 @@ var LANG = Y.Lang,
             for (i=0; i<len; i++) {
                 field = fields[i]; // A field can be a simple string or a hash
                 key = field.key || field; // Find the key
+                locator = field.locator || key; // Find the locator
 
                 // Validate and store locators for later
-                path = SchemaJSON.getPath(key);
+                path = SchemaJSON.getPath(locator);
                 if (path) {
                     if (path.length === 1) {
                         simplePaths[simplePaths.length] = {key:key, path:path[0]};
@@ -364,7 +367,9 @@ var LANG = Y.Lang,
 Y.DataSchema.JSON = Y.mix(SchemaJSON, Y.DataSchema.Base);
 
 
+
 }, '@VERSION@' ,{requires:['json', 'dataschema-base']});
+
 YUI.add('dataschema-xml', function(Y) {
 
 /**
@@ -482,7 +487,7 @@ var LANG = Y.Lang,
                             subloc = location.slice(location.indexOf("[")+1, location.indexOf("]"));
                             //XPath is 1-based while DOM is 0-based
                             subloc--;
-                            context = context.childNodes[subloc];
+                            context = context.children[subloc];
                             isNth = true;
                         }
                         // grab attribute value @
@@ -607,7 +612,7 @@ var LANG = Y.Lang,
          *
          * @method _parseResults
          * @param schema {Object} Schema to parse against.
-         * @param context {Object} XML node document parse.
+         * @param context {Object} XML node or document to parse.
          * @param data_out {Object} In-progress schema-parsed data to update.
          * @return {Object} Schema-parsed data.
          * @static
@@ -652,7 +657,9 @@ var LANG = Y.Lang,
 Y.DataSchema.XML = Y.mix(SchemaXML, Y.DataSchema.Base);
 
 
+
 }, '@VERSION@' ,{requires:['dataschema-base']});
+
 YUI.add('dataschema-array', function(Y) {
 
 /**
@@ -754,7 +761,9 @@ var LANG = Y.Lang,
 Y.DataSchema.Array = Y.mix(SchemaArray, Y.DataSchema.Base);
 
 
+
 }, '@VERSION@' ,{requires:['dataschema-base']});
+
 YUI.add('dataschema-text', function(Y) {
 
 /**
@@ -863,7 +872,9 @@ var LANG = Y.Lang,
 Y.DataSchema.Text = Y.mix(SchemaText, Y.DataSchema.Base);
 
 
+
 }, '@VERSION@' ,{requires:['dataschema-base']});
+
 
 
 YUI.add('dataschema', function(Y){}, '@VERSION@' ,{use:['dataschema-base','dataschema-json','dataschema-xml','dataschema-array','dataschema-text']});

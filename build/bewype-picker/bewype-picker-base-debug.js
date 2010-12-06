@@ -249,4 +249,5 @@ YUI.add('bewype-picker-base', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['stylesheet', 'substitute', 'widget', 'yui-base']});

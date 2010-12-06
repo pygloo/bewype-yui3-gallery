@@ -204,4 +204,5 @@ YUI.add('bewype-color', function(Y) {
 
 
 
-}, '@VERSION@' ,{requires:['yui-base', 'bewype']});
+
+}, '@VERSION@' ,{requires:['yui-base']});

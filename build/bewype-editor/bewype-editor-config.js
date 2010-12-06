@@ -173,4 +173,5 @@ YUI.add('bewype-editor-config', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['plugin']});

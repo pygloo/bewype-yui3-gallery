@@ -145,7 +145,7 @@ YUI.add('bewype-entry-base', function(Y) {
 
         setValue : function( value ) {
             // update value
-            this._value = (value && value.trim() === '') ? null : value;
+            this._value = (value && Y.Bewype.Utils.trim( value ) === '') ? null : value;
 
             // vars
             var _contentBox  = this.get( 'contentBox'  ),
@@ -171,7 +171,9 @@ YUI.add('bewype-entry-base', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['stylesheet', 'substitute', 'widget', 'yui-base']});
+
 YUI.add('bewype-entry-spinner', function(Y) {
 
 
@@ -641,7 +643,9 @@ YUI.add('bewype-entry-spinner', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['event-key', 'widget']});
+
 
 
 YUI.add('bewype-entry', function(Y){}, '@VERSION@' ,{use:['bewype-entry-base', 'bewype-entry-spinner']});

@@ -13,10 +13,10 @@ if (!YUI.Env[Y.version]) {
             BUILD = '/build/',
             ROOT = VERSION + BUILD,
             CDN_BASE = Y.Env.base,
-            GALLERY_VERSION = 'gallery-2010.09.29-18-36',
+            GALLERY_VERSION = 'gallery-2010.12.01-21-32',
             TNT = '2in3',
             TNT_VERSION = '4',
-            YUI2_VERSION = '2.8.1',
+            YUI2_VERSION = '2.8.2',
             COMBO_BASE = CDN_BASE + 'combo?',
             META = { version: VERSION,
                               root: ROOT,
@@ -55,7 +55,7 @@ if (!YUI.Env[Y.version]) {
             comboBase: COMBO_BASE,
             update: galleryUpdate,
             patterns: { 'gallery-': { },
-                         'gallerycss-': { type: 'css' } }
+                        'gallerycss-': { type: 'css' } }
         };
 
         groups.yui2 = {
@@ -85,6 +85,7 @@ if (!YUI.Env[Y.version]) {
         YUI.Env[VERSION] = META;
     }());
 }
+
 
 
 /**
@@ -934,10 +935,14 @@ Y.Loader.prototype = {
      *           e.g., ["en-GB","zh-Hans-CN"]</dd>
      *     <dt>condition:</dt>
      *       <dd>Specifies that the module should be loaded automatically if
-     *           a condition is met.  This is an object with two fields:
+     *           a condition is met.  This is an object with up to three fields:
      *           [trigger] - the name of a module that can trigger the auto-load
      *           [test] - a function that returns true when the module is to be
      *           loaded.
+     *           [when] - specifies the load order of the conditional module
+     *           with regard to the position of the trigger module.
+     *           This should be one of three values: 'before', 'after', or
+     *           'instead'.  The default is 'after'.
      *       </dd>
      * </dl>
      * @method addModule
@@ -964,13 +969,15 @@ Y.Loader.prototype = {
             o.path = _path(name, name, o.type);
         }
 
+        o.supersedes = o.supersedes || o.use;
+
         o.ext = ('ext' in o) ? o.ext : (this._internal) ? false : true;
         o.requires = o.requires || [];
 
         // Handle submodule logic
         var subs = o.submodules, i, l, sup, s, smod, plugins, plug,
             j, langs, packName, supName, flatSup, flatLang, lang, ret,
-            overrides, skinname,
+            overrides, skinname, triggermod, when,
             conditions = this.conditions, trigger;
             // , existing = this.moduleInfo[name], newr;
 
@@ -1053,6 +1060,23 @@ Y.Loader.prototype = {
                             }
 
 // Add rollup file, need to add to supersedes list too
+
+                            // default packages
+                            packName = this.getLangPackName(ROOT_LANG, name);
+                            supName = this.getLangPackName(ROOT_LANG, i);
+
+                            smod = this.moduleInfo[packName];
+
+                            if (!smod) {
+                                smod = this._addLangPack(lang, o, packName);
+                            }
+
+                            if (!(supName in flatSup)) {
+                                smod.supersedes.push(supName);
+                            }
+
+// Add rollup file, need to add to supersedes list too
+
                         }
                     }
 
@@ -1084,10 +1108,30 @@ Y.Loader.prototype = {
 
         if (o.condition) {
             trigger = o.condition.trigger;
+            when = o.condition.when;
             conditions[trigger] = conditions[trigger] || {};
             conditions[trigger][name] = o.condition;
-            o.after = o.after || [];
-            o.after.push(trigger);
+            // the 'when' attribute can be 'before', 'after', or 'instead'
+            // the default is after.
+            if (when && when != 'after') {
+                if (when == 'instead') { // replace the trigger
+                    o.supersedes = o.supersedes || [];
+                    o.supersedes.push(trigger);
+                } else { // before the trigger
+                    // the trigger requires the conditional mod,
+                    // so it should appear before the conditional
+                    // mod if we do not intersede.
+                    //
+                    // triggermod = this.getModule(trigger);
+                    // if (triggermod) {
+                    //     triggermod.after = triggermod.after || [];
+                    //     triggermod.after.push(name);
+                    // }
+                }
+            } else { // after the trigger
+                o.after = o.after || [];
+                o.after.push(trigger);
+            }
         }
 
         if (o.after) {
@@ -1154,7 +1198,8 @@ Y.Loader.prototype = {
             delete mod.expanded;
         }
 
-        if (mod.expanded && (!mod.langCache || mod.langCache == this.lang)) {
+        // if (mod.expanded && (!mod.langCache || mod.langCache == this.lang)) {
+        if (mod.expanded && (!this.lang || mod.langCache === this.lang)) {
             return mod.expanded;
         }
 
@@ -1167,19 +1212,6 @@ Y.Loader.prototype = {
 
         mod._parsed = true;
 
-        // Create skin modules
-        if (mod.skinnable) {
-            skindef = this.skin.overrides;
-            if (skindef && skindef[name]) {
-                for (i = 0; i < skindef[name].length; i++) {
-                    skinmod = this._addSkin(skindef[name][i], name);
-                    d.push(skinmod);
-                }
-            } else {
-                skinmod = this._addSkin(this.skin.defaultSkin, name);
-                d.push(skinmod);
-            }
-        }
 
         for (i = 0; i < r.length; i++) {
             if (!hash[r[i]]) {
@@ -1256,7 +1288,6 @@ Y.Loader.prototype = {
                         hash[condmod] = true;
                         d.push(condmod);
                         m = this.getModule(condmod);
-                        // console.log('conditional', m);
                         if (m) {
                             add = this.getRequires(m);
                             for (j = 0; j < add.length; j++) {
@@ -1266,6 +1297,20 @@ Y.Loader.prototype = {
                     }
                 }
             }, this);
+        }
+
+        // Create skin modules
+        if (mod.skinnable) {
+            skindef = this.skin.overrides;
+            if (skindef && skindef[name]) {
+                for (i = 0; i < skindef[name].length; i++) {
+                    skinmod = this._addSkin(skindef[name][i], name);
+                    d.push(skinmod);
+                }
+            } else {
+                skinmod = this._addSkin(this.skin.defaultSkin, name);
+                d.push(skinmod);
+            }
         }
 
         mod._parsed = false;
@@ -1797,7 +1842,12 @@ Y.Loader.prototype = {
 
     // },
 
-    _insert: function(source, o, type) {
+    partial: function(partial, o, type) {
+        this.sorted = partial;
+        this.insert(o, type, true);
+    },
+
+    _insert: function(source, o, type, skipcalc) {
 
 
         // restore the state at the time of the request
@@ -1808,7 +1858,9 @@ Y.Loader.prototype = {
         // build the dependency list
         // don't include type so we can process CSS and script in
         // one pass when the type is not specified.
-        this.calculate(o);
+        if (!skipcalc) {
+            this.calculate(o);
+        }
 
         this.loadType = type;
 
@@ -1876,12 +1928,12 @@ Y.Loader.prototype = {
      * @param {object} o optional options object.
      * @param {string} type the type of dependency to insert.
      */
-    insert: function(o, type) {
+    insert: function(o, type, skipsort) {
         var self = this, copy = Y.merge(this);
         delete copy.require;
         delete copy.dirty;
         _queue.add(function() {
-            self._insert(copy, o, type);
+            self._insert(copy, o, type, skipsort);
         });
         this._continue();
     },
@@ -2181,6 +2233,7 @@ Y.Loader.prototype = {
         return this._filter((base || this.base || '') + path, name);
     }
 };
+
 
 
 

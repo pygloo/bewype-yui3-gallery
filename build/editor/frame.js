@@ -62,7 +62,9 @@ YUI.add('frame', function(Y) {
             this._iframe.set('src', this.get('src'));
             this.get('container').append(this._iframe);
 
+            this._iframe.set('height', '99%');
 
+            
             var html = '',
                 extra_css = ((this.get('extracss')) ? '<style id="extra_css">' + this.get('extracss') + '</style>' : '');
 
@@ -141,7 +143,7 @@ YUI.add('frame', function(Y) {
             if (e.pageX > 0 || e.pageY > 0) {
                 if (e.type.substring(0, 3) !== 'key') {
                     node = this._instance.one('win');
-                    xy = this._iframe.getXY()
+                    xy = this._iframe.getXY();
                     e.frameX = xy[0] + e.pageX - node.get('scrollLeft');
                     e.frameY = xy[1] + e.pageY - node.get('scrollTop');
                 }
@@ -185,7 +187,7 @@ YUI.add('frame', function(Y) {
             
             if (win.clipboardData) {
                 data = win.clipboardData.getData('Text');
-                if (data == '') { // Could be empty, or failed
+                if (data === '') { // Could be empty, or failed
                     // Verify failure
                     if (!win.clipboardData.setData('Text', data)) {
                         data = null;
@@ -222,6 +224,7 @@ YUI.add('frame', function(Y) {
                 kfn = ((Y.UA.ie) ? Y.throttle(fn, 200) : fn);
 
             inst.Node.DOM_EVENTS.activate = 1;
+            inst.Node.DOM_EVENTS.beforedeactivate = 1;
             inst.Node.DOM_EVENTS.focusin = 1;
             inst.Node.DOM_EVENTS.deactivate = 1;
             inst.Node.DOM_EVENTS.focusout = 1;
@@ -231,7 +234,11 @@ YUI.add('frame', function(Y) {
                 if (v === 1) {
                     if (k !== 'focus' && k !== 'blur' && k !== 'paste') {
                         if (k.substring(0, 3) === 'key') {
-                            inst.on(k, kfn, inst.config.doc);
+                            if (k === 'keydown') {
+                                inst.on(k, fn, inst.config.doc);
+                            } else {
+                                inst.on(k, kfn, inst.config.doc);
+                            }
                         } else {
                             inst.on(k, fn, inst.config.doc);
                         }
@@ -249,11 +256,53 @@ YUI.add('frame', function(Y) {
 
             inst._use = inst.use;
             inst.use = Y.bind(this.use, this);
-
             this._iframe.setStyles({
                 visibility: 'inherit'
             });
             inst.one('body').setStyle('display', 'block');
+            if (Y.UA.ie) {
+                this._fixIECursors();
+            }
+        },
+        /**
+        * It appears that having a BR tag anywhere in the source "below" a table with a percentage width (in IE 7 & 8)
+        * if there is any TEXTINPUT's outside the iframe, the cursor will rapidly flickr and the CPU would occasionally 
+        * spike. This method finds all <BR>'s below the sourceIndex of the first table. Does some checks to see if they
+        * can be modified and replaces then with a <WBR> so the layout will remain in tact, but the flickering will
+        * no longer happen.
+        * @method _fixIECursors
+        * @private
+        */
+        _fixIECursors: function() {
+            var inst = this.getInstance(),
+                tables = inst.all('table'),
+                brs = inst.all('br'), si;
+
+            if (tables.size() && brs.size()) {
+                //First Table
+                si = tables.item(0).get('sourceIndex');
+                brs.each(function(n) {
+                    var p = n.get('parentNode'),
+                        c = p.get('children'), b = p.all('>br');
+                    
+                    if (p.test('div')) {
+                        if (c.size() > 2) {
+                            n.replace(inst.Node.create('<wbr>'));
+                        } else {
+                            if (n.get('sourceIndex') > si) {
+                                if (b.size()) {
+                                    n.replace(inst.Node.create('<wbr>'));
+                                }
+                            } else {
+                                if (b.size() > 1) {
+                                    n.replace(inst.Node.create('<wbr>'));
+                                }
+                            }
+                        }
+                    }
+                    
+                });
+            }
         },
         /**
         * @private
@@ -274,6 +323,10 @@ YUI.add('frame', function(Y) {
                 }
                 //TODO Circle around and deal with CSS loading...
                 args.push(Y.bind(function() {
+                    if (inst.Selection) {
+                        inst.Selection.DEFAULT_BLOCK_TAG = this.get('defaultblock');
+                    }
+
                     this.fire('ready');
                 }, this));
                 inst.use.apply(inst, args);
@@ -332,6 +385,11 @@ YUI.add('frame', function(Y) {
             }
             return html;
         },
+        /**
+        * @private
+        * @method _setLinkedCSS
+        * @description Set's the linked CSS on the instance..
+        */
         _getLinkedCSS: function(urls) {
             if (!Y.Lang.isArray(urls)) {
                 urls = [urls];
@@ -339,13 +397,20 @@ YUI.add('frame', function(Y) {
             var str = '';
             if (!this._ready) {
                 Y.each(urls, function(v) {
-                    str += '<link rel="stylesheet" href="' + v + '" type="text/css">';
+                    if (v !== '') {
+                        str += '<link rel="stylesheet" href="' + v + '" type="text/css">';
+                    }
                 });
             } else {
                 str = urls;
             }
             return str;
         },
+        /**
+        * @private
+        * @method _setLinkedCSS
+        * @description Set's the linked CSS on the instance..
+        */
         _setLinkedCSS: function(css) {
             if (this._ready) {
                 var inst = this.getInstance();
@@ -377,7 +442,6 @@ YUI.add('frame', function(Y) {
         */
         _instanceLoaded: function(inst) {
             this._instance = inst;
-
             this._onContentReady();
             
             var doc = this._instance.config.doc;
@@ -459,6 +523,7 @@ YUI.add('frame', function(Y) {
             }
 
             this._create(Y.bind(function(res) {
+
                 var inst, timer,
                     cb = Y.bind(function(i) {
                         this._instanceLoaded(i);
@@ -591,6 +656,8 @@ YUI.add('frame', function(Y) {
         * @type Object
         */
         DOM_EVENTS: {
+            dblclick: 1,
+            click: 1,
             paste: 1,
             mouseup: 1,
             mousedown: 1,
@@ -599,6 +666,7 @@ YUI.add('frame', function(Y) {
             keypress: 1,
             activate: 1,
             deactivate: 1,
+            beforedeactivate: 1,
             focusin: 1,
             focusout: 1
         },
@@ -609,15 +677,16 @@ YUI.add('frame', function(Y) {
         * @description The default css used when creating the document.
         * @type String
         */
-        DEFAULT_CSS: 'html { height: 95%; } body { padding: 7px; background-color: #fff; font: 13px/1.22 arial,helvetica,clean,sans-serif;*font-size:small;*font:x-small; } a, a:visited, a:hover { color: blue !important; text-decoration: underline !important; cursor: text !important; } img { cursor: pointer !important; border: none; } .yui-cursor { *line-height: 0; *height: 0; *width: 0; *font-size: 0; *overflow: hidden; }',
+        //DEFAULT_CSS: 'html { height: 95%; } body { padding: 7px; background-color: #fff; font: 13px/1.22 arial,helvetica,clean,sans-serif;*font-size:small;*font:x-small; } a, a:visited, a:hover { color: blue !important; text-decoration: underline !important; cursor: text !important; } img { cursor: pointer !important; border: none; }',
+        DEFAULT_CSS: 'body { background-color: #fff; font: 13px/1.22 arial,helvetica,clean,sans-serif;*font-size:small;*font:x-small; } a, a:visited, a:hover { color: blue !important; text-decoration: underline !important; cursor: text !important; } img { cursor: pointer !important; border: none; }',
         /**
         * @static
         * @property HTML
         * @description The template string used to create the iframe
         * @type String
         */
+        //HTML: '<iframe border="0" frameBorder="0" marginWidth="0" marginHeight="0" leftMargin="0" topMargin="0" allowTransparency="true" width="100%" height="99%"></iframe>',
         HTML: '<iframe border="0" frameBorder="0" marginWidth="0" marginHeight="0" leftMargin="0" topMargin="0" allowTransparency="true" width="100%" height="99%"></iframe>',
-        //HTML: '<iframe border="0" frameBorder="0" width="100%" height="99%"></iframe>',
         /**
         * @static
         * @property PAGE_HTML
@@ -638,8 +707,8 @@ YUI.add('frame', function(Y) {
         * @description The meta-tag for Content-Type to add to the dynamic document
         * @type String
         */
-        META: '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">',
-        //META: '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>',
+        //META: '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">',
+        META: '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>',
         /**
         * @static
         * @property NAME
@@ -732,6 +801,18 @@ YUI.add('frame', function(Y) {
                 }
             },
             /**
+            * @attribute node
+            * @description The Node instance of the iframe.
+            * @type Node
+            */
+            node: {
+                readOnly: true,
+                value: null,
+                getter: function() {
+                    return this._iframe;
+                }
+            },
+            /**
             * @attribute id
             * @description Set the id of the new Node. (optional)
             * @type String
@@ -772,6 +853,14 @@ YUI.add('frame', function(Y) {
             */
             host: {
                 value: false
+            },
+            /**
+            * @attribute defaultblock
+            * @description The default tag to use for block level items, defaults to: p
+            * @type String
+            */            
+            defaultblock: {
+                value: 'p'
             }
         }
     });
@@ -781,4 +870,5 @@ YUI.add('frame', function(Y) {
 
 
 
-}, '@VERSION@' ,{skinnable:false, requires:['base', 'node', 'selector-css3', 'substitute']});
+
+}, '@VERSION@' ,{requires:['base', 'node', 'selector-css3', 'substitute'], skinnable:false});

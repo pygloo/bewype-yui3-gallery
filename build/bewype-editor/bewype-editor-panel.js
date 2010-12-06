@@ -172,7 +172,7 @@ YUI.add('bewype-editor-panel', function(Y) {
             }
             button.on( _customEventChange, Y.bind( this._onButtonChange, this, name ) );
 
-            if ( this._pickerButtons.indexOf( name ) != -1 ) {
+            if ( Y.Array.indexOf( this._pickerButtons, name ) != -1 ) {
                 _customEventClick = 'button:onClick';
                 button.before( _customEventClick, Y.bind( this._onButtonClick, this, name ) );
             }
@@ -245,7 +245,7 @@ YUI.add('bewype-editor-panel', function(Y) {
             Y.Object.each( this._spinnerButtons, function( v, k ) {
                 var _hW = null;
                 // check active
-                if ( _activeButtons.indexOf( v ) != -1 ) { 
+                if ( Y.Array.indexOf( _activeButtons, v ) != -1 ) { 
                     // do add
                     _hW = this._addSpinnerButton( v, config );
                     // update width and height
@@ -259,7 +259,7 @@ YUI.add('bewype-editor-panel', function(Y) {
             Y.Object.each( this._toggleButtons , function( v, k ) {
                 var _hW = null;
                 // check active
-                if ( _activeButtons.indexOf( v ) != -1 ) { 
+                if ( Y.Array.indexOf( _activeButtons, v ) != -1 ) { 
                     // do add
                     _hW = this._addToggleButton( v );
                     // update width and height
@@ -271,7 +271,7 @@ YUI.add('bewype-editor-panel', function(Y) {
             Y.Object.each( this._pickerButtons , function( v, k ) {
                 var _hW = null;
                 // check active
-                if ( _activeButtons.indexOf( v ) != -1 ) { 
+                if ( Y.Array.indexOf( _activeButtons, v ) != -1 ) { 
                     // do add
                     _hW = this._addPickerButton( v, this._pickerObjDict[ v ] );
                     // update width and height
@@ -369,7 +369,7 @@ YUI.add('bewype-editor-panel', function(Y) {
 
         registerEditor : function ( editor ) {
             // check already registered
-            if ( this._editors.indexOf( editor ) == -1 ) {
+            if ( Y.Array.indexOf( this._editors, editor ) == -1 ) {
                 this._editors.push( editor );
             }
         },
@@ -377,7 +377,7 @@ YUI.add('bewype-editor-panel', function(Y) {
         unRegisterEditor : function ( editor ) {
 
             // get editor position
-            var _i = this._editors.indexOf( editor );
+            var _i = Y.Array.indexOf( this._editors, editor );
 
             // little check
             if ( _i != -1 ) {
@@ -416,7 +416,7 @@ YUI.add('bewype-editor-panel', function(Y) {
         },
 
         isCssButton : function ( name ) {
-            return this._cssButtons.indexOf( name ) != -1;
+            return Y.Array.indexOf( this._cssButtons, name ) != -1;
         },
 
         _getStyleValue : function ( node, name ) {
@@ -442,7 +442,7 @@ YUI.add('bewype-editor-panel', function(Y) {
             Y.Object.each( _buttonNames, function( v, k ) {
 
                 // no update for inactive button
-                if ( this.get( 'activeButtons' ).indexOf(v) === -1) {
+                if ( Y.Array.indexOf( this.get( 'activeButtons' ), v) === -1) {
                     return;
                 }
 
@@ -515,7 +515,7 @@ YUI.add('bewype-editor-panel', function(Y) {
             // close all pickers first
             Y.Object.each( this._pickerButtons , function( v, k ) {
                 // check active
-                if ( _activeButtons.indexOf( v ) != -1 && v != name ) { 
+                if ( Y.Array.indexOf( _activeButtons, v ) != -1 && v != name ) { 
                     // hide
                     this._buttonDict[ v ].hidePicker();
                 }
@@ -577,6 +577,7 @@ YUI.add('bewype-editor-panel', function(Y) {
 
     Y.namespace( 'Bewype' );
     Y.Bewype.EditorPanel = EditorPanel;
+
 
 
 

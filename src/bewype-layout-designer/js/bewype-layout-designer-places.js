@@ -563,7 +563,7 @@
         unRegisterContent : function ( content ) {
 
             // get content position
-            var _i = this.contents.indexOf( content );
+            var _i = Y.Array.indexOf( this.contents, content );
 
             // little check
             if ( _i != -1 ) {

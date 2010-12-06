@@ -9,6 +9,14 @@
      *
      */
     Utils = {
+    
+        trim : function ( str ) {
+            if ( Y.UA.ie ) {
+                return str.replace( /^\s+|\s+$/g, '' ); 
+            } else {
+                return str.trim();
+            }
+        },
                    
         camelize : function ( str, upperFirst, sep ) {
 
@@ -47,7 +55,7 @@
             default_ = default_ ? default_ : 0;
 
             var _aVal = node.getAttribute( name ),
-                _cVal = node.getComputedStyle( name );
+                _cVal = Y.UA.ie ? null : node.getComputedStyle( name );
 
             // return int value - TODO see if useful for non int value :s
             return parseInt( _aVal || _cVal, default_ );
@@ -88,8 +96,8 @@
 
             // convert to dict
             Y.each( _results, function( v, k ) {
-                var _name  = camelize ? Y.Bewype.Utils.camelize( v.name ) : v.name.trim(),
-                    _value = (v.value) ? v.value.trim() : null,
+                var _name  = camelize ? Y.Bewype.Utils.camelize( v.name ) : Y.Bewype.Utils.trim( v.name ),
+                    _value = (v.value) ? Y.Bewype.Utils.trim( v.value ) : null,
                     _spVal = _value ? _value.split(' ') : null,
                     _s = null,
                     _r = null;
@@ -108,7 +116,7 @@
                                 // prepare name
                                 var _n = camelize ? Y.Bewype.Utils.camelize( _name + '-' + v ) : _name + '-' + v;
                                 // do update
-                                _cssDict[ _n ] = _r[ v ] ? _r[ v ].trim() : 0;
+                                _cssDict[ _n ] = _r[ v ] ? Y.Bewype.Utils.trim( _r[ v ] ) : 0;
                             } );
 
                         } else if ( _spVal.length === 2 ) {   
@@ -125,9 +133,9 @@
                                 var _n = camelize ? Y.Bewype.Utils.camelize( _name + '-' + v ) : _name + '-' + v;
                                 // do update
                                 if ( v === 'top' || v === 'bottom' ) {
-                                    _cssDict[ _n ] = _r[ 'top-bottom' ] ? _r[ 'top-bottom' ].trim() : 0;
+                                    _cssDict[ _n ] = _r[ 'top-bottom' ] ? Y.Bewype.Utils.trim( _r[ 'top-bottom' ] ) : 0;
                                 } else {                                                                     
-                                    _cssDict[ _n ] = _r[ 'right-left' ] ? _r[ 'right-left' ].trim() : 0;
+                                    _cssDict[ _n ] = _r[ 'right-left' ] ? Y.Bewype.Utils.trim( _r[ 'right-left' ] ) : 0;
                                 }
                             } );
                                     
@@ -142,7 +150,7 @@
                             } );
                         }
                     } else {
-                        _cssDict[ _name.trim() ] = _value;
+                        _cssDict[ Y.Bewype.Utils.trim( _name ) ] = _value;
                     }
                 }
             } );
@@ -201,30 +209,34 @@
                 _doc = _win.get( 'document' );
 
             if ( _win && _win._node.getSelection ) {
-            	return _win._node.getSelection();
+                return _win._node.getSelection();
             } else if ( _doc && _doc._node.selection ) { // should come last; Opera!
-            	return _doc._node.selection.createRange();
+                return _doc._node.selection.createRange();
             }
             return null;
         },
 
         getRange : function ( selection ) {
-	        if ( selection.getRangeAt ) {
+            if ( selection.getRangeAt ) {
                 //
-        		return selection.getRangeAt(0);
-
+                return selection.getRangeAt(0);
+                
+            } else if ( document.selection.createRange ) {
+                // ie
+                return document.selection.createRange();
+                
             } else { // Safari!
-        		var _range        = document.createRange(),
+                var _range        = document.createRange(),
                     _anchorNode   = selection.anchorNode,
                     _anchorOffset = selection.anchorOffset,
                     _focusNode    = selection.focusNode,
                     _focusOffset  = selection.focusOffset;
                 // set range
-		        _range.setStart( _anchorNode, _anchorOffset );
-        		_range.setEnd( _focusNode, _focusOffset );
+                _range.setStart( _anchorNode, _anchorOffset );
+                _range.setEnd( _focusNode, _focusOffset );
                 //
-		        return _range;
-        	}
+                return _range;
+            }
         }
     };
 

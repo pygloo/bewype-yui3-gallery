@@ -173,7 +173,9 @@ YUI.add('bewype-editor-config', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['plugin']});
+
 YUI.add('bewype-editor-panel', function(Y) {
 
 
@@ -348,7 +350,7 @@ YUI.add('bewype-editor-panel', function(Y) {
             }
             button.on( _customEventChange, Y.bind( this._onButtonChange, this, name ) );
 
-            if ( this._pickerButtons.indexOf( name ) != -1 ) {
+            if ( Y.Array.indexOf( this._pickerButtons, name ) != -1 ) {
                 _customEventClick = 'button:onClick';
                 button.before( _customEventClick, Y.bind( this._onButtonClick, this, name ) );
             }
@@ -421,7 +423,7 @@ YUI.add('bewype-editor-panel', function(Y) {
             Y.Object.each( this._spinnerButtons, function( v, k ) {
                 var _hW = null;
                 // check active
-                if ( _activeButtons.indexOf( v ) != -1 ) { 
+                if ( Y.Array.indexOf( _activeButtons, v ) != -1 ) { 
                     // do add
                     _hW = this._addSpinnerButton( v, config );
                     // update width and height
@@ -435,7 +437,7 @@ YUI.add('bewype-editor-panel', function(Y) {
             Y.Object.each( this._toggleButtons , function( v, k ) {
                 var _hW = null;
                 // check active
-                if ( _activeButtons.indexOf( v ) != -1 ) { 
+                if ( Y.Array.indexOf( _activeButtons, v ) != -1 ) { 
                     // do add
                     _hW = this._addToggleButton( v );
                     // update width and height
@@ -447,7 +449,7 @@ YUI.add('bewype-editor-panel', function(Y) {
             Y.Object.each( this._pickerButtons , function( v, k ) {
                 var _hW = null;
                 // check active
-                if ( _activeButtons.indexOf( v ) != -1 ) { 
+                if ( Y.Array.indexOf( _activeButtons, v ) != -1 ) { 
                     // do add
                     _hW = this._addPickerButton( v, this._pickerObjDict[ v ] );
                     // update width and height
@@ -545,7 +547,7 @@ YUI.add('bewype-editor-panel', function(Y) {
 
         registerEditor : function ( editor ) {
             // check already registered
-            if ( this._editors.indexOf( editor ) == -1 ) {
+            if ( Y.Array.indexOf( this._editors, editor ) == -1 ) {
                 this._editors.push( editor );
             }
         },
@@ -553,7 +555,7 @@ YUI.add('bewype-editor-panel', function(Y) {
         unRegisterEditor : function ( editor ) {
 
             // get editor position
-            var _i = this._editors.indexOf( editor );
+            var _i = Y.Array.indexOf( this._editors, editor );
 
             // little check
             if ( _i != -1 ) {
@@ -592,7 +594,7 @@ YUI.add('bewype-editor-panel', function(Y) {
         },
 
         isCssButton : function ( name ) {
-            return this._cssButtons.indexOf( name ) != -1;
+            return Y.Array.indexOf( this._cssButtons, name ) != -1;
         },
 
         _getStyleValue : function ( node, name ) {
@@ -618,7 +620,7 @@ YUI.add('bewype-editor-panel', function(Y) {
             Y.Object.each( _buttonNames, function( v, k ) {
 
                 // no update for inactive button
-                if ( this.get( 'activeButtons' ).indexOf(v) === -1) {
+                if ( Y.Array.indexOf( this.get( 'activeButtons' ), v) === -1) {
                     return;
                 }
 
@@ -691,7 +693,7 @@ YUI.add('bewype-editor-panel', function(Y) {
             // close all pickers first
             Y.Object.each( this._pickerButtons , function( v, k ) {
                 // check active
-                if ( _activeButtons.indexOf( v ) != -1 && v != name ) { 
+                if ( Y.Array.indexOf( _activeButtons, v ) != -1 && v != name ) { 
                     // hide
                     this._buttonDict[ v ].hidePicker();
                 }
@@ -756,7 +758,9 @@ YUI.add('bewype-editor-panel', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['bewype-button', 'bewype-entry-spinner', 'bewype-utils', 'dataschema', 'event-custom', 'json-stringify', 'bewype-editor-config']});
+
 YUI.add('bewype-editor-base', function(Y) {
 
 
@@ -827,7 +831,7 @@ YUI.add('bewype-editor-base', function(Y) {
         _hasLeftBlank : function (str){
             if (str.length === 0) {
                 return false;
-            } else if ( str.substring(0, 1).trim().length === 0 ) {
+            } else if ( Y.Bewype.Utils.trim( str.substring(0, 1) ).length === 0 ) {
                 return true;
             }
             return false;
@@ -836,7 +840,7 @@ YUI.add('bewype-editor-base', function(Y) {
         _hasRightBlank : function (str){
             if (str.length === 0) {
                 return false;
-            } else if ( str.substring(str.length - 1, str.length).trim().length === 0 ) {
+            } else if ( Y.Bewype.Utils.trim( str.substring(str.length - 1, str.length) ).length === 0 ) {
                 return true;
             }
             return false;
@@ -849,10 +853,10 @@ YUI.add('bewype-editor-base', function(Y) {
                 _t    = '';
             // ensure blank
             _t += this._hasLeftBlank( _html )  ? '&nbsp;' : '';
-            _t += _html.trim();
+            _t += Y.Bewype.Utils.trim( _html );
             _t += this._hasRightBlank( _html ) ? '&nbsp;' : '';
             // update new node
-            return raw ? _t : _t.trim() === '' ? null : new Y.Node.create( _t );
+            return raw ? _t : Y.Bewype.Utils.trim( _t ) === '' ? null : new Y.Node.create( _t );
         },
 
         removeTagOrStyle : function ( node, selector, styleProperty ) {
@@ -915,7 +919,7 @@ YUI.add('bewype-editor-base', function(Y) {
                 var _cssDict = Y.Bewype.Utils.getCssDict( node );
                 // remove buttons
                 Y.Object.each( this._panel.get( 'activeButtons' ) , function( v, k ) {
-                    if ( this._panel._cssButtons.indexOf( v ) != -1) {
+                    if ( Y.Array.indexOf( this._panel._cssButtons, v ) != -1) {
                         delete( _cssDict[ v ] );
                     }
                 }, this );
@@ -978,7 +982,9 @@ YUI.add('bewype-editor-base', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['bewype-editor-panel']});
+
 YUI.add('bewype-editor-tag', function(Y) {
 
 
@@ -1031,8 +1037,8 @@ YUI.add('bewype-editor-tag', function(Y) {
                 var _isHeight        = key === 'height',            
                     _isWidth         = key === 'width',            
                     _keySplt         = key.split( '-' ),            
-                    _hasBorder       = _keySplt.indexOf( 'border'  ) != -1,
-                    _hasPadding      = _keySplt.indexOf( 'padding' ) != -1;
+                    _hasBorder       = Y.Array.indexOf( _keySplt, 'border'  ) != -1,
+                    _hasPadding      = Y.Array.indexOf( _keySplt, 'padding' ) != -1;
 
                 // place or content style factory
                 if ( _isHeight || _isWidth || _hasBorder || _hasPadding ) {
@@ -1126,7 +1132,7 @@ YUI.add('bewype-editor-tag', function(Y) {
             _tag = this._panel.getWorkingTagName( name );
 
             // has new value to set
-            if ( _value && ( _value === true || _value.trim() !== '' ) ) {
+            if ( _value && ( _value === true || Y.Bewype.Utils.trim( _value ) !== '' ) ) {
 
                 // update with css property
                 if ( this._panel.isCssButton( name ) ) {
@@ -1171,7 +1177,9 @@ YUI.add('bewype-editor-tag', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['bewype-editor-base']});
+
 YUI.add('bewype-editor-text', function(Y) {
 
 
@@ -1263,7 +1271,7 @@ YUI.add('bewype-editor-text', function(Y) {
             return _cssDict;
         },
 
-        _initContent : function ( cssDict ) {
+        _initContent : function ( config, cssDict ) {
 
             // get host
             var _host          = this.get( 'host' ),
@@ -1276,10 +1284,10 @@ YUI.add('bewype-editor-text', function(Y) {
 
             _fn = function ( key, val ) {
 
-                var _isHeightOrWidth = [ 'height', 'width' ].indexOf( key ) != -1,
+                var _isHeightOrWidth = Y.Array.indexOf( [ 'height', 'width' ], key ) != -1,
                     _keySplt         = key.split( '-' ),
-                    _hasBorder       = _keySplt.indexOf( 'border'  ) != -1,
-                    _hasPadding      = _keySplt.indexOf( 'padding' ) != -1;
+                    _hasBorder       = Y.Array.indexOf( _keySplt, 'border'  ) != -1,
+                    _hasPadding      = Y.Array.indexOf( _keySplt, 'padding' ) != -1;
 
                 // place or content style factory
                 if ( _isHeightOrWidth || _hasBorder || _hasPadding ) {
@@ -1315,7 +1323,8 @@ YUI.add('bewype-editor-text', function(Y) {
             _host.setStyle( 'cssText',  '');
         
             //
-            return _spinnerValues;
+            // return _spinnerValues;
+            this._init( config, _spinnerValues );
         },
 
         /**
@@ -1323,11 +1332,14 @@ YUI.add('bewype-editor-text', function(Y) {
          */
         initializer : function( config ) {
 
-            var _cssDict       = this._initEditor(), // add editor
-                _spinnerValues = this._initContent( _cssDict ); // set editor content
-
+            var _cssDict       = this._initEditor(); // add editor
+            
+            //
+            this._editor.on( 'ready', Y.bind( this._initContent, this, config, _cssDict ) ); // set editor content
+            
+            // _spinnerValues = this._initContent( _cssDict ); // set editor content
             // set panel
-            this._init( config, _spinnerValues );
+            // this._init( config, _spinnerValues );
         },
 
         /**
@@ -1364,7 +1376,7 @@ YUI.add('bewype-editor-text', function(Y) {
             _fn = function ( type_, key, val ) {
                 // do update
                 if ( key ) {
-                    if ( type_ === 'content' && ( key.split( '-' ).indexOf( 'padding' ) != -1 || key === 'height' || key === 'width' ) ) {
+                    if ( type_ === 'content' && ( Y.Array.indexOf( key.split( '-' ), 'padding' ) != -1 || key === 'height' || key === 'width' ) ) {
                         // do nothing
                     } else {
                         _host.setStyle( Y.Bewype.Utils.camelize( key ), val );
@@ -1385,9 +1397,9 @@ YUI.add('bewype-editor-text', function(Y) {
 
             // tmp vars
             var _host            = this.get( 'host' ),
-                _isHeightOrWidth = [ 'height', 'width' ].indexOf( name ) != -1,
+                _isHeightOrWidth = Y.Array.indexOf( [ 'height', 'width' ], name ) != -1,
                 _keySplt         = name.split( '-' ),
-                _hasPadding      = _keySplt.indexOf( 'padding' ) != -1,
+                _hasPadding      = Y.Array.indexOf( _keySplt, 'padding' ) != -1,
                 _node            = null,
                 _button          = this._panel.getButton( name ),
                 _value           = _button ? _button.getValue() : null;
@@ -1444,8 +1456,8 @@ YUI.add('bewype-editor-text', function(Y) {
 
             } else {
                 // get positions
-                _aPosition = _mContent.indexOf( _aContent );
-                _fPosition = _mContent.indexOf( _fContent );
+                _aPosition = Y.Array.indexOf( _mContent, _aContent );
+                _fPosition = Y.Array.indexOf( _mContent, _fContent );
 
                 // position test
                 return _fPosition < _aPosition;
@@ -1684,7 +1696,7 @@ YUI.add('bewype-editor-text', function(Y) {
                 // current tag
                 _tag = this._panel.getWorkingTagName( name );
                 // ...
-                if ( _tag && _value && ( _value === true || _value.trim() !== '' ) ) {
+                if ( _tag && _value && ( _value === true || Y.Bewype.Utils.trim( _value ) !== '' ) ) {
                     // create tag node
                     if ( name === 'url' ) {
                         _tagNode = Y.Node.create( '<a href="' + _value + '"></a>' );
@@ -1740,7 +1752,9 @@ YUI.add('bewype-editor-text', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['bewype-editor-base', 'editor']});
+
 
 
 YUI.add('bewype-editor', function(Y){}, '@VERSION@' ,{use:['bewype-editor-config', 'bewype-editor-panel', 'bewype-editor-base', 'bewype-editor-tag', 'bewype-editor-text']});

@@ -11,6 +11,7 @@ if (!GLOBAL_ENV._ready) {
     // }
 }
 
+
 YUI.add('event-base', function(Y) {
 
 /*
@@ -50,6 +51,7 @@ if (GLOBAL_ENV.DOMReady) {
 } else {
     Y.Do.before(function() { Y.fire('domready'); }, YUI.Env, '_ready');
 }
+
 
 /**
  * Custom event engine, DOM event listener abstraction layer, synthetic DOM
@@ -152,7 +154,7 @@ Y.extend(DOMEventFacade, Object, {
         this.pageX = x;
         this.pageY = y;
 
-        c = e.keyCode || e.charCode || 0;
+        c = e.keyCode || e.charCode;
 
         if (ua.webkit && (c in webkitKeymap)) {
             c = webkitKeymap[c];
@@ -160,8 +162,10 @@ Y.extend(DOMEventFacade, Object, {
 
         this.keyCode = c;
         this.charCode = c;
-        this.button = e.which || e.button;
-        this.which = this.button;
+        this.which = e.which || e.charCode || c;
+        // this.button = e.button;
+        this.button = this.which;
+
         this.target = resolve(e.target);
         this.currentTarget = resolve(currentTarget);
         this.relatedTarget = resolve(e.relatedTarget);
@@ -309,6 +313,7 @@ Y.DOMEventFacade = DOMEventFacade;
      * @param immediate {boolean} if true additional listeners
      * on the current target will not be executed
      */
+
 (function() {
 /**
  * DOM event listener abstraction layer
@@ -893,14 +898,7 @@ Event._interval = setInterval(Event._poll, Event.POLL_INTERVAL);
          * @static
          */
         generateId: function(el) {
-            var id = el.id;
-
-            if (!id) {
-                id = Y.stamp(el);
-                el.id = id;
-            }
-
-            return id;
+            return Y.DOM.generateID(el);
         },
 
         /**
@@ -1212,6 +1210,7 @@ Event._poll();
 
 })();
 
+
 /**
  * DOM event listener abstraction layer
  * @module event
@@ -1220,11 +1219,13 @@ Event._poll();
 
 /**
  * Executes the callback as soon as the specified element
- * is detected in the DOM.
+ * is detected in the DOM.  This function expects a selector
+ * string for the element(s) to detect.  If you already have
+ * an element reference, you don't need this event.
  * @event available
  * @param type {string} 'available'
  * @param fn {function} the callback function to execute.
- * @param el {string|HTMLElement|collection} the element(s) to attach
+ * @param el {string} an selector for the element(s) to attach
  * @param context optional argument that specifies what 'this' refers to.
  * @param args* 0..n additional arguments to pass on to the callback function.
  * These arguments will be added after the event object.
@@ -1241,11 +1242,14 @@ Y.Env.evt.plugins.available = {
 /**
  * Executes the callback as soon as the specified element
  * is detected in the DOM with a nextSibling property
- * (indicating that the element's children are available)
+ * (indicating that the element's children are available).
+ * This function expects a selector
+ * string for the element(s) to detect.  If you already have
+ * an element reference, you don't need this event.
  * @event contentready
  * @param type {string} 'contentready'
  * @param fn {function} the callback function to execute.
- * @param el {string|HTMLElement|collection} the element(s) to attach
+ * @param el {string} an selector for the element(s) to attach.
  * @param context optional argument that specifies what 'this' refers to.
  * @param args* 0..n additional arguments to pass on to the callback function.
  * These arguments will be added after the event object.
@@ -1260,4 +1264,6 @@ Y.Env.evt.plugins.contentready = {
 };
 
 
+
 }, '@VERSION@' ,{requires:['event-custom-base']});
+

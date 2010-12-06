@@ -181,7 +181,9 @@ YUI.add('bewype-layout-designer-config', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['plugin']});
+
 YUI.add('bewype-layout-designer-base', function(Y) {
 
 
@@ -347,7 +349,9 @@ YUI.add('bewype-layout-designer-base', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['bewype-layout-designer-sources', 'bewype-layout-designer-target']});
+
 YUI.add('bewype-layout-designer-content', function(Y) {
 
 
@@ -723,7 +727,9 @@ YUI.add('bewype-layout-designer-content', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['async-queue', 'plugin', 'substitute', 'bewype-editor']});
+
 YUI.add('bewype-layout-designer-places', function(Y) {
 
 
@@ -1291,7 +1297,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
         unRegisterContent : function ( content ) {
 
             // get content position
-            var _i = this.contents.indexOf( content );
+            var _i = Y.Array.indexOf( this.contents, content );
 
             // little check
             if ( _i != -1 ) {
@@ -1383,7 +1389,9 @@ YUI.add('bewype-layout-designer-places', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['sortable', 'dd-constrain', 'bewype-layout-designer-content']});
+
 YUI.add('bewype-layout-designer-target', function(Y) {
 
 
@@ -1672,7 +1680,9 @@ YUI.add('bewype-layout-designer-target', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['bewype-layout-designer-places']});
+
 
 
 YUI.add('bewype-layout-designer', function(Y){}, '@VERSION@' ,{use:['bewype-layout-designer-config', 'bewype-layout-designer-base', 'bewype-layout-designer-content', 'bewype-layout-designer-places', 'bewype-layout-designer-target']});

@@ -9,7 +9,8 @@ YUI.add('io-upload-iframe', function(Y) {
 
     var w = Y.config.win,
         d = Y.config.doc,
-        str = (d.documentMode && d.documentMode === 8);
+        _std = (d.documentMode && d.documentMode >= 8),
+		_d = decodeURIComponent;
    /**
     * @description Parses the POST data object and creates hidden form elements
     * for each key-value, and appends them to the HTML form object.
@@ -28,8 +29,8 @@ YUI.add('io-upload-iframe', function(Y) {
         for (i = 0, l = m.length - 1; i < l; i++) {
             o[i] = d.createElement('input');
             o[i].type = 'hidden';
-            o[i].name = m[i].substring(m[i].lastIndexOf('&') + 1);
-            o[i].value = (i + 1 === l) ? m[i + 1] : m[i + 1].substring(0, (m[i + 1].lastIndexOf('&')));
+            o[i].name = _d(m[i].substring(m[i].lastIndexOf('&') + 1));
+            o[i].value = (i + 1 === l) ? _d(m[i + 1]) : _d(m[i + 1].substring(0, (m[i + 1].lastIndexOf('&'))));
             f.appendChild(o[i]);
             Y.log('key: ' +  o[i].name + ' and value: ' + o[i].value + ' added as form data.', 'info', 'io');
         }
@@ -70,12 +71,11 @@ YUI.add('io-upload-iframe', function(Y) {
         f.setAttribute('action', uri);
         f.setAttribute('method', 'POST');
         f.setAttribute('target', 'ioupload' + id );
-        f.setAttribute(Y.UA.ie && !str ? 'encoding' : 'enctype', 'multipart/form-data');
+        f.setAttribute(Y.UA.ie && !_std ? 'encoding' : 'enctype', 'multipart/form-data');
     }
 
    /**
-    * @description Sets the appropriate attributes and values to the HTML
-    * form, in preparation of a file upload transaction.
+    * @description Reset the HTML form attributes to their original values.
     * @method _resetAttrs
     * @private
     * @static
@@ -87,7 +87,7 @@ YUI.add('io-upload-iframe', function(Y) {
         var p;
 
         for (p in a) {
-            if (a.hasOwnProperty(a, p)) {
+            if (a.hasOwnProperty(p)) {
                 if (a[p]) {
                     f.setAttribute(p, f[p]);
                 }
@@ -168,11 +168,16 @@ YUI.add('io-upload-iframe', function(Y) {
             _clearTimeout(o.id);
         }
 
-        if (b) {
+        if (b && (Y.UA.ie !== 0 || Y.UA.webkit > 1)) {
+            // FPI - temporary fix for IE
+            o.c.responseText = b.get('outerText');
+            Y.log('The responseText value for transaction ' + o.id + ' is: ' + o.c.responseText + '.', 'info', 'io');
+        } else if (b) {
             // When a response Content-Type of "text/plain" is used, Firefox and Safari
             // will wrap the response string with <pre></pre>.
-            p = b.query('pre:first-child');
-            o.c.responseText = p ? p.get('text') : b.get('text');
+            // p = b.query('pre:first-child');
+            // o.c.responseText = p ? p.get('text') : b.get('text');
+            o.c.responseText = b.get('text');
             Y.log('The responseText value for transaction ' + o.id + ' is: ' + o.c.responseText + '.', 'info', 'io');
         }
         else {
@@ -265,7 +270,7 @@ YUI.add('io-upload-iframe', function(Y) {
                     Y.log('Transaction ' + o.id + ' aborted.', 'info', 'io');
                 }
                 else {
-                    Y.log('Attempted to abort transaction ' + o.id + ' but transaction has completed.', 'info', 'io');
+                    Y.log('Attempted to abort transaction ' + o.id + ' but transaction has completed.', 'warn', 'io');
                     return false;
                 }
             },
@@ -281,6 +286,7 @@ YUI.add('io-upload-iframe', function(Y) {
             return _send(o, uri, c);
         }
     });
+
 
 
 }, '@VERSION@' ,{requires:['io-base','node-base']});

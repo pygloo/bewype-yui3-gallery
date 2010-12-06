@@ -516,4 +516,5 @@ YUI.add('node-flick', function(Y) {
     Y.Plugin.Flick = Flick;
 
 
+
 }, '@VERSION@' ,{requires:['classnamemanager', 'transition', 'event-flick', 'plugin']});

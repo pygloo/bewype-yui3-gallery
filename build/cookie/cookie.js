@@ -496,4 +496,5 @@ YUI.add('cookie', function(Y) {
     };
 
 
+
 }, '@VERSION@' ,{requires:['yui-base']});

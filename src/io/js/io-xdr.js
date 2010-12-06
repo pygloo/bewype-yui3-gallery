@@ -117,7 +117,7 @@
             return { id: o.id, c: { responseText: s, responseXML: x } };
         }
         else {
-            return { id: o.id, status: o.e };
+            return { id: o.id, e: o.e };
         }
 
     }
@@ -172,36 +172,44 @@
         * @param {object} c - configuration object for the transaction.
         */
         xdr: function(uri, o, c) {
-            if (c.on && c.xdr.use === 'flash') {
-                _cB[o.id] = {
-                    on: c.on,
-                    context: c.context,
-                    arguments: c.arguments
-                };
-                // These properties cannot be serialized across Flash's
-                // ExternalInterface.  Doing so will result in exceptions.
-                c.context = null;
-                c.form = null;
-                o.c.send(uri, c, o.id);
-            }
-            else if (ie) {
-                _evt(o, c);
-                o.c.open(c.method || 'GET', uri);
-                o.c.send(c.data);
-            }
-            else {
-                o.c.send(uri, o, c);
-            }
+			if (c.xdr.use === 'flash') {
+				_cB[o.id] = {
+					on: c.on,
+					context: c.context,
+					arguments: c.arguments
+				};
+				// These properties cannot be serialized across Flash's
+				// ExternalInterface.  Doing so will result in exceptions.
+				c.context = null;
+				c.form = null;
 
-            return {
-                id: o.id,
-                abort: function() {
-                    return o.c ? _abort(o, c) : false;
-                },
-                isInProgress: function() {
-                    return o.c ? _isInProgress(o.id) : false;
-                }
-            };
+				w.setTimeout(function() {
+					if (o.c) {
+						o.c.send(uri, c, o.id);
+					}
+					else {
+						Y.io.xdrResponse(o, c, 'transport error');
+					}
+				}, Y.io.xdr.delay);
+			}
+			else if (ie) {
+				_evt(o, c);
+				o.c.open(c.method || 'GET', uri);
+				o.c.send(c.data);
+			}
+			else {
+				o.c.send(uri, o, c);
+			}
+
+			return {
+				id: o.id,
+				abort: function() {
+					return o.c ? _abort(o, c) : false;
+				},
+				isInProgress: function() {
+					return o.c ? _isInProgress(o.id) : false;
+				}
+			};
         },
 
        /**
@@ -232,7 +240,7 @@
                 }
             }
 
-            switch (e.toLowerCase()) {
+            switch (e) {
                 case 'start':
                     Y.io.start(o.id, c);
                     break;
@@ -240,16 +248,14 @@
                     Y.io.complete(o, c);
                     break;
                 case 'success':
-                    Y.io.success(t || f ?  _data(o, f, t) : o, c);
+                    Y.io.success(t || f ? _data(o, f, t) : o, c);
                     delete m[o.id];
                     break;
                 case 'timeout':
                 case 'abort':
+				case 'transport error':
+					o.e = e;
                 case 'failure':
-                    if (e === ('abort' || 'timeout')) {
-                        o.e = e;
-                    }
-
                     Y.io.failure(t || f ? _data(o, f, t) : o, c);
                     delete m[o.id];
                     break;
@@ -268,6 +274,7 @@
         * @return void
         */
         xdrReady: function(id) {
+			Y.io.xdr.delay = 0;
             Y.fire(E_XDR_READY, id);
         },
 
@@ -281,15 +288,29 @@
         * @return void
         */
         transport: function(o) {
-            var id = o.yid ? o.yid : Y.id;
-                o.id = o.id || 'flash';
+            var yid = o.yid || Y.id,
+				oid = o.id || 'flash',
+				src = Y.UA.ie ? o.src + '?d=' + new Date().valueOf().toString() : o.src;
 
-            if (o.id === 'native' || o.id === 'flash') {
-                _swf(o.src, id);
+            if (oid === 'native' || oid === 'flash') {
+
+				_swf(src, yid);
                 this._transport.flash = d.getElementById('yuiIoSwf');
             }
-            else {
+            else if (oid) {
                 this._transport[o.id] = o.src;
             }
         }
     });
+
+   /**
+	* @description Delay value to calling the Flash transport, in the
+	* event io.swf has not finished loading.  Once the E_XDR_READY
+    * event is fired, this value will be set to 0.
+	*
+	* @property delay
+	* @public
+	* @static
+	* @type number
+	*/
+	Y.io.xdr.delay = 50;

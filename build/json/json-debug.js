@@ -227,7 +227,9 @@ if ( Native ) {
 Y.JSON.useNativeParse = useNative;
 
 
+
 }, '@VERSION@' );
+
 YUI.add('json-stringify', function(Y) {
 
 /**
@@ -519,7 +521,9 @@ Y.mix(Y.namespace('JSON'),{
 });
 
 
+
 }, '@VERSION@' );
+
 
 
 YUI.add('json', function(Y){}, '@VERSION@' ,{use:['json-parse', 'json-stringify']});

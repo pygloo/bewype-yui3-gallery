@@ -50,8 +50,8 @@ YUI.add('bewype-editor-tag', function(Y) {
                 var _isHeight        = key === 'height',            
                     _isWidth         = key === 'width',            
                     _keySplt         = key.split( '-' ),            
-                    _hasBorder       = _keySplt.indexOf( 'border'  ) != -1,
-                    _hasPadding      = _keySplt.indexOf( 'padding' ) != -1;
+                    _hasBorder       = Y.Array.indexOf( _keySplt, 'border'  ) != -1,
+                    _hasPadding      = Y.Array.indexOf( _keySplt, 'padding' ) != -1;
 
                 // place or content style factory
                 if ( _isHeight || _isWidth || _hasBorder || _hasPadding ) {
@@ -145,7 +145,7 @@ YUI.add('bewype-editor-tag', function(Y) {
             _tag = this._panel.getWorkingTagName( name );
 
             // has new value to set
-            if ( _value && ( _value === true || _value.trim() !== '' ) ) {
+            if ( _value && ( _value === true || Y.Bewype.Utils.trim( _value ) !== '' ) ) {
 
                 // update with css property
                 if ( this._panel.isCssButton( name ) ) {
@@ -187,6 +187,7 @@ YUI.add('bewype-editor-tag', function(Y) {
 
     Y.namespace( 'Bewype' );
     Y.Bewype.EditorTag = EditorTag;
+
 
 
 

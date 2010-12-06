@@ -12,9 +12,15 @@
                 ],
                 "condition": {
                    "trigger": "dom-style",
-                   "ua": "ie"
+                   "test": "ie-style-test.js"
                 }
-            } 
+            },
+
+            "dom-deprecated": {
+                "requires": [
+                    "dom-base"
+                ]
+            }
         }, 
         "requires": [
             "oop"

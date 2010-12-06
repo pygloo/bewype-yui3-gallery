@@ -249,7 +249,9 @@ YUI.add('bewype-picker-base', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['stylesheet', 'substitute', 'widget', 'yui-base']});
+
 YUI.add('bewype-picker-color', function(Y) {
 
 
@@ -500,9 +502,12 @@ YUI.add('bewype-picker-color', function(Y) {
 
             if ( _targetNode && _targetNode.get( 'className' ) === _pickerClass + '-selector-bg' ) {
                 
-                // get picker position
-                _x = evt.pageX - _targetNode.getX();
-                _y = evt.pageY - _targetNode.getY();
+				try {
+					// get picker position
+					_x = evt.pageX - _targetNode.getX();
+					_y = evt.pageY - _targetNode.getY();
+				} catch (e) {
+				}
 
                 // manage small picker
                 _x = ( _pickerSize == 180 ) ? _x : _x * 2;
@@ -581,7 +586,9 @@ YUI.add('bewype-picker-color', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['bewype-color', 'slider', 'stylesheet', 'substitute', 'widget', 'yui-base']});
+
 YUI.add('bewype-picker-file', function(Y) {
 
 
@@ -851,7 +858,9 @@ YUI.add('bewype-picker-file', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['async-queue', 'io', 'json-parse', 'stylesheet', 'substitute', 'widget', 'yui-base']});
+
 YUI.add('bewype-picker-font-size', function(Y) {
 
 
@@ -927,7 +936,9 @@ YUI.add('bewype-picker-font-size', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['bewype-picker-base']});
+
 YUI.add('bewype-picker-font-family', function(Y) {
 
 
@@ -1038,7 +1049,9 @@ YUI.add('bewype-picker-font-family', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['bewype-picker-base']});
+
 YUI.add('bewype-picker-text-align', function(Y) {
 
 
@@ -1101,7 +1114,9 @@ YUI.add('bewype-picker-text-align', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['bewype-picker-base']});
+
 YUI.add('bewype-picker-title', function(Y) {
 
 
@@ -1172,7 +1187,9 @@ YUI.add('bewype-picker-title', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['bewype-picker-base']});
+
 YUI.add('bewype-picker-url', function(Y) {
 
 
@@ -1310,7 +1327,9 @@ YUI.add('bewype-picker-url', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['stylesheet', 'substitute', 'widget', 'yui-base']});
+
 
 
 YUI.add('bewype-picker', function(Y){}, '@VERSION@' ,{use:['bewype-picker-base', 'bewype-picker-color', 'bewype-picker-file', 'bewype-picker-font-size', 'bewype-picker-font-family', 'bewype-picker-text-align', 'bewype-picker-title', 'bewype-picker-url']});

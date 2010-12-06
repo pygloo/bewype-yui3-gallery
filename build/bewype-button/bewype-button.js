@@ -211,7 +211,9 @@ YUI.add('bewype-button-base', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['stylesheet', 'substitute', 'widget', 'yui-base']});
+
 YUI.add('bewype-button-toggle', function(Y) {
 
 
@@ -376,7 +378,9 @@ YUI.add('bewype-button-toggle', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['bewype-button-base']});
+
 YUI.add('bewype-button-picker', function(Y) {
 
 
@@ -643,7 +647,9 @@ YUI.add('bewype-button-picker', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['bewype-button-base', 'bewype-picker']});
+
 
 
 YUI.add('bewype-button', function(Y){}, '@VERSION@' ,{use:['bewype-button-base', 'bewype-button-toggle', 'bewype-button-picker']});

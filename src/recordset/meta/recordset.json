@@ -8,12 +8,14 @@
 				"requires": [
 					"arraysort",
 					"recordset-base",
-					"plugin"
-					
+					"plugin"					
 				]
 			},
 			"recordset-filter": {
-				"requires": ["recordset-base", "array-extras"]
+				"requires": ["recordset-base", "array-extras", "plugin"]
+			},
+			"recordset-indexer": {
+				"requires": ["recordset-base", "plugin"]
 			}
 		}
     }

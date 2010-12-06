@@ -66,7 +66,7 @@
         _hasLeftBlank : function (str){
             if (str.length === 0) {
                 return false;
-            } else if ( str.substring(0, 1).trim().length === 0 ) {
+            } else if ( Y.Bewype.Utils.trim( str.substring(0, 1) ).length === 0 ) {
                 return true;
             }
             return false;
@@ -75,7 +75,7 @@
         _hasRightBlank : function (str){
             if (str.length === 0) {
                 return false;
-            } else if ( str.substring(str.length - 1, str.length).trim().length === 0 ) {
+            } else if ( Y.Bewype.Utils.trim( str.substring(str.length - 1, str.length) ).length === 0 ) {
                 return true;
             }
             return false;
@@ -88,10 +88,10 @@
                 _t    = '';
             // ensure blank
             _t += this._hasLeftBlank( _html )  ? '&nbsp;' : '';
-            _t += _html.trim();
+            _t += Y.Bewype.Utils.trim( _html );
             _t += this._hasRightBlank( _html ) ? '&nbsp;' : '';
             // update new node
-            return raw ? _t : _t.trim() === '' ? null : new Y.Node.create( _t );
+            return raw ? _t : Y.Bewype.Utils.trim( _t ) === '' ? null : new Y.Node.create( _t );
         },
 
         removeTagOrStyle : function ( node, selector, styleProperty ) {
@@ -154,7 +154,7 @@
                 var _cssDict = Y.Bewype.Utils.getCssDict( node );
                 // remove buttons
                 Y.Object.each( this._panel.get( 'activeButtons' ) , function( v, k ) {
-                    if ( this._panel._cssButtons.indexOf( v ) != -1) {
+                    if ( Y.Array.indexOf( this._panel._cssButtons, v ) != -1) {
                         delete( _cssDict[ v ] );
                     }
                 }, this );

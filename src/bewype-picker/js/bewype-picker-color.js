@@ -246,9 +246,12 @@
 
             if ( _targetNode && _targetNode.get( 'className' ) === _pickerClass + '-selector-bg' ) {
                 
-                // get picker position
-                _x = evt.pageX - _targetNode.getX();
-                _y = evt.pageY - _targetNode.getY();
+				try {
+					// get picker position
+					_x = evt.pageX - _targetNode.getX();
+					_y = evt.pageY - _targetNode.getY();
+				} catch (e) {
+				}
 
                 // manage small picker
                 _x = ( _pickerSize == 180 ) ? _x : _x * 2;

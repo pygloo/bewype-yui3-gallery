@@ -343,7 +343,9 @@ Y.extend(DSLocal, Y.Base, {
 Y.namespace("DataSource").Local = DSLocal;
 
 
+
 }, '@VERSION@' ,{requires:['base']});
+
 YUI.add('datasource-io', function(Y) {
 
 /**
@@ -427,6 +429,47 @@ Y.extend(DSIO, Y.DataSource.Local, {
     },
 
     /**
+    * IO success callback.
+    *
+    * @method successHandler
+    * @param id {String} Transaction ID.
+    * @param response {String} Response.
+    * @param e {Event.Facade} Event facade.
+    * @private
+    */
+    successHandler: function (id, response, e) {
+        var defIOConfig = this.get("ioConfig");
+
+        delete Y.DataSource.Local.transactions[e.tId];
+
+        this.fire("data", Y.mix({data:response}, e));
+        if (defIOConfig && defIOConfig.on && defIOConfig.on.success) {
+        	defIOConfig.on.success.apply(defIOConfig.context || Y, arguments);
+        }
+    },
+
+    /**
+    * IO failure callback.
+    *
+    * @method failureHandler
+    * @param id {String} Transaction ID.
+    * @param response {String} Response.
+    * @param e {Event.Facade} Event facade.
+    * @private
+    */
+    failureHandler: function (id, response, e) {
+        var defIOConfig = this.get("ioConfig");
+        
+        delete Y.DataSource.Local.transactions[e.tId];
+
+        e.error = new Error("IO data failure");
+        this.fire("data", Y.mix({data:response}, e));
+        if (defIOConfig && defIOConfig.on && defIOConfig.on.failure) {
+        	defIOConfig.on.failure.apply(defIOConfig.context || Y, arguments);
+        }
+    },
+    
+    /**
     * @property _queue
     * @description Object literal to manage asynchronous request/response
     * cycles enabled if queue needs to be managed (asyncMode/ioConnMode):
@@ -470,23 +513,8 @@ Y.extend(DSIO, Y.DataSource.Local, {
             request = e.request,
             cfg = Y.merge(defIOConfig, e.cfg, {
                 on: Y.merge(defIOConfig, {
-                    success: function (id, response, e) {
-                        delete Y.DataSource.Local.transactions[e.tId];
-
-                        this.fire("data", Y.mix({data:response}, e));
-                        if (defIOConfig && defIOConfig.on && defIOConfig.on.success) {
-                        	defIOConfig.on.success.apply(defIOConfig.context || Y, arguments);
-                        }
-                    },
-                    failure: function (id, response, e) {
-                        delete Y.DataSource.Local.transactions[e.tId];
-
-                        e.error = new Error("IO data failure");
-                        this.fire("data", Y.mix({data:response}, e));
-                        if (defIOConfig && defIOConfig.on && defIOConfig.on.failure) {
-                        	defIOConfig.on.failure.apply(defIOConfig.context || Y, arguments);
-                        }
-                    }
+                    success: this.successHandler,
+                    failure: this.failureHandler
                 }),
                 context: this,
                 "arguments": e
@@ -509,7 +537,9 @@ Y.extend(DSIO, Y.DataSource.Local, {
 Y.DataSource.IO = DSIO;
 
 
+
 }, '@VERSION@' ,{requires:['datasource-local', 'io']});
+
 YUI.add('datasource-get', function(Y) {
 
 /**
@@ -568,6 +598,7 @@ Y.DataSource.Get = Y.extend(DSGet, Y.DataSource.Local, {
         this._last = guid;
 
         // Dynamically add handler function with a closure to the callback stack
+        // for access to guid
         YUI.Env.DataSource.callbacks[guid] = Y.bind(function(response) {
             delete YUI.Env.DataSource.callbacks[guid];
             delete Y.DataSource.Local.transactions[e.tId];
@@ -710,7 +741,9 @@ Y.DataSource.Get = Y.extend(DSGet, Y.DataSource.Local, {
 YUI.namespace("Env.DataSource.callbacks");
 
 
+
 }, '@VERSION@' ,{requires:['datasource-local', 'get']});
+
 YUI.add('datasource-function', function(Y) {
 
 /**
@@ -817,7 +850,9 @@ Y.DataSource.Function = DSFn;
     
 
 
+
 }, '@VERSION@' ,{requires:['datasource-local']});
+
 YUI.add('datasource-cache', function(Y) {
 
 /**
@@ -976,7 +1011,9 @@ Y.mix(DataSourceCache, {
 Y.namespace("Plugin").DataSourceCache = DataSourceCache;
 
 
+
 }, '@VERSION@' ,{requires:['datasource-local']});
+
 YUI.add('datasource-jsonschema', function(Y) {
 
 /**
@@ -1083,7 +1120,9 @@ Y.extend(DataSourceJSONSchema, Y.Plugin.Base, {
 Y.namespace('Plugin').DataSourceJSONSchema = DataSourceJSONSchema;
 
 
+
 }, '@VERSION@' ,{requires:['plugin', 'datasource-local', 'dataschema-json']});
+
 YUI.add('datasource-xmlschema', function(Y) {
 
 /**
@@ -1188,7 +1227,9 @@ Y.extend(DataSourceXMLSchema, Y.Plugin.Base, {
 Y.namespace('Plugin').DataSourceXMLSchema = DataSourceXMLSchema;
 
 
+
 }, '@VERSION@' ,{requires:['plugin', 'datasource-local', 'dataschema-xml']});
+
 YUI.add('datasource-arrayschema', function(Y) {
 
 /**
@@ -1293,7 +1334,9 @@ Y.extend(DataSourceArraySchema, Y.Plugin.Base, {
 Y.namespace('Plugin').DataSourceArraySchema = DataSourceArraySchema;
 
 
+
 }, '@VERSION@' ,{requires:['plugin', 'datasource-local', 'dataschema-array']});
+
 YUI.add('datasource-textschema', function(Y) {
 
 /**
@@ -1398,7 +1441,9 @@ Y.extend(DataSourceTextSchema, Y.Plugin.Base, {
 Y.namespace('Plugin').DataSourceTextSchema = DataSourceTextSchema;
 
 
+
 }, '@VERSION@' ,{requires:['plugin', 'datasource-local', 'dataschema-text']});
+
 YUI.add('datasource-polling', function(Y) {
 
 /**
@@ -1489,7 +1534,9 @@ Pollable.prototype = {
 Y.augment(Y.DataSource.Local, Pollable);
 
 
+
 }, '@VERSION@' ,{requires:['datasource-local']});
+
 
 
 YUI.add('datasource', function(Y){}, '@VERSION@' ,{use:['datasource-local','datasource-io','datasource-get','datasource-function','datasource-cache','datasource-jsonschema','datasource-xmlschema','datasource-arrayschema','datasource-textschema','datasource-polling']});

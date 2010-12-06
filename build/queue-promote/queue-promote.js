@@ -50,4 +50,5 @@ Y.mix(Y.Queue.prototype, {
 });
 
 
+
 }, '@VERSION@' ,{requires:['yui-base']});

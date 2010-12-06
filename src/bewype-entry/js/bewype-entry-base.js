@@ -143,7 +143,7 @@
 
         setValue : function( value ) {
             // update value
-            this._value = (value && value.trim() === '') ? null : value;
+            this._value = (value && Y.Bewype.Utils.trim( value ) === '') ? null : value;
 
             // vars
             var _contentBox  = this.get( 'contentBox'  ),

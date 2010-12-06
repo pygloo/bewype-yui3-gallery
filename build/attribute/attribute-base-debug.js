@@ -118,6 +118,7 @@ YUI.add('attribute-base', function(Y) {
             return o;
         }
     };
+
     /**
      * The attribute module provides an augmentable Attribute implementation, which 
      * adds configurable attributes and attribute change events to the class being 
@@ -220,7 +221,7 @@ YUI.add('attribute-base', function(Y) {
         host._requireAddAttr = host._requireAddAttr || false;
 
         // ATTRS support for Node, which is not Base based
-        if ( attrs && !(Base && host instanceof Base)) {
+        if ( attrs && !(Base && Y.instanceOf(host, Base))) {
             host.addAttrs(this._protectAttrs(attrs));
         }
     }
@@ -760,13 +761,17 @@ YUI.add('attribute-base', function(Y) {
 
             facade = (opts) ? Y.merge(opts) : host._ATTR_E_FACADE;
 
-            facade.type = eventName;
+            // Not using the single object signature for fire({type:..., newVal:...}), since 
+            // we don't want to override type. Changed to the fire(type, {newVal:...}) signature.
+
+            // facade.type = eventName;
             facade.attrName = attrName;
             facade.subAttrName = subAttrName;
             facade.prevVal = currVal;
             facade.newVal = newVal;
 
-            host.fire(facade);
+            // host.fire(facade);
+            host.fire(eventName, facade);
         },
 
         /**
@@ -1166,6 +1171,7 @@ YUI.add('attribute-base', function(Y) {
     Y.mix(Attribute, EventTarget, false, null, 1);
 
     Y.Attribute = Attribute;
+
 
 
 }, '@VERSION@' ,{requires:['event-custom']});

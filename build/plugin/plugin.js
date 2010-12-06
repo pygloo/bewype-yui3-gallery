@@ -224,4 +224,5 @@ YUI.add('plugin', function(Y) {
     Y.namespace("Plugin").Base = Plugin;
 
 
+
 }, '@VERSION@' ,{requires:['base-base']});

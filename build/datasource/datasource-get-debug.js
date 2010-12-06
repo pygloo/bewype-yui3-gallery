@@ -56,6 +56,7 @@ Y.DataSource.Get = Y.extend(DSGet, Y.DataSource.Local, {
         this._last = guid;
 
         // Dynamically add handler function with a closure to the callback stack
+        // for access to guid
         YUI.Env.DataSource.callbacks[guid] = Y.bind(function(response) {
             delete YUI.Env.DataSource.callbacks[guid];
             delete Y.DataSource.Local.transactions[e.tId];
@@ -200,6 +201,7 @@ Y.DataSource.Get = Y.extend(DSGet, Y.DataSource.Local, {
 });
   
 YUI.namespace("Env.DataSource.callbacks");
+
 
 
 }, '@VERSION@' ,{requires:['datasource-local', 'get']});

@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
+<head> 
+
+    <title>Pygloo's Repos | bewype-yui3-gallery</title>
+
+    <link href="/bewype-yui3-gallery/css/pygloo-repo.css" rel="stylesheet" type="text/css">
+
+    <style>
+    <!--
+    div.picker {
+        width  : 180px;
+        margin : auto;
+    }
+    -->
+    </style>
+
+    <script type="text/javascript" src="../../../../build/yui/yui.js"></script>
+
+</head>
+<body class="yui3-skin-sam">
+
+    <div class="title">
+        <h1><a href="http://pygloo.github.com/">Pygloo's Repos</a></h1>
+        <span>
+            | 
+            bewype-yui3-gallery
+            <a href="/bewype-yui3-gallery">&#182;</a>
+        </span>
+    </div>
+
+    <h2 class="para-title">Picker Base <em>(demo)</em></h2>
+
+    <div id="picker" class="picker"></div>
+
+    <!--h2 class="para-title">Picker Color Normal <em>(demo)</em></h2>
+
+    <div id="picker-color-normal" class="picker"></div>
+
+    <h2 class="para-title">Picker Color Small <em>(demo)</em></h2>
+
+    <div id="picker-color-small" class="picker"></div-->
+
+    <h2 class="para-title">Picker File <em>(demo)</em></h2>
+    
+    <div id="picker-file" class="picker"></div>
+
+    <h2 class="para-title">Picker Font Family <em>(demo)</em></h2>
+    
+    <div id="picker-font-family" class="picker"></div>
+
+    <h2 class="para-title">Picker Font Size <em>(demo)</em></h2>
+    
+    <div id="picker-font-size" class="picker"></div>
+
+    <h2 class="para-title">Picker Text Align <em>(demo)</em></h2>
+    
+    <div id="picker-text-align" class="picker"></div>
+
+    <h2 class="para-title">Picker Url <em>(demo)</em></h2>
+    
+    <div id="picker-url" class="picker"></div>
+
+    <p/>
+
+    <script>
+        <!--
+        YUI( { filter: 'debug' } ).use( 'bewype-picker', function( Y ) {
+            // picker manual
+            var _picker = new Y.Bewype.Picker();
+            _picker.render( '#picker' );
+
+            // add rows
+            _picker.append( 'test1', 'Test1' );
+            _picker.append( 'test2', 'Test2' );
+            _picker.append( 'test3', 'Test3' );
+
+            // add custom event listener
+            _picker.on( 'picker:onChange', function ( e ) {
+                alert( 'Picker has changed to: ' + e.target.getValue() );
+            } );
+
+			/*
+            // picker color normal
+            var _pickerColorNormal = new Y.Bewype.PickerColor();
+            _pickerColorNormal.render( '#picker-color-normal' );
+
+            // add custom event listener
+            _pickerColorNormal.on( 'picker:onChange', function ( e ) {
+                alert( 'Picker Color Normal has changed to: ' + e.target.getValue() );
+            } );
+
+            // picker color small
+            var _pickerColorSmall = new Y.Bewype.PickerColor( {
+                pickerSize : 90
+            } );
+            _pickerColorSmall.render( '#picker-color-small' );
+
+            // add custom event listener
+            _pickerColorSmall.on( 'picker:onChange', function ( e ) {
+                alert( 'Picker Color Small has changed to: ' + e.target.getValue() );
+            } );
+			*/
+
+            // picker file manual
+            var _pickerFile = new Y.Bewype.PickerFile( {
+                fileStaticPath : 'http://www.bewype.org/uploads/',
+                uploadUrl      : 'http://www.bewype.org/upload'
+            } );
+            _pickerFile.render( '#picker-file' );
+
+            // add custom event listener
+            _pickerFile.on( 'picker:onChange', function ( e ) {
+                alert( 'Picker File has changed to: ' + e.target.getValue() );
+            } );
+
+            // picker font family
+            var _pickerFontFamily = new Y.Bewype.PickerFontFamily();
+            _pickerFontFamily.render( '#picker-font-family' );
+
+            // add custom event listener
+            _pickerFontFamily.on( 'picker:onChange', function ( e ) {
+                alert( 'Picker Font Family has changed to: ' + e.target.getValue() );
+            } );
+
+            // picker font size
+            var _pickerFontSize = new Y.Bewype.PickerFontSize();
+            _pickerFontSize.render( '#picker-font-size' );
+
+            // add custom event listener
+            _pickerFontSize.on( 'picker:onChange', function ( e ) {
+                alert( 'Picker Font Size has changed to: ' + e.target.getValue() );
+            } );
+
+            // picker text align
+            var _pickerTextAlign = new Y.Bewype.PickerTextAlign();
+            _pickerTextAlign.render( '#picker-text-align' );
+
+            // add custom event listener
+            _pickerTextAlign.on( 'picker:onChange', function ( e ) {
+                alert( 'Picker Text Align has changed to: ' + e.target.getValue() );
+            } );
+
+            // picker url
+            var _pickerUrl = new Y.Bewype.PickerUrl();
+            _pickerUrl.render( '#picker-url' );
+
+            // add custom event listener
+            _pickerUrl.on( 'picker:onChange', function ( e ) {
+                alert( 'Picker Url has changed to: ' + e.target.getValue() );
+            } );
+        } );
+        -->
+    </script>
+</body>
+</html>
+

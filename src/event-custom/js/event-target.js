@@ -148,6 +148,26 @@ ET.prototype = {
     },
 
     /**
+     * Takes the type parameter passed to 'on' and parses out the
+     * various pieces that could be included in the type.  If the
+     * event type is passed without a prefix, it will be expanded
+     * to include the prefix one is supplied or the event target
+     * is configured with a default prefix.
+     * @method parseType
+     * @param {string} type the type
+     * @param {string} [pre=this._yuievt.config.prefix] the prefix
+     * @since 3.3.0
+     * @return {Array} an array containing:
+     *  * the detach category, if supplied,
+     *  * the prefixed event type,
+     *  * whether or not this is an after listener,
+     *  * the supplied event type
+     */
+    parseType: function(type, pre) {
+        return _parseType(type, pre || this._yuievt.config.prefix);
+    },
+
+    /**
      * Subscribe to a custom event hosted by this object
      * @method on
      * @param type    {string}   The type of the event

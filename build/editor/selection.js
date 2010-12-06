@@ -49,7 +49,9 @@ YUI.add('selection', function(Y) {
                         //This causes IE to not allow a selection on a doubleclick
                         //rng.select(nodes[i]);
                         if (rng.inRange(sel)) {
-                           ieNode = nodes[i]; 
+                            if (!ieNode) {
+                                ieNode = nodes[i];
+                            }
                         }
                     }
                 }
@@ -60,6 +62,11 @@ YUI.add('selection', function(Y) {
                     if (ieNode.nodeType !== 3) {
                         if (ieNode.firstChild) {
                             ieNode = ieNode.firstChild;
+                        }
+                        if (ieNode && ieNode.tagName && ieNode.tagName.toLowerCase() === 'body') {
+                            if (ieNode.firstChild) {
+                                ieNode = ieNode.firstChild;
+                            }
                         }
                     }
                     this.anchorNode = this.focusNode = Y.Selection.resolve(ieNode);
@@ -154,12 +161,22 @@ YUI.add('selection', function(Y) {
         Y.each(hrs, function(hr) {
             var el = doc.createElement('div');
                 el.className = 'hr yui-non yui-skip';
-                el.setAttribute('style', 'border: 1px solid #ccc; line-height: 0; font-size: 0;margin-top: 5px; margin-bottom: 5px;');
+                
                 el.setAttribute('readonly', true);
                 el.setAttribute('contenteditable', false); //Keep it from being Edited
                 if (hr.parentNode) {
                     hr.parentNode.replaceChild(el, hr);
                 }
+                //Had to move to inline style. writes for ie's < 8. They don't render el.setAttribute('style');
+                var s = el.style;
+                s.border = '1px solid #ccc';
+                s.lineHeight = '0';
+                s.fontSize = '0';
+                s.marginTop = '5px';
+                s.marginBottom = '5px';
+                s.marginLeft = '0px';
+                s.marginRight = '0px';
+                s.padding = '0';
         });
         
 
@@ -230,13 +247,13 @@ YUI.add('selection', function(Y) {
             wrapped = Y.Selection._wrapBlock(wrapped);
         }
 
-        single = Y.all('p');
+        single = Y.all(Y.Selection.DEFAULT_BLOCK_TAG);
         if (single.size() === 1) {
             br = single.item(0).all('br');
             if (br.size() === 1) {
                 br.item(0).remove();
                 var html = single.item(0).get('innerHTML');
-                if (html == '' || html == ' ') {
+                if (html === '' || html === ' ') {
                     single.set('innerHTML', Y.Selection.CURSOR);
                     sel = new Y.Selection();
                     sel.focusCursor(true, true);
@@ -296,6 +313,13 @@ YUI.add('selection', function(Y) {
     */
     Y.Selection.REG_NON = /[\s\S|\n|\t]/gi;
 
+    /**
+    * Regular Expression to remove all HTML from a string
+    * @static
+    * @property REG_NOHTML
+    */
+    Y.Selection.REG_NOHTML = /<\S[^><]*>/g;
+
 
     /**
     * Wraps an array of elements in a Block level tag
@@ -305,7 +329,7 @@ YUI.add('selection', function(Y) {
     */
     Y.Selection._wrapBlock = function(wrapped) {
         if (wrapped) {
-            var newChild = Y.Node.create('<p></p>'),
+            var newChild = Y.Node.create('<' + Y.Selection.DEFAULT_BLOCK_TAG + '></' + Y.Selection.DEFAULT_BLOCK_TAG + '>'),
                 firstChild = Y.one(wrapped[0]), i;
 
             for (i = 1; i < wrapped.length; i++) {
@@ -362,7 +386,8 @@ YUI.add('selection', function(Y) {
         }
         
         Y.all('.hr').addClass('yui-skip').addClass('yui-non');
-
+        
+        /*
         nodes.each(function(n) {
             n.addClass(n._yuid);
             n.setStyle(FONT_FAMILY, '');
@@ -370,6 +395,7 @@ YUI.add('selection', function(Y) {
                 n.removeAttribute('style');
             }
         });
+        */
         
         return html;
     };
@@ -382,7 +408,14 @@ YUI.add('selection', function(Y) {
     */
     Y.Selection.resolve = function(n) {
         if (n && n.nodeType === 3) {
-            n = n.parentNode;
+            //Adding a try/catch here because in rare occasions IE will
+            //Throw a error accessing the parentNode of a stranded text node.
+            //In the case of Ctrl+Z (Undo)
+            try {
+                n = n.parentNode;
+            } catch (re) {
+                n = 'body';
+            }
         }
         return Y.one(n);
     };
@@ -395,14 +428,14 @@ YUI.add('selection', function(Y) {
     * @return {String} The string of text
     */
     Y.Selection.getText = function(node) {
-        var t = node.get('innerHTML').replace(Y.Selection.STRIP_HTML, ''),
-            c = t.match(Y.Selection.REG_CHAR),
-            s = t.match(Y.Selection.REG_NON);
-            if (c === null && s) {
-                t = '';
-            }
-        return t;
+        var txt = node.get('innerHTML').replace(Y.Selection.REG_NOHTML, '');
+        //Clean out the cursor subs to see if the Node is empty
+        txt = txt.replace('<span><br></span>', '').replace('<br>', '');
+        return txt;
     };
+
+    //Y.Selection.DEFAULT_BLOCK_TAG = 'div';
+    Y.Selection.DEFAULT_BLOCK_TAG = 'p';
 
     /**
     * The selector to use when looking for Nodes to cache the value of: [style],font[face]
@@ -410,13 +443,6 @@ YUI.add('selection', function(Y) {
     * @property ALL
     */
     Y.Selection.ALL = '[style],font[face]';
-
-    /**
-    * RegExp used to strip HTML tags from a string
-    * @static
-    * @property STRIP_HTML
-    */
-    Y.Selection.STRIP_HTML = /<\S[^><]*>/g;
 
     /**
     * The selector to use when looking for block level items.
@@ -456,8 +482,7 @@ YUI.add('selection', function(Y) {
     * @static
     * @property CURSOR
     */
-    //Y.Selection.CURSOR = '<span id="' + Y.Selection.CURID + '"><span id="' + Y.Selection.CUR_WRAPID + '">&nbsp;</span></span>';
-    Y.Selection.CURSOR = '<span id="' + Y.Selection.CURID + '"><br class="yui-cursor"></span>';
+    Y.Selection.CURSOR = '<span><br class="yui-cursor"></span>';
 
     Y.Selection.hasCursor = function() {
         var cur = Y.all('#' + Y.Selection.CUR_WRAPID);
@@ -470,6 +495,22 @@ YUI.add('selection', function(Y) {
     * @method cleanCursor
     */
     Y.Selection.cleanCursor = function() {
+        var cur, sel = 'br.yui-cursor';
+        cur = Y.all(sel);
+        if (cur.size()) {
+            cur.each(function(b) {
+                var c = b.get('parentNode.parentNode.childNodes'), html;
+                if (c.size() > 1) {
+                    b.remove();
+                } else {
+                    html = Y.Selection.getText(c.item(0));
+                    if (html !== '') {
+                        b.remove();
+                    }
+                }
+            });
+        }
+        /*
         var cur = Y.all('#' + Y.Selection.CUR_WRAPID);
         if (cur.size()) {
             cur.each(function(c) {
@@ -481,7 +522,7 @@ YUI.add('selection', function(Y) {
                 }
             });
         }
-        
+        */
     };
 
     Y.Selection.prototype = {
@@ -670,10 +711,14 @@ YUI.add('selection', function(Y) {
                     }
                     newNode = Y.Node.create(html);
                     html = node.get('innerHTML').replace(/\n/gi, '');
-                    if (html == '' || html == '<br>') {
+                    if (html === '' || html === '<br>') {
                         node.append(newNode);
                     } else {
-                        node.insert(newNode, 'before');
+                        if (newNode.get('parentNode')) {
+                            node.insert(newNode, 'before');
+                        } else {
+                            Y.one('body').prepend(newNode);
+                        }
                     }
                     if (node.get('firstChild').test('br')) {
                         node.get('firstChild').remove();
@@ -843,7 +888,6 @@ YUI.add('selection', function(Y) {
             if (cur) {
                 if (keep) {
                     cur.removeAttribute('id');
-                    //cur.set('innerHTML', '<span id="' + Y.Selection.CUR_WRAPID + '">&nbsp;</span>');
                     cur.set('innerHTML', '<br class="yui-cursor">');
                 } else {
                     cur.remove();
@@ -881,4 +925,5 @@ YUI.add('selection', function(Y) {
     };
 
 
-}, '@VERSION@' ,{skinnable:false, requires:['node']});
+
+}, '@VERSION@' ,{requires:['node'], skinnable:false});

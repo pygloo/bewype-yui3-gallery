@@ -145,7 +145,7 @@ YUI.add('bewype-entry-base', function(Y) {
 
         setValue : function( value ) {
             // update value
-            this._value = (value && value.trim() === '') ? null : value;
+            this._value = (value && Y.Bewype.Utils.trim( value ) === '') ? null : value;
 
             // vars
             var _contentBox  = this.get( 'contentBox'  ),
@@ -168,6 +168,7 @@ YUI.add('bewype-entry-base', function(Y) {
 
     Y.namespace('Bewype');
     Y.Bewype.Entry = Entry;
+
 
 
 

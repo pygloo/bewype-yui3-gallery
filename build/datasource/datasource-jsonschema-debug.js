@@ -104,4 +104,5 @@ Y.extend(DataSourceJSONSchema, Y.Plugin.Base, {
 Y.namespace('Plugin').DataSourceJSONSchema = DataSourceJSONSchema;
 
 
+
 }, '@VERSION@' ,{requires:['plugin', 'datasource-local', 'dataschema-json']});

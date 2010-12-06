@@ -17,6 +17,11 @@ YUI.add('exec-command', function(Y) {
         };
 
         Y.extend(ExecCommand, Y.Base, {
+            /**
+            * An internal reference to the keyCode of the last key that was pressed.
+            * @private
+            * @property _lastKey
+            */
             _lastKey: null,
             /**
             * An internal reference to the instance of the frame plugged into.
@@ -33,6 +38,15 @@ YUI.add('exec-command', function(Y) {
             */
             command: function(action, value) {
                 var fn = ExecCommand.COMMANDS[action];
+                
+                if (action !== 'insertbr') {
+                    Y.later(0, this, function() {
+                        var inst = this.getInstance();
+                        if (inst && inst.Selection) {
+                            inst.Selection.cleanCursor();
+                        }
+                    });
+                }
 
                 Y.log('execCommand(' + action + '): "' + value + '"', 'info', 'exec-command');
                 if (fn) {
@@ -51,6 +65,14 @@ YUI.add('exec-command', function(Y) {
             _command: function(action, value) {
                 var inst = this.getInstance();
                 try {
+                    try {
+                        inst.config.doc.execCommand('styleWithCSS', null, 1);
+                    } catch (e1) {
+                        try {
+                            inst.config.doc.execCommand('useCSS', null, 0);
+                        } catch (e2) {
+                        }
+                    }
                     Y.log('Internal execCommand(' + action + '): "' + value + '"', 'info', 'exec-command');
                     inst.config.doc.execCommand(action, null, value);
                 } catch (e) {
@@ -168,7 +190,7 @@ YUI.add('exec-command', function(Y) {
                     cur = sel.getCursor();
                     cur.insert('<br>', 'before');
                     sel.focusCursor(true, false);
-                    return cur.previous();
+                    return ((cur && cur.previous) ? cur.previous() : null);
                 },
                 /**
                 * Inserts an image at the cursor position
@@ -206,10 +228,10 @@ YUI.add('exec-command', function(Y) {
                     return (new inst.Selection()).getSelected().removeClass(cls);
                 },
                 /**
-                * Adds a background color to the current selection, or creates a new element and applies it
-                * @method COMMANDS.backcolor
+                * Adds a forecolor to the current selection, or creates a new element and applies it
+                * @method COMMANDS.forecolor
                 * @static
-                * @param {String} cmd The command executed: backcolor
+                * @param {String} cmd The command executed: forecolor
                 * @param {String} val The color value to apply
                 * @return {NodeList} NodeList of the items touched by this command.
                 */
@@ -218,7 +240,7 @@ YUI.add('exec-command', function(Y) {
                         sel = new inst.Selection(), n;
 
                     if (!Y.UA.ie) {
-                        this._command('styleWithCSS', 'true');
+                        this._command('useCSS', false);
                     }
                     if (inst.Selection.hasCursor()) {
                         if (sel.isCollapsed) {
@@ -236,10 +258,15 @@ YUI.add('exec-command', function(Y) {
                     } else {
                         this._command(cmd, val);
                     }
-                    if (!Y.UA.ie) {
-                        this._command('styleWithCSS', false);
-                    }
                 },
+                /**
+                * Adds a background color to the current selection, or creates a new element and applies it
+                * @method COMMANDS.backcolor
+                * @static
+                * @param {String} cmd The command executed: backcolor
+                * @param {String} val The color value to apply
+                * @return {NodeList} NodeList of the items touched by this command.
+                */
                 backcolor: function(cmd, val) {
                     var inst = this.getInstance(),
                         sel = new inst.Selection(), n;
@@ -248,7 +275,7 @@ YUI.add('exec-command', function(Y) {
                         cmd = 'hilitecolor';
                     }
                     if (!Y.UA.ie) {
-                        this._command('styleWithCSS', 'true');
+                        this._command('useCSS', false);
                     }
                     if (inst.Selection.hasCursor()) {
                         if (sel.isCollapsed) {
@@ -257,7 +284,6 @@ YUI.add('exec-command', function(Y) {
                                 n = sel.anchorNode;
                             } else {
                                 n = this.command('inserthtml', '<span style="background-color: ' + val + '">' + inst.Selection.CURSOR + '</span>');
-
                                 sel.focusCursor(true, true);
                             }
                             return n;
@@ -265,19 +291,7 @@ YUI.add('exec-command', function(Y) {
                             return this._command(cmd, val);
                         }
                     } else {
-                        if (Y.UA.gecko && sel.isCollapsed) {
-                            this._command('inserthtml', '<span id="yui3-bcolor" style="background-color: ' + val + '"></span>');
-                            var c = inst.one('#yui3-bcolor');
-                            if (c) {
-                                c.set('id', '');
-                                c.removeAttribute('id');
-                            }
-                        } else {
-                            this._command(cmd, val);
-                        }
-                    }
-                    if (!Y.UA.ie) {
-                        this._command('styleWithCSS', false);
+                        this._command(cmd, val);
                     }
                 },
                 /**
@@ -324,11 +338,16 @@ YUI.add('exec-command', function(Y) {
                     var inst = this.getInstance(),
                         sel = new inst.Selection();
                     
-                    if (sel.isCollapsed && (this._lastKey != 32)) {
+                    if (sel.isCollapsed && sel.anchorNode && (this._lastKey != 32)) {
+                        if (Y.UA.webkit) {
+                            if (sel.anchorNode.getStyle('lineHeight')) {
+                                sel.anchorNode.setStyle('lineHeight', '');
+                            }
+                        }
                         if (sel.anchorNode.test('font')) {
                             sel.anchorNode.set('size', val);
                         } else if (Y.UA.gecko) {
-                            var p = sel.anchorNode.ancestor('p');
+                            var p = sel.anchorNode.ancestor(inst.Selection.DEFAULT_BLOCK_TAG);
                             if (p) {
                                 p.setStyle('fontSize', '');
                             }
@@ -337,10 +356,72 @@ YUI.add('exec-command', function(Y) {
                 }
             }
         });
+        
+        /**
+        * This method is meant to normalize IE's in ability to exec the proper command on elements with CSS styling.
+        * @method fixIETags
+        * @protected
+        * @param {String} cmd The command to execute
+        * @param {String} tag The tag to create
+        * @param {String} rule The rule that we are looking for.
+        */
+        var fixIETags = function(cmd, tag, rule) {
+            var inst = this.getInstance(),
+                doc = inst.config.doc,
+                sel = doc.selection.createRange(),
+                o = doc.queryCommandValue(cmd),
+                html, reg, m, p, d, s, c;
+
+            if (o) {
+                html = sel.htmlText;
+                reg = new RegExp(rule, 'g');
+                m = html.match(reg);
+
+                if (m) {
+                    html = html.replace(rule + ';', '').replace(rule, '');
+
+                    sel.pasteHTML('<var id="yui-ie-bs">');
+
+                    p = doc.getElementById('yui-ie-bs');
+                    d = doc.createElement('div');
+                    s = doc.createElement(tag);
+                    
+                    d.innerHTML = html;
+                    if (p.parentNode !== inst.config.doc.body) {
+                        p = p.parentNode;
+                    }
+
+                    c = d.childNodes;
+
+                    p.parentNode.replaceChild(s, p);
+
+                    Y.each(c, function(f) {
+                        s.appendChild(f);
+                    });
+                    sel.collapse();
+                    sel.moveToElementText(s);
+                    sel.select();
+                }
+            }
+            this._command(cmd);
+        };
+
+        if (Y.UA.ie) {
+            ExecCommand.COMMANDS.bold = function() {
+                fixIETags.call(this, 'bold', 'b', 'FONT-WEIGHT: bold');
+            }
+            ExecCommand.COMMANDS.italic = function() {
+                fixIETags.call(this, 'italic', 'i', 'FONT-STYLE: italic');
+            }
+            ExecCommand.COMMANDS.underline = function() {
+                fixIETags.call(this, 'underline', 'u', 'TEXT-DECORATION: underline');
+            }
+        }
 
         Y.namespace('Plugin');
         Y.Plugin.ExecCommand = ExecCommand;
 
 
 
-}, '@VERSION@' ,{skinnable:false, requires:['frame']});
+
+}, '@VERSION@' ,{requires:['frame'], skinnable:false});

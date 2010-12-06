@@ -60,4 +60,5 @@ YUI.add('bewype-picker-text-align', function(Y) {
 
 
 
+
 }, '@VERSION@' ,{requires:['bewype-picker-base']});
