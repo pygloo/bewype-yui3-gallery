@@ -182,10 +182,9 @@
             Y.log('The responseText value for transaction ' + o.id + ' is: ' + o.c.responseText + '.', 'info', 'io');
 
         } else if (b) { // Opera
-            
-            p = b.query('pre:first-child');
-            o.c.responseText = p ? p.get('text') : b.get('text');
-
+           
+            o.c.responseText = b.get('text');
+            Y.log('The responseText value for transaction ' + o.id + ' is: ' + o.c.responseText + '.', 'info', 'io');
         }
 
         // FIX PURPOSE
