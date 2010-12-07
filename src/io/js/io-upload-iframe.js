@@ -176,12 +176,12 @@
         // .. ORI ..
 
         // FIX PURPOSE
-        if (b && (Y.UA.ie !== 0 || Y.UA.webkit > 1)) { // IE & Chrome
+        if (b && (Y.UA.ie !== 0 || Y.UA.webkit > 1)) { // IE || Chrome
 
             o.c.responseText = b.get('outerText');
             Y.log('The responseText value for transaction ' + o.id + ' is: ' + o.c.responseText + '.', 'info', 'io');
 
-        } else if (b) { // Opera
+        } else if (b) { // Opera || FireFox || Chrome
            
             o.c.responseText = b.get('text');
             Y.log('The responseText value for transaction ' + o.id + ' is: ' + o.c.responseText + '.', 'info', 'io');

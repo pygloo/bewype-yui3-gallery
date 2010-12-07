@@ -1410,16 +1410,15 @@ YUI.add('io-upload-iframe', function(Y) {
         // .. ORI ..
 
         // FIX PURPOSE
-        if (b && (Y.UA.ie !== 0 || Y.UA.webkit > 1)) { // IE & Chrome
+        if (b && (Y.UA.ie !== 0 || Y.UA.webkit > 1)) { // IE || Chrome
 
             o.c.responseText = b.get('outerText');
             Y.log('The responseText value for transaction ' + o.id + ' is: ' + o.c.responseText + '.', 'info', 'io');
 
-        } else if (b) { // Opera
-            
-            p = b.query('pre:first-child');
-            o.c.responseText = p ? p.get('text') : b.get('text');
-
+        } else if (b) { // Opera || FireFox || Chrome
+           
+            o.c.responseText = b.get('text');
+            Y.log('The responseText value for transaction ' + o.id + ' is: ' + o.c.responseText + '.', 'info', 'io');
         }
 
         // FIX PURPOSE
