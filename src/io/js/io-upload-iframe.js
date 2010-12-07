@@ -181,17 +181,13 @@
             o.c.responseText = b.get('outerText');
             Y.log('The responseText value for transaction ' + o.id + ' is: ' + o.c.responseText + '.', 'info', 'io');
 
-        } else if (b && (Y.UA.opera > 0)) { // Opera
+        } else if (b) { // Opera
             
             p = b.query('pre:first-child');
             o.c.responseText = p ? p.get('text') : b.get('text');
 
-        } else if (b) { // Firefox and Safari
-
-            o.c.responseText = b.get('text');
-            Y.log('The responseText value for transaction ' + o.id + ' is: ' + o.c.responseText + '.', 'info', 'io');
-
         }
+
         // FIX PURPOSE
 
         else {

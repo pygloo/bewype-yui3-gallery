@@ -179,16 +179,13 @@ YUI.add('io-upload-iframe', function(Y) {
 
             o.c.responseText = b.get('outerText');
 
-        } else if (b && (Y.UA.opera > 0)) { // Opera
+        } else if (b) { // Opera
             
             p = b.query('pre:first-child');
             o.c.responseText = p ? p.get('text') : b.get('text');
 
-        } else if (b) { // Firefox and Safari
-
-            o.c.responseText = b.get('text');
-
         }
+
         // FIX PURPOSE
 
         else {
@@ -295,7 +292,6 @@ YUI.add('io-upload-iframe', function(Y) {
             return _send(o, uri, c);
         }
     });
-
 
 
 }, '@VERSION@' ,{requires:['io-base','node-base']});

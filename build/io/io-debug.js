@@ -813,9 +813,7 @@ YUI.add('io-base', function(Y) {
     Y.io.http = _io;
 
 
-
 }, '@VERSION@' ,{requires:['event-custom-base', 'querystring-stringify-simple']});
-
 YUI.add('io-form', function(Y) {
 
    /**
@@ -910,9 +908,7 @@ YUI.add('io-form', function(Y) {
     }, true);
 
 
-
 }, '@VERSION@' ,{requires:['io-base','node-base']});
-
 YUI.add('io-xdr', function(Y) {
 
    /**
@@ -1233,9 +1229,7 @@ YUI.add('io-xdr', function(Y) {
 	Y.io.xdr.delay = 50;
 
 
-
 }, '@VERSION@' ,{requires:['io-base','datatype-xml']});
-
 YUI.add('io-upload-iframe', function(Y) {
 
    /**
@@ -1421,17 +1415,13 @@ YUI.add('io-upload-iframe', function(Y) {
             o.c.responseText = b.get('outerText');
             Y.log('The responseText value for transaction ' + o.id + ' is: ' + o.c.responseText + '.', 'info', 'io');
 
-        } else if (b && (Y.UA.opera > 0)) { // Opera
+        } else if (b) { // Opera
             
             p = b.query('pre:first-child');
             o.c.responseText = p ? p.get('text') : b.get('text');
 
-        } else if (b) { // Firefox and Safari
-
-            o.c.responseText = b.get('text');
-            Y.log('The responseText value for transaction ' + o.id + ' is: ' + o.c.responseText + '.', 'info', 'io');
-
         }
+
         // FIX PURPOSE
 
         else {
@@ -1544,9 +1534,7 @@ YUI.add('io-upload-iframe', function(Y) {
     });
 
 
-
 }, '@VERSION@' ,{requires:['io-base','node-base']});
-
 YUI.add('io-queue', function(Y) {
 
    /**
@@ -1753,9 +1741,7 @@ YUI.add('io-queue', function(Y) {
     }, true);
 
 
-
 }, '@VERSION@' ,{requires:['io-base','queue-promote']});
-
 
 
 YUI.add('io', function(Y){}, '@VERSION@' ,{use:['io-base', 'io-form', 'io-xdr', 'io-upload-iframe', 'io-queue']});
