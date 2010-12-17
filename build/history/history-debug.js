@@ -624,9 +624,7 @@ Y.mix(HistoryBase.prototype, {
 Y.HistoryBase = HistoryBase;
 
 
-
 }, '@VERSION@' ,{requires:['event-custom-complex']});
-
 YUI.add('history-hash', function(Y) {
 
 /**
@@ -1105,9 +1103,7 @@ if (useHistoryHTML5 === false || (!Y.History && useHistoryHTML5 !== true &&
 }
 
 
-
 }, '@VERSION@' ,{requires:['event-synthetic', 'history-base', 'yui-later']});
-
 YUI.add('history-hash-ie', function(Y) {
 
 /**
@@ -1246,9 +1242,7 @@ if (Y.UA.ie && !Y.HistoryBase.nativeHashChange) {
 }
 
 
-
 }, '@VERSION@' ,{requires:['history-hash', 'node-base']});
-
 YUI.add('history-html5', function(Y) {
 
 /**
@@ -1498,9 +1492,7 @@ if (useHistoryHTML5 === true || (useHistoryHTML5 !== false &&
 }
 
 
-
 }, '@VERSION@' ,{optional:['json'], requires:['event-base', 'history-base', 'node-base']});
-
 
 
 YUI.add('history', function(Y){}, '@VERSION@' ,{use:['history-base', 'history-hash', 'history-hash-ie', 'history-html5']});

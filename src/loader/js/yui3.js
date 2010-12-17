@@ -1038,8 +1038,11 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
                     "event-base"
                 ], 
                 "condition": {
-                    "trigger": "node-base", 
-                    "ua": "ie"
+                    "test": function(Y) {
+    var imp = Y.config.doc && Y.config.doc.implementation;
+    return (imp && (!imp.hasFeature('Events', '2.0')));
+}, 
+                    "trigger": "node-base"
                 }, 
                 "requires": [
                     "node-base"
@@ -1557,8 +1560,7 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
                 "path": "scrollview/scrollview-paginator-min.js", 
                 "requires": [
                     "plugin"
-                ], 
-                "skinnable": true
+                ]
             }, 
             "scrollview-scrollbars": {
                 "path": "scrollview/scrollview-scrollbars-min.js", 
@@ -1874,4 +1876,4 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         }
     }
 };
-YUI.Env[Y.version].md5 = '5359b72f233622d0363c5b01272b3aad';
+YUI.Env[Y.version].md5 = '125c06742b0eb2e49fc7950fbbced60a';

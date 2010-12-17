@@ -339,6 +339,7 @@ proto = {
             useBrowserConsole: true,
             throwFail: true,
             bootstrap: true,
+            cacheUse: true,
             fetchCSS: true
         };
 
@@ -528,7 +529,6 @@ proto = {
                         }
                     }
 
-
                     if (use) {
                         for (j = 0; j < use.length; j++) {
                             if (!done[use[j]]) {
@@ -614,11 +614,13 @@ proto = {
         } else {
             key = args.join();
 
-            if (Y.Env.serviced[key]) {
+            if (Y.config.cacheUse && Y.Env.serviced[key]) {
                 Y._notify(callback, ALREADY_DONE, args);
             } else {
                 Y._use(args, function(Y, response) {
-                    Y.Env.serviced[key] = true;
+                    if (Y.config.cacheUse) {
+                        Y.Env.serviced[key] = true;
+                    }
                     Y._notify(callback, response, args);
                 });
             }
@@ -628,7 +630,9 @@ proto = {
     },
 
     _notify: function(callback, response, args) {
-        if (callback) {
+        if (!response.success && this.config.loadErrorFn) {
+            this.config.loadErrorFn.call(this, this, callback, response, args);
+        } else if (callback) {
             try {
                 callback(this, response);
             } catch (e) {
@@ -889,11 +893,12 @@ proto = {
      * a JS error is thrown
      * @method error
      * @param msg {string} the error message.
-     * @param e {Error} Optional JS error that was caught.  If supplied
+     * @param e {Error|string} Optional JS error that was caught, or an error string.
+     * @param data Optional additional info
      * and throwFail is specified, this error will be re-thrown.
      * @return {YUI} this YUI instance.
      */
-    error: function(msg, e) {
+    error: function(msg, e, data) {
 
         var Y = this, ret;
 
@@ -1454,6 +1459,42 @@ proto = {
  */
 
 /**
+ * A callback to execute when the loader fails to load one or
+ * more resource.  This could be because of a script load
+ * failure.  It can also fail if a javascript module fails
+ * to register itself, but only when the 'requireRegistration'
+ * is true.  If this function is defined, the use() callback will
+ * only be called when the loader succeeds, otherwise it always
+ * executes unless there was a javascript error when attaching
+ * a module.
+ *
+ * @since 3.3.0
+ * @property loadErrorFn
+ * @type Function
+ */
+
+/**
+ * When set to true, the YUI loader will expect that all modules
+ * it is responsible for loading will be first-class YUI modules
+ * that register themselves with the YUI global.  If this is
+ * set to true, loader will fail if the module registration fails
+ * to happen after the script is loaded.
+ *
+ * @since 3.3.0
+ * @property requireRegistration
+ * @type boolean
+ * @default false
+ */
+
+/**
+ * Cache serviced use() requests.
+ * @since 3.3.0
+ * @property cacheUse
+ * @type boolean
+ * @default true
+ */
+
+/**
  * The parameter defaults for the remote loader service.
  * Requires the rls submodule.  The properties that are
  * supported:
@@ -1573,7 +1614,11 @@ SUBREGEX = /\{\s*([^\|\}]+?)\s*(?:\|([^\}]*))?\s*\}/g;
  * @param o The object to test.
  * @return {boolean} true if o is an array.
  */
-L.isArray = Array.isArray || function(o) {
+// L.isArray = Array.isArray || function(o) {
+//     return L.type(o) === ARRAY;
+// };
+
+L.isArray = function(o) {
     return L.type(o) === ARRAY;
 };
 
@@ -2289,11 +2334,15 @@ Y.cached = function(source, cache, refetch) {
  */
 var F = function() {},
 
-O = Object.create || function(o) {
+// O = Object.create || function(o) {
+//     F.prototype = o;
+//     return new F();
+// },
+
+O = function(o) {
     F.prototype = o;
     return new F();
 },
-
 
 owns = function(o, k) {
     return o && o.hasOwnProperty && o.hasOwnProperty(k);
@@ -2337,7 +2386,11 @@ Y.Object = O;
  * @param o an object.
  * @return {string[]} the keys.
  */
-O.keys = Object.keys || function(o) {
+// O.keys = Object.keys || function(o) {
+//     return _extract(o);
+// };
+
+O.keys = function(o) {
     return _extract(o);
 };
 
@@ -2348,7 +2401,11 @@ O.keys = Object.keys || function(o) {
  * @param o an object.
  * @return {Array} the values.
  */
-O.values = Object.values || function(o) {
+// O.values = Object.values || function(o) {
+//     return _extract(o, 1);
+// };
+
+O.values = function(o) {
     return _extract(o, 1);
 };
 

@@ -59,5 +59,4 @@ Y.Event.define("mouseenter", config, true);
 Y.Event.define("mouseleave", Y.merge(config, { proxyType: "mouseout" }), true);
 
 
-
 }, '@VERSION@' ,{requires:['event-synthetic']});

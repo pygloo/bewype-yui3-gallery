@@ -236,9 +236,7 @@ Y.Event.define('flick', {
 });
 
 
-
 }, '@VERSION@' ,{requires:['node-base','event-touch','event-synthetic']});
-
 YUI.add('event-move', function(Y) {
 
 /**
@@ -745,9 +743,7 @@ define(GESTURE_MOVE_END, {
 });
 
 
-
 }, '@VERSION@' ,{requires:['node-base','event-touch','event-synthetic']});
-
 
 
 YUI.add('event-gestures', function(Y){}, '@VERSION@' ,{use:['event-flick', 'event-move']});

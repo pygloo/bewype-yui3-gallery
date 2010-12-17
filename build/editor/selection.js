@@ -251,7 +251,9 @@ YUI.add('selection', function(Y) {
         if (single.size() === 1) {
             br = single.item(0).all('br');
             if (br.size() === 1) {
-                br.item(0).remove();
+                if (!br.item(0).test('.yui-cursor')) {
+                    br.item(0).remove();
+                }
                 var html = single.item(0).get('innerHTML');
                 if (html === '' || html === ' ') {
                     single.set('innerHTML', Y.Selection.CURSOR);
@@ -832,6 +834,9 @@ YUI.add('selection', function(Y) {
         * @return {Y.Selection}
         */
         selectNode: function(node, collapse, end) {
+            if (!node) {
+                return;
+            }
             end = end || 0;
             node = Y.Node.getDOMNode(node);
 		    var range = this.createRange();
@@ -923,7 +928,6 @@ YUI.add('selection', function(Y) {
             return 'Selection Object';
         }
     };
-
 
 
 }, '@VERSION@' ,{requires:['node'], skinnable:false});

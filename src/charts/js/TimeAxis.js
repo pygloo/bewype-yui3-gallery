@@ -4,6 +4,7 @@
  * @param {Object} config (optional) Configuration parameters for the Chart.
  * @class TimeAxis
  * @constructor
+ * @extends AxisType
  */
 function TimeAxis(config)
 {
@@ -120,6 +121,10 @@ TimeAxis.ATTRS =
 Y.extend(TimeAxis, Y.AxisType, {
     /**
      * Constant used to generate unique id.
+     *
+     * @property GUID
+     * @type String
+     * @private
      */
     GUID: "yuitimeaxis",
 	
@@ -128,6 +133,35 @@ Y.extend(TimeAxis, Y.AxisType, {
      */
     _dataType: "time",
 	
+    /**
+     * Calculates and returns a value based on the number of labels and the index of
+     * the current label.
+     *
+     * @method getLabelByIndex
+     * @param {Number} i Index of the label.
+     * @param {Number} l Total number of labels.
+     * @return String
+     */
+    getLabelByIndex: function(i, l)
+    {
+        var min = this.get("minimum"),
+            max = this.get("maximum"),
+            position = this.get("position"),
+            increm,
+            label;
+            l -= 1;
+        increm = ((max - min)/l) * i;
+        if(position == "bottom" || position == "top")
+        {
+            label = min + increm;
+        }
+        else
+        {
+            label = max - increm;
+        }
+        return label;
+    },
+
     /**
      * @private
      */

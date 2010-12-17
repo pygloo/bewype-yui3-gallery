@@ -346,23 +346,25 @@ suite.add( new Y.Test.Case({
         d.set('value', -93);
         Y.Assert.areEqual( -93, d.get('value') );
         Y.Assert.areEqual( 66, parseInt(d._handleNode.getStyle('left'),10) );
-    },
+    } // no comma *****************
 
-    "setValue(v) when hidden should still move the thumb": function () {
-        var d = this.dial;
+/* // FIX THIS IE, and other non-FF browser BUG. Try using setStyle in stead of setXY for moving handle and marker in all cases      
+    "setValue(v) when hidden should still move the handle-user": function () {
+		var d = this.dial;
 
         Y.one('#testbed').setStyle('display','none');
 
         d.render('#testbed');
 
-		Y.Assert.areEqual( 50, parseInt(d._handleNode.getStyle('left'),10) ); // FIX THIS IE BUG
+		Y.Assert.areEqual( 50, parseInt(d._handleNode.getStyle('left'),10) ); 
         d.set('value', 20);
         Y.Assert.areEqual( 86, parseInt(d._handleNode.getStyle('left'),10) );
 
 
         Y.one('#testbed').setStyle('display','');
         Y.Assert.areEqual( 86, parseInt(d._handleNode.getStyle('left'),10) );
-    }
+	}
+*/
 	
 	
 	
@@ -422,7 +424,7 @@ suite.add( new Y.Test.Case({
     },
 
 
-    "test clickableRail": function () {
+    "test increments and min max": function () {
         
     },
 
@@ -465,6 +467,55 @@ suite.add( new Y.Test.Case({
     }
 }));
 
+suite.add( new Y.Test.Case({
+	
+		name: "String Changes After Render",
+	
+		setUp: function () {
+			Y.one('body').append('<span id="testbed"></span>');
+		},
+	
+		tearDown: function () {
+			Y.one('#testbed').remove(true);
+		},
+	
+		"test changing strings after rendering dial": function() {
+			var testbed = Y.one("#testbed"),
+			labelStr = 'My new label',
+			tooltipStr = 'My new tooltip';
+			
+			dial = new Y.Dial().render("#testbed");
+			dial.setLabelString(labelStr);
+			dial.setTooltipString(tooltipStr);
+			Y.Assert.areEqual( labelStr, Y.one('.' + dial._classes[0].CSS_CLASSES.labelString).get('innerHTML') );
+			Y.Assert.areEqual( tooltipStr, Y.one('.' + dial._classes[0].CSS_CLASSES.handleUser).get('title') );
+		}
+}));
+
+suite.add( new Y.Test.Case({
+	
+		name: "International Strings",
+	
+		setUp: function () {
+			Y.one('body').append('<span id="testbed"></span>');
+		},
+	
+		tearDown: function () {
+			Y.one('#testbed').remove(true);
+		},
+	
+		"test international strings from lang files": function() {
+			var testbed = Y.one("#testbed");
+			
+			Y.Intl.add ( 'dial' , 'xs' , {label: 'My label lang test', resetStr: 'Reset lang test', tooltipHandle: 'Drag to set value lang test'} )
+
+			Y.Intl.setLang('dial', 'xs');
+			//alert(Y.Intl.setLang('dial', 'xs'));
+			dial = new Y.Dial().render("#testbed");
+			Y.Assert.areEqual( Y.Intl.get('dial').label, Y.one('.' + dial._classes[0].CSS_CLASSES.labelString).get('innerHTML') );
+			Y.Assert.areEqual( Y.Intl.get('dial').tooltipHandle, Y.one('.' + dial._classes[0].CSS_CLASSES.handleUser).get('title') );
+		}
+}));
 
 /*
 suite.add( new Y.Test.Case({

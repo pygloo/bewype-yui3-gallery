@@ -519,5 +519,4 @@ Y.extend(Queue, Y.EventTarget, {
 
 
 
-
 }, '@VERSION@' ,{requires:['event-custom']});

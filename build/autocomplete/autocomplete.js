@@ -164,7 +164,7 @@ function AutoCompleteBase() {
 
     /**
      * Fires after query results are received from the <code>source</code>. If
-     * source has been set, this event will not fire.
+     * no source has been set, this event will not fire.
      *
      * @event results
      * @param {EventFacade} e Event facade with the following additional
@@ -1517,9 +1517,7 @@ AutoCompleteBase.prototype = {
 Y.AutoCompleteBase = AutoCompleteBase;
 
 
-
-}, '@VERSION@' ,{optional:['autocomplete-sources'], requires:['array-extras', 'base-build', 'escape', 'event-valuechange', 'node-base']});
-
+}, '@VERSION@' ,{requires:['array-extras', 'base-build', 'escape', 'event-valuechange', 'node-base'], optional:['autocomplete-sources']});
 YUI.add('autocomplete-sources', function(Y) {
 
 /**
@@ -1907,9 +1905,7 @@ ACSources.ATTRS = {
 Y.Base.mix(Y.AutoCompleteBase, [ACSources]);
 
 
-
-}, '@VERSION@' ,{optional:['io-base', 'json-parse', 'jsonp', 'yql'], requires:['autocomplete-base']});
-
+}, '@VERSION@' ,{requires:['autocomplete-base'], optional:['io-base', 'json-parse', 'jsonp', 'yql']});
 YUI.add('autocomplete-list', function(Y) {
 
 /**
@@ -1989,8 +1985,8 @@ List = Y.Base.create('autocompleteList', Y.Widget, [
         this[_SELECTOR_ITEM]     = '.' + this[_CLASS_ITEM];
 
         /**
-         * Fires when an autocomplete suggestion is selected from the list by
-         * a keyboard action or mouse click.
+         * Fires when an autocomplete suggestion is selected from the list,
+         * typically via a keyboard action or mouse click.
          *
          * @event select
          * @param {EventFacade} e Event facade with the following additional
@@ -2688,9 +2684,7 @@ Y.AutoCompleteList = List;
 Y.AutoComplete = List;
 
 
-
-}, '@VERSION@' ,{requires:['autocomplete-base', 'selector-css3', 'widget', 'widget-position', 'widget-position-align', 'widget-stack'], after:['autocomplete-sources'], skinnable:true, lang:['en']});
-
+}, '@VERSION@' ,{lang:['en'], requires:['autocomplete-base', 'selector-css3', 'widget', 'widget-position', 'widget-position-align', 'widget-stack'], after:['autocomplete-sources'], skinnable:true});
 YUI.add('autocomplete-plugin', function(Y) {
 
 /**
@@ -2744,9 +2738,7 @@ Plugin.AutoComplete     = ACListPlugin;
 Plugin.AutoCompleteList = ACListPlugin;
 
 
-
 }, '@VERSION@' ,{requires:['autocomplete-list', 'node-pluginhost']});
-
 
 
 YUI.add('autocomplete', function(Y){}, '@VERSION@' ,{use:['autocomplete-base', 'autocomplete-sources', 'autocomplete-list', 'autocomplete-plugin']});

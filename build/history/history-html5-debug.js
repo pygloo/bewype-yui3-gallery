@@ -247,5 +247,4 @@ if (useHistoryHTML5 === true || (useHistoryHTML5 !== false &&
 }
 
 
-
 }, '@VERSION@' ,{optional:['json'], requires:['event-base', 'history-base', 'node-base']});

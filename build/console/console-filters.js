@@ -720,5 +720,4 @@ Y.namespace('Plugin').ConsoleFilters = Y.extend(ConsoleFilters, Y.Plugin.Base,
 });
 
 
-
 }, '@VERSION@' ,{requires:['console','plugin']});

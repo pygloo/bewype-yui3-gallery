@@ -175,5 +175,4 @@ Filters = Y.mix(Y.namespace('AutoCompleteFilters'), {
 });
 
 
-
 }, '@VERSION@' ,{requires:['array-extras', 'text-wordbreak']});

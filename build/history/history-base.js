@@ -624,5 +624,4 @@ Y.mix(HistoryBase.prototype, {
 Y.HistoryBase = HistoryBase;
 
 
-
 }, '@VERSION@' ,{requires:['event-custom-complex']});

@@ -1,4 +1,3 @@
-
 (function() {
 
 var stateChangeListener,
@@ -39,7 +38,6 @@ if (docElement.doScroll && !GLOBAL_ENV._ieready) {
 }
 
 })();
-
 YUI.add('event-base-ie', function(Y) {
 
 /*
@@ -134,11 +132,12 @@ Y.extend(IEEventFacade, Y.DOM2EventFacade, {
 
 });
 
-if (Y.UA.ie) {
+var imp = Y.config.doc && Y.config.doc.implementation;
+
+if (imp && (!imp.hasFeature('Events', '2.0'))) {
     Y.DOMEventFacade = IEEventFacade;
 }
 
 
 
 }, '@VERSION@' );
-

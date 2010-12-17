@@ -81,5 +81,4 @@ Y.ClassNameManager = function () {
 }();
 
 
-
 }, '@VERSION@' );

@@ -12,7 +12,6 @@ Y.Env.evt = {
 };
 
 
-
 /**
  * Custom event engine, DOM event listener abstraction layer, synthetic DOM
  * events.
@@ -328,7 +327,6 @@ DO.Error = DO.Halt;
 //////////////////////////////////////////////////////////////////////////
 
 // Y["Event"] && Y.Event.addListener(window, "unload", Y.Do._unload, Y.Do);
-
 
 
 /**
@@ -1165,7 +1163,6 @@ Y.Subscriber.prototype = {
     }
 
 };
-
 
 /**
  * Custom event engine, DOM event listener abstraction layer, synthetic DOM
@@ -2025,9 +2022,7 @@ Y.Global = YUI.Env.globalEvents;
  */
 
 
-
 }, '@VERSION@' ,{requires:['oop']});
-
 YUI.add('event-custom-complex', function(Y) {
 
 
@@ -2151,35 +2146,33 @@ Y.extend(Y.EventFacade, Object, {
 });
 
 CEProto.fireComplex = function(args) {
-    var es = Y.Env._eventstack, ef, q, queue, ce, ret, events, subs,
-        self = this, host = self.host || self, next, oldbubble,
-        postponed;
 
-    if (es) {
+    var es, ef, q, queue, ce, ret, events, subs, postponed,
+        self = this, host = self.host || self, next, oldbubble;
+
+    if (self.stack) {
         // queue this event if the current item in the queue bubbles
-        if (self.queuable && self.type != es.next.type) {
+        if (self.queuable && self.type != self.stack.next.type) {
             self.log('queue ' + self.type);
-            es.queue.push([self, args]);
+            self.stack.queue.push([self, args]);
             return true;
         }
-    } else {
-        Y.Env._eventstack = {
-           // id of the first event in the stack
-           id: self.id,
-           execDefaultCnt: 0,
-           next: self,
-           silent: self.silent,
-           stopped: 0,
-           prevented: 0,
-           bubbling: null,
-           type: self.type,
-           // defaultFnQueue: new Y.Queue(),
-           afterQueue: new Y.Queue(),
-           defaultTargetOnly: self.defaultTargetOnly,
-           queue: []
-        };
-        es = Y.Env._eventstack;
     }
+
+    es = self.stack || {
+       // id of the first event in the stack
+       id: self.id,
+       next: self,
+       silent: self.silent,
+       stopped: 0,
+       prevented: 0,
+       bubbling: null,
+       type: self.type,
+       // defaultFnQueue: new Y.Queue(),
+       afterQueue: new Y.Queue(),
+       defaultTargetOnly: self.defaultTargetOnly,
+       queue: []
+    };
 
     subs = self.getSubs();
 
@@ -2240,7 +2233,7 @@ CEProto.fireComplex = function(args) {
             es.prevented = 0;
         }
 
-        ret = host.bubble(self);
+        ret = host.bubble(self, args, null, es);
 
         self.stopped = Math.max(self.stopped, es.stopped);
         self.prevented = Math.max(self.prevented, es.prevented);
@@ -2254,9 +2247,7 @@ CEProto.fireComplex = function(args) {
         !self.prevented &&
         ((!self.defaultTargetOnly && !es.defaultTargetOnly) || host === ef.target)) {
 
-        es.execDefaultCnt++;
         self.defaultFn.apply(host, args);
-        es.execDefaultCnt--;
     }
 
     // broadcast listeners are fired as discreet events on the
@@ -2265,8 +2256,7 @@ CEProto.fireComplex = function(args) {
 
     // Queue the after
     if (subs[1] && !self.prevented && self.stopped < 2) {
-        if (es.id === self.id || self.type != host._yuievt.bubbling &&
-            es.execDefaultCnt === 0) {
+        if (es.id === self.id || self.type != host._yuievt.bubbling) {
             self._procSubs(subs[1], args, ef);
             while ((next = es.afterQueue.last())) {
                 next();
@@ -2280,31 +2270,13 @@ CEProto.fireComplex = function(args) {
                 });
             }
 
-            if (es.execDefaultCnt) {
-                if (!es.forwardQueue) {
-                    es.forwardQueue = new Y.Queue();
-                    es.afterQueue.add(function() {
-                        while ((next = es.forwardQueue.next())) {
-                            next();
-                        }
-                        es.forwardQueue = null;
-                    });
-                }
-                es.forwardQueue.add(function() {
-                    self._procSubs(postponed, args, ef);
-                });
-            } else {
-                es.afterQueue.add(function() {
-                    self._procSubs(postponed, args, ef);
-                });
-            }
+            es.afterQueue.add(function() {
+                self._procSubs(postponed, args, ef);
+            });
         }
     }
 
     self.target = null;
-
-    // es.stopped = 0;
-    // es.prevented = 0;
 
     if (es.id === self.id) {
         queue = es.queue;
@@ -2315,11 +2287,9 @@ CEProto.fireComplex = function(args) {
             // set up stack to allow the next item to be processed
             es.next = ce;
             ce.fire.apply(ce, q[1]);
-            // es.stopped = 0;
-            // es.prevented = 0;
         }
 
-        Y.Env._eventstack = null;
+        self.stack = null;
     }
 
     ret = !(self.stopped);
@@ -2388,7 +2358,9 @@ CEProto._getFacade = function() {
  */
 CEProto.stopPropagation = function() {
     this.stopped = 1;
-    Y.Env._eventstack.stopped = 1;
+    if (this.stack) {
+        this.stack.stopped = 1;
+    }
     this.events.fire('stopped', this);
 };
 
@@ -2399,7 +2371,9 @@ CEProto.stopPropagation = function() {
  */
 CEProto.stopImmediatePropagation = function() {
     this.stopped = 2;
-    Y.Env._eventstack.stopped = 2;
+    if (this.stack) {
+        this.stack.stopped = 2;
+    }
     this.events.fire('stopped', this);
 };
 
@@ -2410,7 +2384,9 @@ CEProto.stopImmediatePropagation = function() {
 CEProto.preventDefault = function() {
     if (this.preventable) {
         this.prevented = 1;
-        Y.Env._eventstack.prevented = 1;
+        if (this.stack) {
+            this.stack.prevented = 1;
+        }
         this.events.fire('prevented', this);
     }
 };
@@ -2475,12 +2451,12 @@ ETProto.removeTarget = function(o) {
  * @return {boolean} the aggregated return value from Event.Custom.fire
  * @for EventTarget
  */
-ETProto.bubble = function(evt, args, target) {
+ETProto.bubble = function(evt, args, target, es) {
 
     var targs = this._yuievt.targets, ret = true,
         t, type = evt && evt.type, ce, i, bc, ce2,
         originalTarget = target || (evt && evt.target) || this,
-        es = Y.Env._eventstack, oldbubble;
+        oldbubble;
 
     if (!evt || ((!evt.stopped) && targs)) {
 
@@ -2502,7 +2478,7 @@ ETProto.bubble = function(evt, args, target) {
                 // continue propagating the event.
                 if (!ce) {
                     if (t._yuievt.hasTargets) {
-                        t.bubble(evt, args, originalTarget);
+                        t.bubble(evt, args, originalTarget, es);
                     }
                 } else {
 
@@ -2519,6 +2495,8 @@ ETProto.bubble = function(evt, args, target) {
                     // default publish may not have emitFacade true -- that
                     // shouldn't be what the implementer meant to do
                     ce.emitFacade = true;
+
+                    ce.stack = es;
 
                     ret = ret && ce.fire.apply(ce, args || evt.details || []);
                     ce.broadcast = bc;
@@ -2544,9 +2522,7 @@ FACADE_KEYS = Y.Object.keys(FACADE);
 
 
 
-
 }, '@VERSION@' ,{requires:['event-custom-base']});
-
 
 
 YUI.add('event-custom', function(Y){}, '@VERSION@' ,{use:['event-custom-base', 'event-custom-complex']});

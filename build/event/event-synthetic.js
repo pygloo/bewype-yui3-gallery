@@ -748,5 +748,4 @@ Y.Event.define = function (type, config, force) {
 };
 
 
-
 }, '@VERSION@' ,{requires:['node-base', 'event-custom']});

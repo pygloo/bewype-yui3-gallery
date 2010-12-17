@@ -1,3 +1,12 @@
+/**
+ * Graph manages and contains series instances for a <code>CartesianChart</code>
+ * instance.
+ *
+ * @class Graph
+ * @constructor
+ * @extends Widget
+ * @uses Renderer
+ */
 Y.Graph = Y.Base.create("graph", Y.Widget, [Y.Renderer], {
     bindUI: function()
     {
@@ -72,12 +81,17 @@ Y.Graph = Y.Base.create("graph", Y.Widget, [Y.Renderer], {
     },
 
     /**
+     * @private
      * Hash of arrays containing series mapped to a series type.
      */
     seriesTypes: null,
 
     /**
      * Returns a series instance based on an index.
+     * 
+     * @method getSeriesByIndex
+     * @param {Number} val index of the series
+     * @return CartesianSeries
      */
     getSeriesByIndex: function(val)
     {
@@ -92,6 +106,10 @@ Y.Graph = Y.Base.create("graph", Y.Widget, [Y.Renderer], {
 
     /**
      * Returns a series instance based on a key value.
+     * 
+     * @method getSeriesByKey
+     * @param {String} val key value of the series
+     * @return CartesianSeries
      */
     getSeriesByKey: function(val)
     {
@@ -105,7 +123,12 @@ Y.Graph = Y.Base.create("graph", Y.Widget, [Y.Renderer], {
     },
 
     /**
-     * Adds dispatcher to collection
+     * @protected
+     * Adds dispatcher to a <code>_dispatcher</code> used to
+     * to ensure all series have redrawn before for firing event.
+     *
+     * @method addDispatcher
+     * @param {CartesianSeries} val series instance to add
      */
     addDispatcher: function(val)
     {
@@ -129,8 +152,7 @@ Y.Graph = Y.Base.create("graph", Y.Widget, [Y.Renderer], {
 
     /**
      * @private
-     * @description Parses series instances to be displayed in the graph.
-     * @param {Array} Collection of series instances or object literals containing necessary properties for creating a series instance.
+     * Parses series instances to be displayed in the graph.
      */
     _parseSeriesCollection: function(val)
     {
@@ -175,8 +197,7 @@ Y.Graph = Y.Base.create("graph", Y.Widget, [Y.Renderer], {
 
     /**
      * @private
-     * @description Adds a series to the graph.
-     * @param {Series}
+     * Adds a series to the graph.
      */
     _addSeries: function(series)
     {
@@ -203,6 +224,9 @@ Y.Graph = Y.Base.create("graph", Y.Widget, [Y.Renderer], {
         this.fire("seriesAdded", series);
     },
 
+    /**
+     * @private
+     */
     _createSeries: function(seriesData)
     {
         var type = seriesData.type,
@@ -230,9 +254,6 @@ Y.Graph = Y.Base.create("graph", Y.Widget, [Y.Renderer], {
 
     /**
      * @private
-     * @description Creates a series instance based on a specified type.
-     * @param {String} Indicates type of series instance to be created.
-     * @return {Series} Series instance created.
      */
     _getSeries: function(type)
     {
@@ -433,7 +454,13 @@ Y.Graph = Y.Base.create("graph", Y.Widget, [Y.Renderer], {
     },
 
     /**
-     * @private
+     * @protected
+     *
+     * Gets the default value for the <code>styles</code> attribute. Overrides
+     * base implementation.
+     *
+     * @method _getDefaultStyles
+     * @return Object
      */
     _getDefaultStyles: function()
     {
@@ -453,6 +480,13 @@ Y.Graph = Y.Base.create("graph", Y.Widget, [Y.Renderer], {
     }
 }, {
     ATTRS: {
+        /**
+         * Collection of series. When setting the <code>seriesCollection</code> the array can contain a combination of either
+         * <code>CartesianSeries</code> instances or object literals with properties that will define a series.
+         *
+         * @attribute seriesCollection
+         * @type CartesianSeries
+         */
         seriesCollection: {
             getter: function()
             {
@@ -465,11 +499,24 @@ Y.Graph = Y.Base.create("graph", Y.Widget, [Y.Renderer], {
                 return this._seriesCollection;
             }
         },
-        
+       
+        /**
+         * Indicates whether the <code>Graph</code> has a background.
+         *
+         * @attribute showBackground
+         * @type Boolean
+         * @default true
+         */
         showBackground: {
             value: true
         },
 
+        /**
+         * Read-only hash lookup for all series on in the <code>Graph</code>.
+         *
+         * @attribute seriesDictionary
+         * @type Object
+         */
         seriesDictionary: {
             readOnly: true,
 
@@ -479,6 +526,13 @@ Y.Graph = Y.Base.create("graph", Y.Widget, [Y.Renderer], {
             }
         },
 
+        /**
+         * Reference to the horizontal <code>Gridlines</code> instance.
+         *
+         * @attribute horizontalGridlines
+         * @type Gridlines
+         * @default null
+         */
         horizontalGridlines: {
             value: null,
 
@@ -505,6 +559,13 @@ Y.Graph = Y.Base.create("graph", Y.Widget, [Y.Renderer], {
             }
         },
         
+        /**
+         * Reference to the vertical <code>Gridlines</code> instance.
+         *
+         * @attribute verticalGridlines
+         * @type Gridlines
+         * @default null
+         */
         verticalGridlines: {
             value: null,
 
@@ -530,5 +591,27 @@ Y.Graph = Y.Base.create("graph", Y.Widget, [Y.Renderer], {
                 }
             }
         }
+
+        /**
+         * Style properties used for drawing a background. Below are the default values:
+         *  <dl>
+         *      <dt>fill</dt><dd>A hash containing the following values:
+         *          <dl>
+         *              <dt>color</dt><dd>Color of the fill. The default value is #faf9f2.</dd>
+         *              <dt>alpha</dt><dd>Number from 0 to 1 indicating the opacity of the background fill. The default value is 1.</dd>
+         *          </dl>
+         *      </dd>
+         *      <dt>border</dt><dd>A hash containing the following values:
+         *          <dl>
+         *              <dt>color</dt><dd>Color of the border. The default value is #dad8c9.</dd>
+         *              <dt>alpha</dt><dd>Number from 0 to 1 indicating the opacity of the background border. The default value is 1.</dd>
+         *              <dt>weight</dt><dd>Number indicating the width of the border. The default value is 1.</dd>
+         *          </dl>
+         *      </dd>
+         *  </dl>
+         *
+         * @attribute styles
+         * @type Object
+         */
     }
 });

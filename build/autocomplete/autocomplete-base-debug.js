@@ -164,7 +164,7 @@ function AutoCompleteBase() {
 
     /**
      * Fires after query results are received from the <code>source</code>. If
-     * source has been set, this event will not fire.
+     * no source has been set, this event will not fire.
      *
      * @event results
      * @param {EventFacade} e Event facade with the following additional
@@ -1524,5 +1524,4 @@ AutoCompleteBase.prototype = {
 Y.AutoCompleteBase = AutoCompleteBase;
 
 
-
-}, '@VERSION@' ,{optional:['autocomplete-sources'], requires:['array-extras', 'base-build', 'escape', 'event-valuechange', 'node-base']});
+}, '@VERSION@' ,{requires:['array-extras', 'base-build', 'escape', 'event-valuechange', 'node-base'], optional:['autocomplete-sources']});

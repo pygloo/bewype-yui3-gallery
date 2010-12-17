@@ -37,7 +37,7 @@ YUI.add('dial', function(Y) {
         Dial.superclass.constructor.apply(this, arguments);
     }
 
-    // static properties
+    // Y.Dial static properties
 
     /**
      * The identity of the widget.
@@ -168,15 +168,8 @@ YUI.add('dial', function(Y) {
          * @default {label: 'My label', resetStr: 'Reset', tooltipHandle: 'Drag to set value'}
          */
         strings: {
-
-//            valueFn: function () {
-//                return Y.Intl.get('autocomplete-list');
-//            }
-//            value: Y.Intl.get('dial')
-
-			value: {label: 'My label',
-				resetStr: 'Reset',
-				tooltipHandle: 'Drag to set value'
+			valueFn: function () {
+				return Y.Intl.get('dial');
 			}
         },
 
@@ -242,7 +235,7 @@ YUI.add('dial', function(Y) {
      * @property Dial.LABEL_TEMPLATE
      * @type {String}
      * @default &lt;div>...&lt;/div>
-	 * @private
+	 * @protected
      */
 	Dial.LABEL_TEMPLATE = '<div id="' + labelId + '" class="' + Dial.CSS_CLASSES.label + '"><span class="' + Dial.CSS_CLASSES.labelString + '">{label}</span><span class="' + Dial.CSS_CLASSES.valueString + '"></span></div>';
 
@@ -253,7 +246,7 @@ YUI.add('dial', function(Y) {
 		 * @property Dial.RING_TEMPLATE
 		 * @type {String}
 		 * @default &lt;div class="[...-ring]">&lt;div class="[...-northMark]">&lt;/div>&lt;/div>
-		 * @private
+		 * @protected
 		 */
 		Dial.RING_TEMPLATE = '<div class="' + Dial.CSS_CLASSES.ring + '"><div class="' + Dial.CSS_CLASSES.northMark + '"></div></div>';
 
@@ -263,7 +256,7 @@ YUI.add('dial', function(Y) {
 		 * @property Dial.MARKER_TEMPLATE
 		 * @type {String}
 		 * @default &lt;div class="[...-marker] marker-hidden">&lt;div class="[...-markerUser]">&lt;/div>&lt;/div>
-		 * @private
+		 * @protected
 		 */
 		Dial.MARKER_TEMPLATE = '<div class="' + Dial.CSS_CLASSES.marker + ' marker-hidden"><div class="' + Dial.CSS_CLASSES.markerUser + '"></div></div>';
 
@@ -273,7 +266,7 @@ YUI.add('dial', function(Y) {
 		 * @property Dial.CENTER_BUTTON_TEMPLATE
 		 * @type {String}
 		 * @default &lt;div class="[...-centerButton]">&lt;div class="[...-resetString]">' + Y.substitute('{resetStr}', Dial.ATTRS.strings.value) + '&lt;/div>&lt;/div>
-		 * @private
+		 * @protected
 		 */
 		Dial.CENTER_BUTTON_TEMPLATE = '<div class="' + Dial.CSS_CLASSES.centerButton + '"><div class="' + Dial.CSS_CLASSES.resetString + '">{resetStr}</div></div>';
 
@@ -283,7 +276,7 @@ YUI.add('dial', function(Y) {
 		 * @property Dial.HANDLE_TEMPLATE
 		 * @type {String}
 		 * @default &lt;div class="[...-handle]">&lt;div class="[...-handleUser]" aria-labelledby="' + labelId + '" aria-valuetext="" aria-valuemax="" aria-valuemin="" aria-valuenow="" role="slider"  tabindex="0">&lt;/div>&lt;/div>';// title="{tooltipHandle}"
-		 * @private
+		 * @protected
 		 */
 		Dial.HANDLE_TEMPLATE = '<div class="' + Dial.CSS_CLASSES.handle + '"><div class="' + Dial.CSS_CLASSES.handleUser + '" aria-labelledby="' + labelId + '" aria-valuetext="" aria-valuemax="" aria-valuemin="" aria-valuenow="" role="slider"  tabindex="0" title="{tooltipHandle}"></div></div>';// title="{tooltipHandle}"
 	
@@ -327,7 +320,7 @@ YUI.add('dial', function(Y) {
 		 * creates the DOM structure for the Dial.
 		 *
 		 * @method renderUI
-		 * @private
+		 * @protected
 		 */
         renderUI : function() {
 			this._renderLabel();
@@ -361,7 +354,7 @@ YUI.add('dial', function(Y) {
 		 * binds Dial interaction to the configured value model.
 		 *
 		 * @method bindUI
-		 * @private
+		 * @protected
 		 */
         bindUI : function() {
             this.after("valueChange", this._afterValueChange);
@@ -413,7 +406,7 @@ YUI.add('dial', function(Y) {
 		 * Sets the string in the object the user clicks to reset the Dial value
 		 * 
 		 * @method _dialCenterOver
-		 * @private
+         * @param e {DOMEvent} the mouseover event object
 		 */
 		_dialCenterOver : function(e){
 			this._resetString.setContent(Y.substitute('{resetStr}', this.get('strings')));
@@ -421,9 +414,10 @@ YUI.add('dial', function(Y) {
 		
 		/**
 		 * Sets the string in the object the user clicks to reset the Dial value
+		 * to ""
 		 * 
 		 * @method _dialCenterOut
-		 * @private
+         * @param e {DOMEvent} the mouseover event object
 		 */
 		_dialCenterOut : function(e){
 			this._resetString.setContent(''); 
@@ -434,7 +428,8 @@ YUI.add('dial', function(Y) {
 		 * checks for wrapping around top center, handles exceeding min or max values 
 		 *
 		 * @method _handleDrag
-		 * @private
+         * @param e {DOMEvent} the drag event object
+		 * @protected
 		 */
 		_handleDrag : function(e){
 			var ang = Math.atan( (this._centerYOnPage - e.pageY)  /  (this._centerXOnPage - e.pageX)  ) * (180 / Math.PI), 
@@ -469,7 +464,8 @@ YUI.add('dial', function(Y) {
 		 * handles the user starting to drag the handle around the Dial
 		 *
 		 * @method _handleDragStart
-		 * @private
+         * @param e {DOMEvent} the drag event object
+		 * @protected
 		 */
 		_handleDragStart : function(e){
 			this._markerNode.removeClass('marker-hidden');
@@ -489,7 +485,7 @@ YUI.add('dial', function(Y) {
 		 * resting position.
 		 *
 		 * @method _handleDragEnd
-		 * @private
+		 * @protected
 		 */
 		_handleDragEnd : function(){
 			var node = this._handleNode;			
@@ -514,7 +510,7 @@ YUI.add('dial', function(Y) {
 		 *
 		 * @method _setNodeToFixedRadius
 		 * @param obj {Node}
-		 * @private
+		 * @protected
 		 * @return {Array} an array of [XY] is optionally returned
 		 */
 		 _setNodeToFixedRadius : function(obj){
@@ -533,7 +529,6 @@ YUI.add('dial', function(Y) {
 		 * Synchronizes the DOM state with the attribute settings.
 		 *
 		 * @method syncUI
-		 * @private
 		 */
         syncUI : function() {
             this._uiSetValue(this.get("value"));
@@ -543,7 +538,7 @@ YUI.add('dial', function(Y) {
 		 * renders the DOM object for the Dial's label
 		 *
 		 * @method _renderLabel
-		 * @private
+		 * @protected
 		 */
         _renderLabel : function() {
             var contentBox = this.get("contentBox"),
@@ -560,7 +555,7 @@ YUI.add('dial', function(Y) {
 		 * renders the DOM object for the Dial's background ring
 		 *
 		 * @method _renderRing
-		 * @private
+		 * @protected
 		 */
         _renderRing : function() {
             var contentBox = this.get("contentBox"),
@@ -578,7 +573,7 @@ YUI.add('dial', function(Y) {
 		 * tracks the angle of the user dragging the handle
 		 *
 		 * @method _renderMarker
-		 * @private
+		 * @protected
 		 */
         _renderMarker : function() {
             var contentBox = this.get("contentBox"),
@@ -597,7 +592,7 @@ YUI.add('dial', function(Y) {
 		 * based on the size of the string object 
 		 *
 		 * @method _setXYResetString
-		 * @private
+		 * @protected
 		 */
 		_setXYResetString : function(){
 			this._resetString.setStyle('top', (this._centerButtonNode.get('region').height / 2) - (this._resetString.get('region').height / 2) + 'px');
@@ -608,7 +603,7 @@ YUI.add('dial', function(Y) {
 		 * renders the DOM object for the Dial's center
 		 *
 		 * @method _renderCenterButton
-		 * @private
+		 * @protected
 		 */
         _renderCenterButton : function() {
             var contentBox = this.get("contentBox"),
@@ -630,7 +625,7 @@ YUI.add('dial', function(Y) {
 		 * renders the DOM object for the Dial's user draggable handle
 		 *
 		 * @method _renderHandle
-		 * @private
+		 * @protected
 		 */
         _renderHandle : function() {
             var contentBox = this.get("contentBox"),
@@ -648,7 +643,7 @@ YUI.add('dial', function(Y) {
 		 *
 		 * @method setLabelString
 		 * @param str {String}
-		 * @private
+		 * @protected
 		 */
         setLabelString : function(str) {
             this.get("contentBox").one("." + Dial.CSS_CLASSES.labelString).setContent(str);
@@ -659,7 +654,7 @@ YUI.add('dial', function(Y) {
 		 *
 		 * @method setResetString
 		 * @param str {String}
-		 * @private
+		 * @protected
 		 */
         setResetString : function(str) {
 			this.set('strings.resetStr', str);
@@ -673,7 +668,7 @@ YUI.add('dial', function(Y) {
 		 *
 		 * @method setTooltipString
 		 * @param str {String}
-		 * @private
+		 * @protected
 		 */
         setTooltipString : function(str) {
             this.get("contentBox").one("." + Dial.CSS_CLASSES.handleUser).set('title', str);
@@ -686,8 +681,8 @@ YUI.add('dial', function(Y) {
 		 * but needs left and right arrow keys for other purposes.
 		 *
 		 * @method _onDirectionKey
-		 * @param e {Event}
-		 * @private
+		 * @param e {Event} the key event
+		 * @protected
 		 */
         _onDirectionKey : function(e) {
             e.preventDefault();
@@ -717,8 +712,8 @@ YUI.add('dial', function(Y) {
 		 * sets the Dial's value in response to left or right key events
 		 *
 		 * @method _onLeftRightKey
-		 * @param e {Event}
-		 * @private
+		 * @param e {Event} the key event
+		 * @protected
 		 */
         _onLeftRightKey : function(e) {
             e.preventDefault();
@@ -736,7 +731,7 @@ YUI.add('dial', function(Y) {
 		 * increments Dial value by a minor increment
 		 *
 		 * @method _incrMinor
-		 * @private
+		 * @protected
 		 */
 		_incrMinor : function(){
 				var newVal = (this.get('value') + this.get("minorStep"));
@@ -748,7 +743,7 @@ YUI.add('dial', function(Y) {
 		 * decrements Dial value by a minor increment
 		 *
 		 * @method _decrMinor
-		 * @private
+		 * @protected
 		 */
 		_decrMinor : function(){
 				var newVal = (this.get('value') - this.get("minorStep"));
@@ -760,7 +755,7 @@ YUI.add('dial', function(Y) {
 		 * increments Dial value by a major increment
 		 *
 		 * @method _incrMajor
-		 * @private
+		 * @protected
 		 */
 		_incrMajor : function(){
 				var newVal = (this.get('value') + this.get("majorStep"));
@@ -772,7 +767,7 @@ YUI.add('dial', function(Y) {
 		 * decrements Dial value by a major increment
 		 *
 		 * @method _decrMajor
-		 * @private
+		 * @protected
 		 */
 		_decrMajor : function(){
 				var newVal = (this.get('value') - this.get("majorStep"));
@@ -784,7 +779,7 @@ YUI.add('dial', function(Y) {
 		 * sets Dial value to dial's max attr
 		 *
 		 * @method _decrMajor
-		 * @private
+		 * @protected
 		 */
 		_setToMax : function(){
 				this.set('value', this.get("max"));
@@ -794,7 +789,7 @@ YUI.add('dial', function(Y) {
 		 * sets Dial value to dial's min attr
 		 *
 		 * @method _decrMajor
-		 * @private
+		 * @protected
 		 */
 		_setToMin : function(){
 				this.set('value', this.get("min"));
@@ -804,7 +799,7 @@ YUI.add('dial', function(Y) {
 		 * resets Dial value to the orignal initial value. 
 		 *
 		 * @method _resetDial
-		 * @private
+		 * @protected
 		 */
 		_resetDial : function(){
 			this.set('value', this._originalValue);
@@ -817,6 +812,7 @@ YUI.add('dial', function(Y) {
 		 * @method _getAngleFromValue
 		 * @param newVal {Number} the current value of the Dial
 		 * @return {Number} the angle associated with the current Dial value
+		 * @protected
 		 */
 		_getAngleFromValue : function(newVal){
 			var nonWrapedPartOfValue = newVal % this.get('stepsPerRev');
@@ -830,6 +826,7 @@ YUI.add('dial', function(Y) {
 		 * @method _getValueFromAngle
 		 * @param angle {Number} the current angle of the Dial's handle
 		 * @return {Number} the current Dial value corresponding to the handle position
+		 * @protected
 		 */
 		_getValueFromAngle : function(angle){
 			if(angle < 0){
@@ -848,7 +845,7 @@ YUI.add('dial', function(Y) {
 		 *
 		 * @method _afterValueChange
 		 * @param e {Event}
-		 * @private
+		 * @protected
 		 */
         _afterValueChange : function(e) {
             this._uiSetValue(e.newVal);
@@ -897,7 +894,7 @@ YUI.add('dial', function(Y) {
 		 *
 		 * @method _validateValue
 		 * @param val {Number} value of the Dial
-		 * @private
+		 * @protected
 		 */
         _validateValue: function(val) {
             var min = this.get("min"),

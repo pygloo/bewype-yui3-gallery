@@ -346,9 +346,7 @@ A.zip = function(a, a2) {
 A.forEach = A.each;
 
 
-
 }, '@VERSION@' );
-
 YUI.add('arraylist', function(Y) {
 
 /**
@@ -555,9 +553,7 @@ Y.mix( ArrayList, {
 Y.ArrayList = ArrayList;
 
 
-
 }, '@VERSION@' );
-
 YUI.add('arraylist-add', function(Y) {
 
 /**
@@ -638,9 +634,7 @@ Y.mix(Y.ArrayList.prototype, {
 });
 
 
-
 }, '@VERSION@' ,{requires:['arraylist']});
-
 YUI.add('arraylist-filter', function(Y) {
 
 /**
@@ -683,9 +677,7 @@ Y.mix(Y.ArrayList.prototype, {
 });
 
 
-
 }, '@VERSION@' ,{requires:['arraylist']});
-
 YUI.add('array-invoke', function(Y) {
 
 /**
@@ -729,9 +721,7 @@ Y.Array.invoke = function(items, name) {
 };
 
 
-
 }, '@VERSION@' );
-
 
 
 YUI.add('collection', function(Y){}, '@VERSION@' ,{use:['array-extras', 'arraylist', 'arraylist-add', 'arraylist-filter', 'array-invoke']});

@@ -148,9 +148,13 @@
          */
         initializer : function( config ) {
 
-            var _cssDict       = this._initEditor(); // add editor
+            var _cssDict = this._initEditor(); // add editor
             // ie need to be ready
-            this._editor.on( 'ready', Y.bind( this._initContent, this, config, _cssDict ) ); // set editor content
+			if ( Y.UA.ie != 0 ) {
+				this._editor.on( 'ready', Y.bind( this._initContent, this, config, _cssDict ) );
+			} else {
+				this._initContent( config, _cssDict );
+			}
         },
 
         /**

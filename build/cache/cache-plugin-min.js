@@ -1,1 +1,1 @@
-YUI.add("cache-plugin",function(b){function a(e){var d=e&&e.cache?e.cache:b.Cache,f=b.Base.create("dataSourceCache",d,[b.Plugin.Base]),c=new f(e);f.NS="tmpClass";return c;}b.mix(a,{NS:"cache",NAME:"cachePlugin"});b.namespace("Plugin").Cache=a;},"@VERSION@",{requires:["cache-base"]});
+YUI.add("cache-plugin",function(B){function A(E){var D=E&&E.cache?E.cache:B.Cache,F=B.Base.create("dataSourceCache",D,[B.Plugin.Base]),C=new F(E);F.NS="tmpClass";return C;}B.mix(A,{NS:"cache",NAME:"cachePlugin"});B.namespace("Plugin").Cache=A;},"@VERSION@",{requires:["cache-base"]});

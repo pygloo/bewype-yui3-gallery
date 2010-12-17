@@ -132,5 +132,4 @@ Highlight = Y.mix(Y.Highlight, {
 });
 
 
-
 }, '@VERSION@' ,{requires:['highlight-base', 'text-accentfold']});

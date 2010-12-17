@@ -285,5 +285,4 @@ YUI.add('editor-bidi', function(Y) {
 
 
 
-
 }, '@VERSION@' ,{requires:['editor-base'], skinnable:false});

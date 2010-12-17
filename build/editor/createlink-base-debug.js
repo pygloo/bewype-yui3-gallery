@@ -83,5 +83,4 @@ YUI.add('createlink-base', function(Y) {
 
 
 
-
 }, '@VERSION@' ,{requires:['editor-base'], skinnable:false});

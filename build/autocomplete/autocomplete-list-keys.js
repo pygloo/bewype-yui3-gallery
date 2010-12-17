@@ -98,7 +98,14 @@ ListKeys.prototype = {
      * @protected
      */
     _keyEnter: function () {
-        this.selectItem();
+        var item = this.get('activeItem');
+
+        if (item) {
+            this.selectItem(item);
+        } else {
+            // Don't prevent form submission when there's no active item.
+            return false;
+        }
     },
 
     /**
@@ -176,7 +183,6 @@ ListKeys.prototype = {
 };
 
 Y.Base.mix(Y.AutoCompleteList, [ListKeys]);
-
 
 
 }, '@VERSION@' ,{requires:['autocomplete-list', 'base-build']});

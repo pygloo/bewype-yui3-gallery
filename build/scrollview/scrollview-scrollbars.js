@@ -560,5 +560,4 @@ Y.namespace("Plugin").ScrollViewScrollbars = Y.extend(ScrollbarsPlugin, Y.Plugin
 });
 
 
-
-}, '@VERSION@' ,{requires:['plugin'], skinnable:true});
+}, '@VERSION@' ,{skinnable:true, requires:['plugin']});

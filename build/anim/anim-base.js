@@ -655,5 +655,4 @@ YUI.add('anim-base', function(Y) {
     Y.extend(Y.Anim, Y.Base, proto);
 
 
-
 }, '@VERSION@' ,{requires:['base-base', 'node-style']});

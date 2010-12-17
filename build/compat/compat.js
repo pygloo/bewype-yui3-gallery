@@ -576,7 +576,6 @@ if (Y.Event) {
 Y.register("event", Y.util.Event, {version: "@VERSION@", build: "@BUILD@"});
 
 
-
 var propertyCache = {};
 var patterns = {
     HYPHEN: /(-[a-z])/i, // to normalize get/setStyle
@@ -906,7 +905,5 @@ YAHOO.register("dom", YAHOO.util.Dom, {version: "@VERSION@", build: "@BUILD@"});
 
 
 
-
 }, '@VERSION@' ,{requires:['dom','dom-style-ie','event-base','dump','substitute']});
 YUI._setup(); YUI.use('compat');
-

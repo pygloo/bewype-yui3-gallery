@@ -100,6 +100,30 @@ Y.CartesianChart = Y.Base.create("cartesianChart", Y.Widget, [Y.ChartBase], {
         }
         this._selectedIndex = index;
         
+        /**
+         * Broadcasts when <code>interactionType</code> is set to <code>planar</code> and a series' marker plane has received a mouseover event.
+         * 
+         *
+         * @event planarEvent:mouseover
+         * @preventable false
+         * @param {EventFacade} e Event facade with the following additional
+         *   properties:
+         *  <dl>
+         *      <dt>categoryItem</dt><dd>An array of hashes, each containing information about the category <code>Axis</code> of each marker whose plane has been intersected.</dd>
+         *      <dt>valueItem</dt><dd>An array of hashes, each containing information about the value <code>Axis</code> of each marker whose plane has been intersected.</dd>
+         *      <dt>x</dt><dd>The x-coordinate of the mouse in relation to the Chart.</dd>
+         *      <dt>y</dt><dd>The y-coordinate of the mouse in relation to the Chart.</dd>
+         *      <dt>items</dt><dd>An array including all the series which contain a marker whose plane has been intersected.</dd>
+         *      <dt>index</dt><dd>Index of the markers in their respective series.</dd>
+         *  </dl>
+         */
+        /**
+         * Broadcasts when <code>interactionType</code> is set to <code>planar</code> and a series' marker plane has received a mouseout event.
+         *
+         * @event planarEvent:mouseout
+         * @preventable false
+         * @param {EventFacade} e 
+         */
         if(index > -1)
         {
             this.fire("planarEvent:mouseover", {categoryItem:categoryItems, valueItem:valueItems, x:posX, y:posY, items:items, index:index});
@@ -277,8 +301,6 @@ Y.CartesianChart = Y.Base.create("cartesianChart", Y.Widget, [Y.ChartBase], {
 
     /**
      * @private
-     * @description Gets the appropriate axis to bind a series to when one is not explicitly
-     * set.
      */
     _getSeriesAxis:function(key, axisName)
     {
@@ -313,7 +335,7 @@ Y.CartesianChart = Y.Base.create("cartesianChart", Y.Widget, [Y.ChartBase], {
 
     /**
      * @private
-     * @description Gets an attribute from an object, using a getter for Base objects and a property for object
+     * Gets an attribute from an object, using a getter for Base objects and a property for object
      * literals. Used for determining attributes from series/axis references which can be an actual class instance
      * or a hash of properties that will be used to create a class instance.
      */
@@ -332,7 +354,7 @@ Y.CartesianChart = Y.Base.create("cartesianChart", Y.Widget, [Y.ChartBase], {
 
     /**
      * @private
-     * @description Sets an attribute on an object, using a setter of Base objects and a property for object
+     * Sets an attribute on an object, using a setter of Base objects and a property for object
      * literals. Used for setting attributes on a Base class, either directly or to be stored in an object literal
      * for use at instantiation.
      */
@@ -772,6 +794,7 @@ Y.CartesianChart = Y.Base.create("cartesianChart", Y.Widget, [Y.ChartBase], {
      * @method getSeriesItem
      * @param {CartesianSeries} series Reference to a series.
      * @param {Number} index Index of the specified item within a series.
+     * @return Object
      */
     getSeriesItems: function(series, index)
     {
@@ -816,7 +839,7 @@ Y.CartesianChart = Y.Base.create("cartesianChart", Y.Widget, [Y.ChartBase], {
 
     /**
      * @private
-     * @description Listender for axisRendered event.
+     * Listender for axisRendered event.
      */
     _axisRendered: function(e)
     {
@@ -968,6 +991,7 @@ Y.CartesianChart = Y.Base.create("cartesianChart", Y.Widget, [Y.ChartBase], {
 }, {
     ATTRS: {
         /**
+         * @private
          * Style object for the axes.
          *
          * @attribute axesStyles
@@ -1011,6 +1035,7 @@ Y.CartesianChart = Y.Base.create("cartesianChart", Y.Widget, [Y.ChartBase], {
         },
 
         /**
+         * @private
          * Style object for the series
          *
          * @attribute seriesStyles
@@ -1073,6 +1098,7 @@ Y.CartesianChart = Y.Base.create("cartesianChart", Y.Widget, [Y.ChartBase], {
         },
 
         /**
+         * @private
          * Styles for the graph.
          *
          * @attribute graphStyles
@@ -1098,7 +1124,25 @@ Y.CartesianChart = Y.Base.create("cartesianChart", Y.Widget, [Y.ChartBase], {
         },
 
         /**
-         * Styles properties for the chart.
+         * Style properties for the chart. Contains a key indexed hash of the following:
+         *  <dl>
+         *      <dt>series</dt><dd>A key indexed hash containing references to the <code>styles</code> attribute for each series in the chart.
+         *      Specific style attributes vary depending on the series:
+         *      <ul>
+         *          <li><a href="AreaSeries.html#config_styles">AreaSeries</a></li>
+         *          <li><a href="BarSeries.html#config_styles">BarSeries</a></li>
+         *          <li><a href="ColumnSeries.html#config_styles">ColumnSeries</a></li>
+         *          <li><a href="ComboSeries.html#config_styles">ComboSeries</a></li>
+         *          <li><a href="LineSeries.html#config_styles">LineSeries</a></li>
+         *          <li><a href="MarkerSeries.html#config_styles">MarkerSeries</a></li>
+         *          <li><a href="SplineSeries.html#config_styles">SplineSeries</a></li>
+         *      </ul>
+         *      </dd>
+         *      <dt>axes</dt><dd>A key indexed hash containing references to the <code>styles</code> attribute for each axes in the chart. Specific
+         *      style attributes can be found in the <a href="Axis.html#config_styles">Axis</a> class.</dd>
+         *      <dt>graph</dt><dd>A reference to the <code>styles</code> attribute in the chart. Specific style attributes can be found in the
+         *      <a href="Graph.html#config_styles">Graph</a> class.</dd>
+         *  </dl>
          *
          * @attribute styles
          * @type Object
@@ -1145,7 +1189,8 @@ Y.CartesianChart = Y.Base.create("cartesianChart", Y.Widget, [Y.ChartBase], {
         },
 
         /**
-         * Axes to appear in the chart. 
+         * Axes to appear in the chart. This can be a key indexed hash of axis instances or object literals
+         * used to construct the appropriate axes.
          *
          * @attribute axes
          * @type Object
@@ -1161,7 +1206,7 @@ Y.CartesianChart = Y.Base.create("cartesianChart", Y.Widget, [Y.ChartBase], {
 
         /**
          * Collection of series to appear on the chart. This can be an array of Series instances or object literals
-         * used to describe a Series instance.
+         * used to construct the appropriate series.
          *
          * @attribute seriesCollection
          * @type Array
@@ -1180,6 +1225,7 @@ Y.CartesianChart = Y.Base.create("cartesianChart", Y.Widget, [Y.ChartBase], {
          *
          * @attribute leftAxesCollection
          * @type Array
+         * @private
          */
         leftAxesCollection: {},
 
@@ -1188,6 +1234,7 @@ Y.CartesianChart = Y.Base.create("cartesianChart", Y.Widget, [Y.ChartBase], {
          *
          * @attribute bottomAxesCollection
          * @type Array
+         * @private
          */
         bottomAxesCollection: {},
 
@@ -1196,6 +1243,7 @@ Y.CartesianChart = Y.Base.create("cartesianChart", Y.Widget, [Y.ChartBase], {
          *
          * @attribute rightAxesCollection
          * @type Array
+         * @private
          */
         rightAxesCollection: {},
 
@@ -1204,6 +1252,7 @@ Y.CartesianChart = Y.Base.create("cartesianChart", Y.Widget, [Y.ChartBase], {
          *
          * @attribute topAxesCollection
          * @type Array
+         * @private
          */
         topAxesCollection: {},
         

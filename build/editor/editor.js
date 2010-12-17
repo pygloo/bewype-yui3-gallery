@@ -80,7 +80,9 @@ YUI.add('frame', function(Y) {
                 EXTRA_CSS: extra_css
             });
             if (Y.config.doc.compatMode != 'BackCompat') {
-                html = Frame.DOC_TYPE + "\n" + html;
+                
+                //html = Frame.DOC_TYPE + "\n" + html;
+                html = Frame.getDocType() + "\n" + html;
             } else {
             }
 
@@ -575,6 +577,10 @@ YUI.add('frame', function(Y) {
                     if (c.item(0).test('br')) {
                         sel.selectNode(n, true, false);
                     }
+                    if (c.item(0).test('p')) {
+                        n = c.item(0).one('br.yui-cursor').get('parentNode');
+                        sel.selectNode(n, true, false);
+                    }
                 }
             }
         },
@@ -694,6 +700,36 @@ YUI.add('frame', function(Y) {
         * @type String
         */
         PAGE_HTML: '<html dir="{DIR}" lang="{LANG}"><head><title>{TITLE}</title>{META}<base href="{BASE_HREF}"/>{LINKED_CSS}<style id="editor_css">{DEFAULT_CSS}</style>{EXTRA_CSS}</head><body>{CONTENT}</body></html>',
+
+        /**
+        * @static
+        * @method getDocType
+        * @description Parses document.doctype and generates a DocType to match the parent page, if supported.
+        * For IE8, it grabs document.all[0].nodeValue and uses that. For IE < 8, it falls back to Frame.DOC_TYPE.
+        * @returns {String} The normalized DocType to apply to the iframe
+        */
+        getDocType: function() {
+            var dt = Y.config.doc.doctype,
+                str = Frame.DOC_TYPE;
+
+            if (dt) {
+                str = '<!DOCTYPE ' + dt.name + ((dt.publicId) ? ' ' + dt.publicId : '') + ((dt.systemId) ? ' ' + dt.systemId : '') + '>';
+            } else {
+                if (Y.config.doc.all) {
+                    dt = Y.config.doc.all[0];
+                    if (dt.nodeType) {
+                        if (dt.nodeType === 8) {
+                            if (dt.nodeValue) {
+                                if (dt.nodeValue.toLowerCase().indexOf('doctype') !== -1) {
+                                    str = '<!' + dt.nodeValue + '>';
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return str;
+        },
         /**
         * @static
         * @property DOC_TYPE
@@ -870,9 +906,7 @@ YUI.add('frame', function(Y) {
 
 
 
-
 }, '@VERSION@' ,{requires:['base', 'node', 'selector-css3', 'substitute'], skinnable:false});
-
 YUI.add('selection', function(Y) {
 
     /**
@@ -1126,7 +1160,9 @@ YUI.add('selection', function(Y) {
         if (single.size() === 1) {
             br = single.item(0).all('br');
             if (br.size() === 1) {
-                br.item(0).remove();
+                if (!br.item(0).test('.yui-cursor')) {
+                    br.item(0).remove();
+                }
                 var html = single.item(0).get('innerHTML');
                 if (html === '' || html === ' ') {
                     single.set('innerHTML', Y.Selection.CURSOR);
@@ -1707,6 +1743,9 @@ YUI.add('selection', function(Y) {
         * @return {Y.Selection}
         */
         selectNode: function(node, collapse, end) {
+            if (!node) {
+                return;
+            }
             end = end || 0;
             node = Y.Node.getDOMNode(node);
 		    var range = this.createRange();
@@ -1800,9 +1839,7 @@ YUI.add('selection', function(Y) {
     };
 
 
-
 }, '@VERSION@' ,{requires:['node'], skinnable:false});
-
 YUI.add('exec-command', function(Y) {
 
 
@@ -1844,6 +1881,7 @@ YUI.add('exec-command', function(Y) {
             command: function(action, value) {
                 var fn = ExecCommand.COMMANDS[action];
                 
+                /*
                 if (action !== 'insertbr') {
                     Y.later(0, this, function() {
                         var inst = this.getInstance();
@@ -1852,6 +1890,7 @@ YUI.add('exec-command', function(Y) {
                         }
                     });
                 }
+                */
 
                 if (fn) {
                     return fn.call(this, action, value);
@@ -2225,9 +2264,7 @@ YUI.add('exec-command', function(Y) {
 
 
 
-
 }, '@VERSION@' ,{requires:['frame'], skinnable:false});
-
 YUI.add('editor-tab', function(Y) {
 
     /**
@@ -2297,9 +2334,7 @@ YUI.add('editor-tab', function(Y) {
     Y.Plugin.EditorTab = EditorTab;
 
 
-
 }, '@VERSION@' ,{requires:['editor-base'], skinnable:false});
-
 YUI.add('createlink-base', function(Y) {
 
     /**
@@ -2384,9 +2419,7 @@ YUI.add('createlink-base', function(Y) {
 
 
 
-
 }, '@VERSION@' ,{requires:['editor-base'], skinnable:false});
-
 YUI.add('editor-base', function(Y) {
 
 
@@ -2550,7 +2583,7 @@ YUI.add('editor-base', function(Y) {
                 case 'keydown':
                     if (!Y.UA.gecko) {
                         if (!EditorBase.NC_KEYS[e.changedEvent.keyCode] && !e.changedEvent.shiftKey && !e.changedEvent.ctrlKey && (e.changedEvent.keyCode !== 13)) {
-                            inst.later(100, inst, inst.Selection.cleanCursor);
+                            //inst.later(100, inst, inst.Selection.cleanCursor);
                         }
                     }
                     break;
@@ -2561,13 +2594,9 @@ YUI.add('editor-base', function(Y) {
                             this.execCommand('inserttext', '\t');
                         } else if (Y.UA.gecko) {
                             this.frame.exec._command('inserthtml', '<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>');
-                        } else {
+                        } else if (Y.UA.ie) {
                             sel = new inst.Selection();
-                            sel.setCursor();
-                            cur = sel.getCursor();
-                            cur.insert(EditorBase.TABKEY, 'before');
-                            sel.focusCursor();
-                            inst.Selection.cleanCursor();
+                            sel._selection.pasteHTML(EditorBase.TABKEY);
                         }
                     }
                     break;
@@ -3245,9 +3274,7 @@ YUI.add('editor-base', function(Y) {
 
 
 
-
 }, '@VERSION@' ,{requires:['base', 'frame', 'node', 'exec-command', 'selection', 'editor-para'], skinnable:false});
-
 YUI.add('editor-lists', function(Y) {
 
     /**
@@ -3415,9 +3442,7 @@ YUI.add('editor-lists', function(Y) {
 
 
 
-
 }, '@VERSION@' ,{requires:['editor-base'], skinnable:false});
-
 YUI.add('editor-bidi', function(Y) {
 
 
@@ -3705,9 +3730,7 @@ YUI.add('editor-bidi', function(Y) {
 
 
 
-
 }, '@VERSION@' ,{requires:['editor-base'], skinnable:false});
-
 YUI.add('editor-para', function(Y) {
 
 
@@ -3740,8 +3763,10 @@ YUI.add('editor-para', function(Y) {
         _fixFirstPara: function() {
             var host = this.get(HOST), inst = host.getInstance(), sel;
             inst.one('body').set('innerHTML', '<' + P + '>' + inst.Selection.CURSOR + '</' + P + '>');
+            var n = inst.one(FIRST_P);
             sel = new inst.Selection();
-            sel.focusCursor(true, false);
+            sel.selectNode(n, true, false);
+            
         },
         /**
         * nodeChange handler to handle fixing an empty document.
@@ -4041,9 +4066,7 @@ YUI.add('editor-para', function(Y) {
 
 
 
-
 }, '@VERSION@' ,{requires:['node'], skinnable:false});
-
 YUI.add('editor-br', function(Y) {
 
 
@@ -4067,7 +4090,6 @@ YUI.add('editor-br', function(Y) {
 
 
     Y.extend(EditorBR, Y.Base, {
-        _lastKey: null,
         /**
         * Frame keyDown handler that normalizes BR's when pressing ENTER.
         * @private
@@ -4081,19 +4103,14 @@ YUI.add('editor-br', function(Y) {
             if (e.keyCode == 13) {
                 var host = this.get(HOST), inst = host.getInstance(),
                     sel = new inst.Selection(),
-                    last = '<wbr>';
+                    last = '';
 
                 if (sel) {
                     if (Y.UA.ie) {
-                        if (this._lastKey === 13) {
-                            last = '<br>';
-                        }
                         if (!sel.anchorNode || (!sel.anchorNode.test(LI) && !sel.anchorNode.ancestor(LI))) {
-                            sel._selection.pasteHTML('<div id="yui-ie-enter">' + last + '<br></div>');
-                            inst.on('available', function() {
-                                this.set('id', '');
-                                sel.selectNode(this.get('lastChild'), true, false);
-                            }, '#yui-ie-enter');
+                            sel._selection.pasteHTML('<br>');
+                            sel._selection.collapse(false);
+                            sel._selection.select();
                             e.halt();
                         }
                     }
@@ -4105,7 +4122,6 @@ YUI.add('editor-br', function(Y) {
                     }
                 }
             }
-            this._lastKey = e.keyCode;
         },
         /**
         * Adds listeners for keydown in IE and Webkit. Also fires insertbeonreturn for supporting browsers.
@@ -4185,10 +4201,8 @@ YUI.add('editor-br', function(Y) {
 
 
 
-
 }, '@VERSION@' ,{requires:['node'], skinnable:false});
 
 
-
-YUI.add('editor', function(Y){}, '@VERSION@' ,{use:['frame', 'selection', 'exec-command', 'editor-base', 'editor-para', 'editor-br'], skinnable:false});
+YUI.add('editor', function(Y){}, '@VERSION@' ,{skinnable:false, use:['frame', 'selection', 'exec-command', 'editor-base', 'editor-para', 'editor-br', 'editor-bidi', 'createlink-base']});
 

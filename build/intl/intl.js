@@ -147,5 +147,4 @@ Y.augment(Y.Intl, Y.EventTarget);
 Y.Intl.publish("intl:langChange", {emitFacade:true});
 
 
-
 }, '@VERSION@' ,{requires:['event-custom']});

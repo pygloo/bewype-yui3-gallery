@@ -341,5 +341,4 @@ Highlight = {
 Y.Highlight = Highlight;
 
 
-
 }, '@VERSION@' ,{requires:['array-extras', 'escape', 'text-wordbreak']});

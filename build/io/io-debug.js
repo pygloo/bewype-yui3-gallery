@@ -813,7 +813,9 @@ YUI.add('io-base', function(Y) {
     Y.io.http = _io;
 
 
+
 }, '@VERSION@' ,{requires:['event-custom-base', 'querystring-stringify-simple']});
+
 YUI.add('io-form', function(Y) {
 
    /**
@@ -908,7 +910,9 @@ YUI.add('io-form', function(Y) {
     }, true);
 
 
+
 }, '@VERSION@' ,{requires:['io-base','node-base']});
+
 YUI.add('io-xdr', function(Y) {
 
    /**
@@ -1229,7 +1233,9 @@ YUI.add('io-xdr', function(Y) {
 	Y.io.xdr.delay = 50;
 
 
+
 }, '@VERSION@' ,{requires:['io-base','datatype-xml']});
+
 YUI.add('io-upload-iframe', function(Y) {
 
    /**
@@ -1283,7 +1289,7 @@ YUI.add('io-upload-iframe', function(Y) {
     function _removeData(f, o) {
         var i, l;
 
-        for(i = 0, l = o.length; i < l; i++){
+        for (i = 0, l = o.length; i < l; i++) {
             f.removeChild(o[i]);
         }
     }
@@ -1400,34 +1406,16 @@ YUI.add('io-upload-iframe', function(Y) {
             _clearTimeout(o.id);
         }
 
-        // .. ORI ..
-        // if (b) {
+        if (b) {
             // When a response Content-Type of "text/plain" is used, Firefox and Safari
             // will wrap the response string with <pre></pre>.
-            // p = b.query('pre:first-child');
-            // o.c.responseText = p ? p.get('text') : b.get('text');
-        // }
-        // .. ORI ..
-
-        // FIX PURPOSE
-        if (b && (Y.UA.ie !== 0 || Y.UA.webkit > 1)) { // IE || Chrome
-
-            o.c.responseText = b.get('outerText');
-            Y.log('The responseText value for transaction ' + o.id + ' is: ' + o.c.responseText + '.', 'info', 'io');
-
-        } else if (b) { // Opera || FireFox || Chrome
-           
-            o.c.responseText = b.get('text');
+            p = b.one('pre:first-child');
+            o.c.responseText = p ? p.get('text') : b.get('text');
             Y.log('The responseText value for transaction ' + o.id + ' is: ' + o.c.responseText + '.', 'info', 'io');
         }
-
-        // FIX PURPOSE
-
         else {
-
             o.c.responseXML = d._node;
             Y.log('The response for transaction ' + o.id + ' is an XML document.', 'info', 'io');
-
         }
 
         Y.io.complete(o, c);
@@ -1533,7 +1521,9 @@ YUI.add('io-upload-iframe', function(Y) {
     });
 
 
+
 }, '@VERSION@' ,{requires:['io-base','node-base']});
+
 YUI.add('io-queue', function(Y) {
 
    /**
@@ -1740,7 +1730,9 @@ YUI.add('io-queue', function(Y) {
     }, true);
 
 
+
 }, '@VERSION@' ,{requires:['io-base','queue-promote']});
+
 
 
 YUI.add('io', function(Y){}, '@VERSION@' ,{use:['io-base', 'io-form', 'io-xdr', 'io-upload-iframe', 'io-queue']});

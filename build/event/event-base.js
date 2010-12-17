@@ -11,7 +11,6 @@ if (!GLOBAL_ENV._ready) {
     // }
 }
 
-
 YUI.add('event-base', function(Y) {
 
 /*
@@ -51,7 +50,6 @@ if (GLOBAL_ENV.DOMReady) {
 } else {
     Y.Do.before(function() { Y.fire('domready'); }, YUI.Env, '_ready');
 }
-
 
 /**
  * Custom event engine, DOM event listener abstraction layer, synthetic DOM
@@ -313,7 +311,6 @@ Y.DOMEventFacade = DOMEventFacade;
      * @param immediate {boolean} if true additional listeners
      * on the current target will not be executed
      */
-
 (function() {
 /**
  * DOM event listener abstraction layer
@@ -1210,7 +1207,6 @@ Event._poll();
 
 })();
 
-
 /**
  * DOM event listener abstraction layer
  * @module event
@@ -1264,6 +1260,4 @@ Y.Env.evt.plugins.contentready = {
 };
 
 
-
 }, '@VERSION@' ,{requires:['event-custom-base']});
-

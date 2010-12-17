@@ -309,5 +309,4 @@ delegate._applyFilter = function (filter, args, ce) {
 Y.delegate = Y.Event.delegate = delegate;
 
 
-
 }, '@VERSION@' ,{requires:['node-base']});

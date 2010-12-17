@@ -4,6 +4,7 @@
  * @param {Object} config (optional) Configuration parameters for the Chart.
  * @class AxisType
  * @constructor
+ * @extends Axis
  */
 Y.AxisType = Y.Base.create("baseAxis", Y.Axis, [], {
     /**
@@ -13,6 +14,8 @@ Y.AxisType = Y.Base.create("baseAxis", Y.Axis, [], {
     {
         this.after("dataReady", Y.bind(this._dataChangeHandler, this));
         this.after("dataUpdate", Y.bind(this._dataChangeHandler, this));
+        this.after("minimumChange", Y.bind(this._keyChangeHandler, this));
+        this.after("maximumChange", Y.bind(this._keyChangeHandler, this));
         this.after("keysChange", this._keyChangeHandler);
         this.after("dataProviderChange", this._dataProviderChangeHandler);
         this.after("stylesChange", this._updateHandler);
@@ -176,6 +179,7 @@ Y.AxisType = Y.Base.create("baseAxis", Y.Axis, [], {
      * @method getKeyValueAt
      * @param {String} key value used to look up the correct array
      * @param {Number} index within the array
+     * @return Object
      */
     getKeyValueAt: function(key, index)
     {
@@ -193,6 +197,7 @@ Y.AxisType = Y.Base.create("baseAxis", Y.Axis, [], {
      *
      * @method getDataByKey
      * @param {String} value value used to identify the array
+     * @return Object
      */
     getDataByKey: function (value)
     {
@@ -241,6 +246,7 @@ Y.AxisType = Y.Base.create("baseAxis", Y.Axis, [], {
      * Returns the total number of majorUnits that will appear on an axis.
      *
      * @method getTotalMajorUnits
+     * @return Number
      */
     getTotalMajorUnits: function()
     {
@@ -265,6 +271,7 @@ Y.AxisType = Y.Base.create("baseAxis", Y.Axis, [], {
      * @param {Number} len Number of ticks
      * @param {Number} uiLen Size of the axis.
      * @param {Object} majorUnit Hash of properties used to determine the majorUnit
+     * @return Number
      */
     getMajorUnitDistance: function(len, uiLen, majorUnit)
     {
@@ -371,15 +378,16 @@ Y.AxisType = Y.Base.create("baseAxis", Y.Axis, [], {
 
         /**
          *Indicates how to round unit values.
-         *  <ul>
-         *      <li>niceNumber</li>
-         *      <li>auto</li>
-         *      <li>numeric value</li>
-         *      <li>null</li>
-         *  </ul>
+         *  <dl>
+         *      <dt>niceNumber</dt><dd>Units will be smoothed based on the number of ticks and data range.</dd>
+         *      <dt>auto</dt><dd>If the range is greater than 1, the units will be rounded.</dd>
+         *      <dt>numeric value</dt><dd>Units will be equal to the numeric value.</dd>
+         *      <dt>null</dt><dd>No rounding will occur.</dd>
+         *  </dl>
          *
          * @attribute roundingMethod
          * @type String
+         * @default niceNumber
          */
         roundingMethod: {
             value: "niceNumber"
@@ -387,12 +395,12 @@ Y.AxisType = Y.Base.create("baseAxis", Y.Axis, [], {
 
         /**
          *Returns the type of axis data
-         *  <ul>
-         *      <li><code>time</code></li>
-         *      <li><code>stacked</code></li>      
-         *      <li><code>numeric</code></li>
-         *      <li><code>category</code></li>
-         *  </ul>
+         *  <dl>
+         *      <dt>time</dt><dd>Manages time data</dd>
+         *      <dt>stacked</dt><dd>Manages stacked numeric data</dd>      
+         *      <dt>numeric</dt><dd>Manages numeric data</dd>
+         *      <dt>category</dt><dd>Manages categorical data</dd>
+         *  </dl>
          *
          * @attribute type
          * @type String
@@ -411,7 +419,7 @@ Y.AxisType = Y.Base.create("baseAxis", Y.Axis, [], {
          * Instance of <code>ChartDataProvider</code> that the class uses
          * to build its own data.
          *
-         * @attribute
+         * @attribute dataProvider
          * @type Array
          */
         dataProvider:{
@@ -457,7 +465,7 @@ Y.AxisType = Y.Base.create("baseAxis", Y.Axis, [], {
             },
             setter: function (value)
             {
-                this._setMaximum = value;
+                this._setMaximum = parseFloat(value);
                 return value;
             }
         },
@@ -498,7 +506,7 @@ Y.AxisType = Y.Base.create("baseAxis", Y.Axis, [], {
             },
             setter: function(val)
             {
-                this._setMinimum = val;
+                this._setMinimum = parseFloat(val);
                 return val;
             }
         },
@@ -575,7 +583,16 @@ Y.AxisType = Y.Base.create("baseAxis", Y.Axis, [], {
             },
             readOnly: true
         },
-
+        
+        /**
+         * Method used for formatting a label.
+         *
+         * @attribute labelFunction
+         * @type Function
+         * @param {String} val label to be formatted.
+         * @param {Object} format temlate for formatting a label.
+         * @return String
+         */
         labelFunction: {
             value: function(val, format)
             {

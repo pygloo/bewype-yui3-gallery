@@ -175,5 +175,4 @@ YUI.add('pluginhost-base', function(Y) {
     Y.namespace("Plugin").Host = PluginHost;
 
 
-
 }, '@VERSION@' ,{requires:['yui-base']});

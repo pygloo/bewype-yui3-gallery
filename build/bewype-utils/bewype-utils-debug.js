@@ -57,7 +57,7 @@ YUI.add('bewype-utils', function(Y) {
             default_ = default_ ? default_ : 0;
 
             var _aVal = node.getAttribute( name ),
-                _cVal = Y.UA.ie ? null : node.getComputedStyle( name );
+                _cVal = node.getComputedStyle( name );
 
             // return int value - TODO see if useful for non int value :s
             return parseInt( _aVal || _cVal, default_ );

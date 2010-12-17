@@ -1,3 +1,11 @@
+/**
+ * PieSeries visualizes data as a circular chart divided into wedges which represent data as a 
+ * percentage of a whole.
+ *
+ * @class PieSeries
+ * @constructor
+ * @extends MarkerSeries
+ */
 Y.PieSeries = Y.Base.create("pieSeries", Y.MarkerSeries, [], { 
     /**
      * @private
@@ -30,13 +38,19 @@ Y.PieSeries = Y.Base.create("pieSeries", Y.MarkerSeries, [], {
         this.after("valueAxisChange", this.valueAxisChangeHandler);
         this.after("stylesChange", this._updateHandler);
     },
-   
+    
+    /**
+     * @private
+     */
     validate: function()
     {
         this.draw();
         this._renderered = true;
     },
 
+    /**
+     * @private
+     */
     _categoryAxisChangeHandler: function(e)
     {
         var categoryAxis = this.get("categoryAxis");
@@ -44,63 +58,73 @@ Y.PieSeries = Y.Base.create("pieSeries", Y.MarkerSeries, [], {
         categoryAxis.after("dataUpdate", Y.bind(this._categoryDataChangeHandler, this));
     },
     
+    /**
+     * @private
+     */
     _valueAxisChangeHandler: function(e)
     {
         var valueAxis = this.get("valueAxis");
         valueAxis.after("dataReady", Y.bind(this._valueDataChangeHandler, this));
         valueAxis.after("dataUpdate", Y.bind(this._valueDataChangeHandler, this));
     },
-	/**
-	 * Constant used to generate unique id.
-	 */
-	GUID: "pieseries",
 	
-	/**
-	 * @private (protected)
-	 * Handles updating the graph when the x < code>Axis</code> values
-	 * change.
-	 */
-	_categoryDataChangeHandler: function(event)
-	{
+    /**
+     * Constant used to generate unique id.
+     *
+     * @private
+     */
+    GUID: "pieseries",
+	
+    /**
+     * @private (protected)
+     * Handles updating the graph when the x < code>Axis</code> values
+     * change.
+     */
+    _categoryDataChangeHandler: function(event)
+    {
        if(this._rendered && this.get("categoryKey") && this.get("valueKey"))
-		{
-			this.draw();
-		}
-	},
-
-	/**
-	 * @private (protected)
-	 * Handles updating the chart when the y <code>Axis</code> values
-	 * change.
-	 */
-	_valueDataChangeHandler: function(event)
-	{
-        if(this._rendered && this.get("categoryKey") && this.get("valueKey"))
-		{
+        {
             this.draw();
-		}
-	},
+        }
+    },
+
+    /**
+     * @private (protected)
+     * Handles updating the chart when the y <code>Axis</code> values
+     * change.
+     */
+    _valueDataChangeHandler: function(event)
+    {
+        if(this._rendered && this.get("categoryKey") && this.get("valueKey"))
+        {
+            this.draw();
+        }
+    },
    
-	/**
-	 * @private (override)
-	 */
-	draw: function()
+    /**
+     * @protected
+     *
+     * Draws the series. Overrides the base implementation.
+     *
+     * @method draw
+     */
+    draw: function()
     {
         var graph = this.get("graph"),
             w = graph.get("width"),
             h = graph.get("height");
         if(isFinite(w) && isFinite(h) && w > 0 && h > 0)
-		{   
+        {   
             this._rendered = true;
             this.drawSeries();
             this.fire("drawingComplete");
-		}
-	},
-    
+        }
+    },
+
     /**
      * @private
      */
-	drawPlots: function()
+    drawPlots: function()
     {
         var values = this.get("valueAxis").getDataByKey(this.get("valueKey")).concat(),
             catValues = this.get("categoryAxis").getDataByKey(this.get("categoryKey")).concat(),
@@ -119,7 +143,7 @@ Y.PieSeries = Y.Base.create("pieSeries", Y.MarkerSeries, [], {
             tfa,
             padding = styles.padding,
             graph = this.get("graph"),
-			w = graph.get("width") - (padding.left + padding.right),
+            w = graph.get("width") - (padding.left + padding.right),
             h = graph.get("height") - (padding.top + padding.bottom),
             startAngle = -90,
             halfWidth = w / 2,
@@ -212,6 +236,15 @@ Y.PieSeries = Y.Base.create("pieSeries", Y.MarkerSeries, [], {
         this._clearMarkerCache();
     },
 
+    /**
+     * @protected
+     *
+     * Resizes and positions markers based on a mouse interaction.
+     *
+     * @method updateMarkerState
+     * @param {String} type state of the marker
+     * @param {Number} i index of the marker
+     */
     updateMarkerState: function(type, i)
     {
         if(this._markers[i])
@@ -339,18 +372,39 @@ Y.PieSeries = Y.Base.create("pieSeries", Y.MarkerSeries, [], {
     }
 }, {
     ATTRS: {
-
+        /**
+         * Read-only attribute indicating the type of series.
+         *
+         * @attribute type
+         * @type String
+         * @default pie
+         */
         type: {		
             value: "pie"
         },
+        
         /**
-         * Order of this ISeries instance of this <code>type</code>.
+         * Order of this instance of this <code>type</code>.
+         *
+         * @attribute order
+         * @type Number
          */
         order: {},
+
+        /**
+         * Reference to the <code>Graph</code> in which the series is drawn into.
+         *
+         * @attribute graph
+         * @type Graph
+         */
         graph: {},
+        
         /**
          * Reference to the <code>Axis</code> instance used for assigning 
-         * x-values to the graph.
+         * category values to the graph.
+         *
+         * @attribute categoryAxis
+         * @type Axis
          */
         categoryAxis: {
             value: null,
@@ -361,6 +415,13 @@ Y.PieSeries = Y.Base.create("pieSeries", Y.MarkerSeries, [], {
             }
         },
         
+        /**
+         * Reference to the <code>Axis</code> instance used for assigning 
+         * series values to the graph.
+         *
+         * @attribute categoryAxis
+         * @type Axis
+         */
         valueAxis: {
             value: null,
 
@@ -369,6 +430,7 @@ Y.PieSeries = Y.Base.create("pieSeries", Y.MarkerSeries, [], {
                 return value !== this.get("valueAxis");
             }
         },
+
         /**
          * Indicates which array to from the hash of value arrays in 
          * the category <code>Axis</code> instance.
@@ -394,6 +456,12 @@ Y.PieSeries = Y.Base.create("pieSeries", Y.MarkerSeries, [], {
             }
         },
 
+        /**
+         * Name used for for displaying category data
+         *
+         * @attribute categoryDisplayName
+         * @type String
+         */
         categoryDisplayName: {
             setter: function(val)
             {
@@ -407,6 +475,12 @@ Y.PieSeries = Y.Base.create("pieSeries", Y.MarkerSeries, [], {
             }
         },
 
+        /**
+         * Name used for for displaying value data
+         *
+         * @attribute valueDisplayName
+         * @type String
+         */
         valueDisplayName: {
             setter: function(val)
             {
@@ -419,7 +493,40 @@ Y.PieSeries = Y.Base.create("pieSeries", Y.MarkerSeries, [], {
                 return this._valueDisplayName || this.get("valueKey");
             }
         },
-
+        
+        /**
+         * @private
+         */
         slices: null
+        
+        /**
+         * Style properties used for drawing markers. This attribute is inherited from <code>MarkerSeries</code>. Below are the default values:
+         *  <dl>
+         *      <dt>fill</dt><dd>A hash containing the following values:
+         *          <dl>
+         *              <dt>colors</dt><dd>An array of colors to be used for the marker fills. The color for each marker is retrieved from the 
+         *              array below:<br/>
+         *              <code>["#66007f", "#a86f41", "#295454", "#996ab2", "#e8cdb7", "#90bdbd","#000000","#c3b8ca", "#968373", "#678585"]</code>
+         *              </dd>
+         *              <dt>alphas</dt><dd>An array of alpha references (Number from 0 to 1) indicating the opacity of each marker fill. The default value is [1].</dd>
+         *          </dl>
+         *      </dd>
+         *      <dt>border</dt><dd>A hash containing the following values:
+         *          <dl>
+         *              <dt>color</dt><dd>An array of colors to be used for the marker borders. The color for each marker is retrieved from the
+         *              array below:<br/>
+         *              <code>["#205096", "#b38206", "#000000", "#94001e", "#9d6fa0", "#e55b00", "#5e85c9", "#adab9e", "#6ac291", "#006457"]</code>
+         *              <dt>alpha</dt><dd>Number from 0 to 1 indicating the opacity of the marker border. The default value is 1.</dd>
+         *              <dt>weight</dt><dd>Number indicating the width of the border. The default value is 1.</dd>
+         *          </dl>
+         *      </dd>
+         *      <dt>over</dt><dd>hash containing styles for markers when highlighted by a <code>mouseover</code> event. The default 
+         *      values for each style is null. When an over style is not set, the non-over value will be used. For example,
+         *      the default value for <code>marker.over.fill.color</code> is equivalent to <code>marker.fill.color</code>.</dd>
+         *  </dl>
+         *
+         * @attribute styles
+         * @type Object
+         */
     }
 });

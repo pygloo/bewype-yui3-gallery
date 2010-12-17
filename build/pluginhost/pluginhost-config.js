@@ -118,5 +118,4 @@ YUI.add('pluginhost-config', function(Y) {
     };
 
 
-
 }, '@VERSION@' ,{requires:['pluginhost-base']});

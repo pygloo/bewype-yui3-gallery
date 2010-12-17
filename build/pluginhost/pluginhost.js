@@ -174,9 +174,7 @@ YUI.add('pluginhost-base', function(Y) {
     Y.namespace("Plugin").Host = PluginHost;
 
 
-
 }, '@VERSION@' ,{requires:['yui-base']});
-
 YUI.add('pluginhost-config', function(Y) {
 
     /**
@@ -297,9 +295,7 @@ YUI.add('pluginhost-config', function(Y) {
     };
 
 
-
 }, '@VERSION@' ,{requires:['pluginhost-base']});
-
 
 
 YUI.add('pluginhost', function(Y){}, '@VERSION@' ,{use:['pluginhost-base', 'pluginhost-config']});

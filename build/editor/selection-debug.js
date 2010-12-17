@@ -256,9 +256,12 @@ YUI.add('selection', function(Y) {
             Y.log('Only One default block tag (' + Y.Selection.DEFAULT_BLOCK_TAG + '), focus it..', 'info', 'selection');
             br = single.item(0).all('br');
             if (br.size() === 1) {
-                br.item(0).remove();
+                if (!br.item(0).test('.yui-cursor')) {
+                    br.item(0).remove();
+                }
                 var html = single.item(0).get('innerHTML');
                 if (html === '' || html === ' ') {
+                    Y.log('Paragraph empty, focusing cursor', 'info', 'selection');
                     single.set('innerHTML', Y.Selection.CURSOR);
                     sel = new Y.Selection();
                     sel.focusCursor(true, true);
@@ -851,6 +854,10 @@ YUI.add('selection', function(Y) {
         * @return {Y.Selection}
         */
         selectNode: function(node, collapse, end) {
+            if (!node) {
+                Y.log('Node passed to selectNode is null', 'error', 'selection');
+                return;
+            }
             end = end || 0;
             node = Y.Node.getDOMNode(node);
 		    var range = this.createRange();
@@ -942,7 +949,6 @@ YUI.add('selection', function(Y) {
             return 'Selection Object';
         }
     };
-
 
 
 }, '@VERSION@' ,{requires:['node'], skinnable:false});

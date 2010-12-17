@@ -171,5 +171,4 @@ YUI.add('editor-lists', function(Y) {
 
 
 
-
 }, '@VERSION@' ,{requires:['editor-base'], skinnable:false});

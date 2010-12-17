@@ -12,7 +12,6 @@ Y.Env.evt = {
 };
 
 
-
 /**
  * Custom event engine, DOM event listener abstraction layer, synthetic DOM
  * events.
@@ -328,7 +327,6 @@ DO.Error = DO.Halt;
 //////////////////////////////////////////////////////////////////////////
 
 // Y["Event"] && Y.Event.addListener(window, "unload", Y.Do._unload, Y.Do);
-
 
 
 /**
@@ -1165,7 +1163,6 @@ Y.Subscriber.prototype = {
     }
 
 };
-
 
 /**
  * Custom event engine, DOM event listener abstraction layer, synthetic DOM
@@ -2023,7 +2020,6 @@ Y.Global = YUI.Env.globalEvents;
  * @return the event target or a detach handle per 'chain' config
  * @for YUI
  */
-
 
 
 }, '@VERSION@' ,{requires:['oop']});

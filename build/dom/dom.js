@@ -347,7 +347,7 @@ Y_DOM = {
     /**
      * Provides a normalized attribute interface. 
      * @method setAttibute
-     * @param {String | HTMLElement} el The target element for the attribute.
+     * @param {HTMLElement} el The target element for the attribute.
      * @param {String} attr The attribute to set.
      * @param {String} val The value of the attribute.
      */
@@ -362,7 +362,7 @@ Y_DOM = {
     /**
      * Provides a normalized attribute interface. 
      * @method getAttibute
-     * @param {String | HTMLElement} el The target element for the attribute.
+     * @param {HTMLElement} el The target element for the attribute.
      * @param {String} attr The attribute to get.
      * @return {String} The current value of the attribute. 
      */
@@ -409,8 +409,8 @@ Y_DOM = {
      * Inserts content in a node at the given location 
      * @method addHTML
      * @param {HTMLElement} node The node to insert into
-     * @param {String | HTMLElement | Array | HTMLCollection} content The content to be inserted 
-     * @param {String | HTMLElement} where Where to insert the content
+     * @param {HTMLElement | Array | HTMLCollection} content The content to be inserted 
+     * @param {HTMLElement} where Where to insert the content
      * If no "where" is given, content is appended to the node
      * Possible values for "where"
      * <dl>
@@ -840,7 +840,6 @@ addFeature('value-set', 'select', {
 
 Y.DOM = Y_DOM;
 })(Y);
-
 var addClass, hasClass, removeClass;
 
 Y.mix(Y.DOM, {
@@ -927,7 +926,6 @@ hasClass = Y.DOM.hasClass;
 removeClass = Y.DOM.removeClass;
 addClass = Y.DOM.addClass;
 
-
 Y.mix(Y.DOM, {
     /**
      * Sets the width of the element to the given size, regardless
@@ -973,9 +971,7 @@ Y.mix(Y.DOM, {
 });
 
 
-
 }, '@VERSION@' ,{requires:['oop']});
-
 YUI.add('dom-style', function(Y) {
 
 (function(Y) {
@@ -1222,7 +1218,6 @@ Y_DOM.CUSTOM_STYLES.transform = {
 
 
 })(Y);
-
 (function(Y) {
 var PARSE_INT = parseInt,
     RE = RegExp;
@@ -1299,9 +1294,7 @@ Y.Color = {
 
 
 
-
 }, '@VERSION@' ,{requires:['dom-base']});
-
 YUI.add('dom-screen', function(Y) {
 
 (function(Y) {
@@ -1704,7 +1697,6 @@ Y.mix(Y_DOM, {
 });
 
 })(Y);
-
 (function(Y) {
 var TOP = 'top',
     RIGHT = 'right',
@@ -1881,9 +1873,7 @@ Y.mix(DOM, {
 })(Y);
 
 
-
 }, '@VERSION@' ,{requires:['dom-base', 'dom-style', 'event-base']});
-
 YUI.add('selector-native', function(Y) {
 
 (function(Y) {
@@ -2147,9 +2137,7 @@ Y.mix(Y.Selector, Selector, true);
 })(Y);
 
 
-
 }, '@VERSION@' ,{requires:['dom-base']});
-
 YUI.add('selector-css2', function(Y) {
 
 /**
@@ -2598,13 +2586,10 @@ if (Y.Selector.useNative && Y.config.doc.querySelector) {
 
 
 
-
 }, '@VERSION@' ,{requires:['selector-native']});
 
 
-
 YUI.add('selector', function(Y){}, '@VERSION@' ,{use:['selector-native', 'selector-css2']});
-
 
 
 

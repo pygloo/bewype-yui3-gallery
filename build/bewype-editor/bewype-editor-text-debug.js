@@ -150,14 +150,13 @@ YUI.add('bewype-editor-text', function(Y) {
          */
         initializer : function( config ) {
 
-            var _cssDict       = this._initEditor(); // add editor
-            
-            //
-            this._editor.on( 'ready', Y.bind( this._initContent, this, config, _cssDict ) ); // set editor content
-            
-            // _spinnerValues = this._initContent( _cssDict ); // set editor content
-            // set panel
-            // this._init( config, _spinnerValues );
+            var _cssDict = this._initEditor(); // add editor
+            // ie need to be ready
+			if ( Y.UA.ie != 0 ) {
+				this._editor.on( 'ready', Y.bind( this._initContent, this, config, _cssDict ) );
+			} else {
+				this._initContent( config, _cssDict );
+			}
         },
 
         /**
@@ -357,7 +356,6 @@ YUI.add('bewype-editor-text', function(Y) {
             var _host          = this.get( 'host' ),
                 _inst          = this._editor.getInstance(),
                 _body          = _inst.one( 'body'  ),
-                // _main          = _body.one( '.main' ),
                 _selectionNode = _body.one( '.selection' ),
                 _selection     = Y.Bewype.Utils.getSelection( _host ),
                 _range         = Y.Bewype.Utils.getRange( _selection ),

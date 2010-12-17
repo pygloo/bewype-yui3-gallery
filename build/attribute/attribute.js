@@ -118,7 +118,6 @@ YUI.add('attribute-base', function(Y) {
             return o;
         }
     };
-
     /**
      * The attribute module provides an augmentable Attribute implementation, which 
      * adds configurable attributes and attribute change events to the class being 
@@ -1157,9 +1156,7 @@ YUI.add('attribute-base', function(Y) {
     Y.Attribute = Attribute;
 
 
-
 }, '@VERSION@' ,{requires:['event-custom']});
-
 YUI.add('attribute-complex', function(Y) {
 
     /**
@@ -1282,9 +1279,7 @@ YUI.add('attribute-complex', function(Y) {
     Y.mix(Y.Attribute, Y.Attribute.Complex, true, null, 1);
 
 
-
 }, '@VERSION@' ,{requires:['attribute-base']});
-
 
 
 YUI.add('attribute', function(Y){}, '@VERSION@' ,{use:['attribute-base', 'attribute-complex']});

@@ -23,5 +23,4 @@ Y.namespace('Plugin');
 Y.Plugin.NodeFX = NodeFX;
 
 
-
 }, '@VERSION@' ,{requires:['node-pluginhost', 'anim-base']});

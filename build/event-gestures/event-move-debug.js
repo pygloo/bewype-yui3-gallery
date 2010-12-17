@@ -514,5 +514,4 @@ define(GESTURE_MOVE_END, {
 });
 
 
-
 }, '@VERSION@' ,{requires:['node-base','event-touch','event-synthetic']});

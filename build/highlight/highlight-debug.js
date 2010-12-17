@@ -341,9 +341,7 @@ Highlight = {
 Y.Highlight = Highlight;
 
 
-
 }, '@VERSION@' ,{requires:['array-extras', 'escape', 'text-wordbreak']});
-
 YUI.add('highlight-accentfold', function(Y) {
 
 /**
@@ -478,9 +476,7 @@ Highlight = Y.mix(Y.Highlight, {
 });
 
 
-
 }, '@VERSION@' ,{requires:['highlight-base', 'text-accentfold']});
-
 
 
 YUI.add('highlight', function(Y){}, '@VERSION@' ,{use:['highlight-base', 'highlight-accentfold']});

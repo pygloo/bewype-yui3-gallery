@@ -261,9 +261,7 @@ Y.mix(Y.Selector, Selector, true);
 })(Y);
 
 
-
 }, '@VERSION@' ,{requires:['dom-base']});
-
 YUI.add('selector-css2', function(Y) {
 
 /**
@@ -712,9 +710,7 @@ if (Y.Selector.useNative && Y.config.doc.querySelector) {
 
 
 
-
 }, '@VERSION@' ,{requires:['selector-native']});
-
 
 
 YUI.add('selector', function(Y){}, '@VERSION@' ,{use:['selector-native', 'selector-css2']});

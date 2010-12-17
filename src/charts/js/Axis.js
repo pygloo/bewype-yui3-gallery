@@ -8,7 +8,6 @@
 Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
     /**
      * @private
-     * @description Handler for data changes.
      */
     _dataChangeHandler: function(e)
     {
@@ -69,7 +68,6 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
 
     /**
      * @private
-     * Creates a <code>Graphic</code> instance.
      */
     _setCanvas: function()
     {
@@ -98,8 +96,13 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
     },
 	
     /**
-     * @private
-     * @description Returns the default style values for the axis.
+     * @protected
+     *
+     * Gets the default value for the <code>styles</code> attribute. Overrides
+     * base implementation.
+     *
+     * @method _getDefaultStyles
+     * @return Object
      */
     _getDefaultStyles: function()
     {
@@ -149,6 +152,9 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
         return Y.merge(Y.Renderer.prototype._getDefaultStyles(), axisstyles); 
     },
 
+    /**
+     * @private
+     */
     _handleSizeChange: function(e)
     {
         var attrName = e.attrName,
@@ -166,14 +172,11 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
 
     /**
      * @private
-     * @description Strategy for drawing the axis dependent upon the axis position.
      */
     _layout: null,
 
     /**
      * @private 
-     * @description Returns the correct _layout class instance to be used for drawing the
-     * axis.
      */
     getLayout: function(pos)
     {
@@ -198,7 +201,6 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
     
     /**
      * @private
-     * @description Draws line based on start point, end point and line object.
      */
     drawLine: function(startPoint, endPoint, line)
     {
@@ -211,7 +213,6 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
 
     /**
      * @private
-     * Basic logic for drawing an axis.
      */
     _drawAxis: function ()
     {
@@ -298,19 +299,16 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
 
     /**
      * @private
-     * @description Collection of labels used in creating an axis.
      */
     _labels: null,
 
     /**
      * @private 
-     * @description Collection of labels to be reused in creating an axis.
      */
     _labelCache: null,
 
     /**
      * @private
-     * @description Draws and positions a label based on its style properties.
      */
     getLabel: function(pt, pos)
     {
@@ -351,7 +349,6 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
 
     /**
      * @private
-     * Creates a cache of labels for reuse.
      */
     _createLabelCache: function()
     {
@@ -375,7 +372,6 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
     
     /**
      * @private
-     * Removes unused labels from the label cache
      */
     _clearLabelCache: function()
     {
@@ -396,14 +392,11 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
 
     /**
      * @private
-     * Indicates how to include tick length in the size calculation of an
-     * axis. If set to true, the length of the tick is used to calculate
-     * this size. If false, the offset of tick will be used.
      */
     _calculateSizeByTickLength: true,
 
     /**
-     * Indicate the end point of the axis line
+     * @private 
      */
     getLineEnd: function(pt)
     {
@@ -421,7 +414,7 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
     },
 
     /**
-     * Returns the distance between the first and last data points.
+     * @private
      */
     getLength: function()
     {
@@ -443,7 +436,7 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
     },
 
     /**
-     * Calculates the coordinates for the first point on an axis.
+     * @private
      */
     getFirstPoint:function(pt)
     {
@@ -463,7 +456,7 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
     },
 
     /**
-     * Returns the next majorUnit point.
+     * @private
      */
     getNextPoint: function(point, majorUnitDistance)
     {
@@ -480,7 +473,7 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
     },
 
     /**
-     * Calculates the coordinates for the last point on an axis.
+     * @private 
      */
     getLastPoint: function()
     {
@@ -499,7 +492,7 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
     },
 
     /**
-     * Calculates the position of a point on the axis.
+     * @private 
      */
     getPosition: function(point)
     {
@@ -531,6 +524,14 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
 }, {
     ATTRS: 
     {
+        /**
+         * @protected
+         *
+         * Difference betweend the first/last tick and edge of axis.
+         *
+         * @attribute edgeOffset
+         * @type Number
+         */
         edgeOffset: 
         {
             value: 0
@@ -538,16 +539,25 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
 
         /**
          * The graphic in which the axis line and ticks will be rendered.
+         *
+         * @attribute graphic
+         * @type Graphic
          */
         graphic: {},
         
         /**
          * Contains the contents of the axis. 
+         *
+         * @attribute node
+         * @type HTMLElement
          */
         node: {},
 
         /**
          * Direction of the axis.
+         *
+         * @attribute position
+         * @type String
          */
         position: {
             lazyAdd: false,
@@ -567,6 +577,9 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
         /**
          * Distance determined by the tick styles used to calculate the distance between the axis
          * line in relation to the top of the axis.
+         *
+         * @attribute topTickOffset
+         * @type Number
          */
         topTickOffset: {
             value: 0
@@ -575,6 +588,9 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
         /**
          * Distance determined by the tick styles used to calculate the distance between the axis
          * line in relation to the bottom of the axis.
+         *
+         * @attribute bottomTickOffset
+         * @type Number
          */
         bottomTickOffset: {
             value: 0
@@ -583,6 +599,9 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
         /**
          * Distance determined by the tick styles used to calculate the distance between the axis
          * line in relation to the left of the axis.
+         *
+         * @attribute leftTickOffset
+         * @type Number
          */
         leftTickOffset: {
             value: 0
@@ -591,11 +610,20 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
         /**
          * Distance determined by the tick styles used to calculate the distance between the axis
          * line in relation to the right side of the axis.
+         *
+         * @attribute rightTickOffset
+         * @type Number
          */
         rightTickOffset: {
             value: 0
         },
         
+        /**
+         * Collection of labels used to render the axis.
+         *
+         * @attribute labels
+         * @type Array
+         */
         labels: {
             readOnly: true,
             getter: function()
@@ -606,6 +634,9 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
 
         /**
          * Collection of points used for placement of labels and ticks along the axis.
+         *
+         * @attribute tickPoints
+         * @type Array
          */
         tickPoints: {
             readOnly: true,
@@ -623,6 +654,9 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
         /**
          * Indicates whether the axis overlaps the graph. If an axis is the inner most axis on a given
          * position and the tick position is inside or cross, the axis will need to overlap the graph.
+         *
+         * @attribute overlapGraph
+         * @type Boolean
          */
         overlapGraph: {
             value:true,
@@ -635,7 +669,61 @@ Y.Axis = Y.Base.create("axis", Y.Widget, [Y.Renderer], {
 
         /**
          * Object which should have by the labelFunction
+         *
+         * @attribute labelFunctionScope
+         * @type Object
          */
         labelFunctionScope: {}
+            
+        /**
+         * Style properties used for drawing an axis. This attribute is inherited from <code>Renderer</code>. Below are the default values:
+         *  <dl>
+         *      <dt>majorTicks</dt><dd>Properties used for drawing ticks.
+         *          <dl>
+         *              <dt>display</dt><dd>Position of the tick. Possible values are <code>inside</code>, <code>outside</code>, <code>cross</code> and <code>none</code>. The
+         *              default value is <code>inside</code>.</dd>
+         *              <dt>length</dt><dd>The length (in pixels) of the tick. The default value is 4.</dd>
+         *              <dt>color</dt><dd>The color of the tick. The default value is <code>#dad8c9</code></dd>
+         *              <dt>weight</dt><dd>Number indicating the width of the tick. The default value is 1.</dd>
+         *              <dt>alpha</dt><dd>Number from 0 to 1 indicating the opacity of the tick. The default value is 1.</dd>
+         *          </dl>
+         *      </dd>
+         *      <dt>line</dt><dd>Properties used for drawing the axis line. 
+         *          <dl>
+         *              <dt>weight</dt><dd>Number indicating the width of the axis line. The default value is 1.</dd>
+         *              <dt>color</dt><dd>The color of the axis line. The default value is <code>#dad8c9</code>.</dd>
+         *              <dt>alpha</dt><dd>Number from 0 to 1 indicating the opacity of the tick. The default value is 1.</dd>
+         *          </dl>
+         *      </dd>
+         *      <dt>majorUnit</dt><dd>Properties used to calculate the <code>majorUnit</code> for the axis. 
+         *          <dl>
+         *              <dt>determinant</dt><dd>The algorithm used for calculating distance between ticks. The possible options are <code>count</code> and <code>distance</code>. If
+         *              the <code>determinant</code> is <code>count</code>, the axis ticks will spaced so that a specified number of ticks appear on the axis. If the <code>determinant</code>
+         *              is <code>distance</code>, the axis ticks will spaced out according to the specified distance. The default value is <code>count</code>.</dd>
+         *              <dt>count</dt><dd>Number of ticks to appear on the axis when the <code>determinant</code> is <code>count</code>. The default value is 11.</dd>
+         *              <dt>distance</dt><dd>The distance (in pixels) between ticks when the <code>determinant</code> is <code>distance</code>. The default value is 75.</dd>
+         *          </dl>
+         *      </dd>
+         *      <dt>label</dt><dd>Properties and styles applied to the axis labels.
+         *          <dl>
+         *              <dt>color</dt><dd>The color of the labels. The default value is <code>#808080</code>.</dd>
+         *              <dt>alpha</dt><dd>Number between 0 and 1 indicating the opacity of the labels. The default value is 1.</dd>
+         *              <dt>fontSize</dt><dd>The font-size of the labels. The default value is 85%</dd>
+         *              <dt>rotation</dt><dd>The rotation, in degrees (between -90 and 90) of the labels. The default value is 0.</dd>
+         *              <dt>margin</dt><dd>The distance between the label and the axis/tick. Depending on the position of the <code>Axis</code>, only one of the properties used.
+         *                  <dl>
+         *                      <dt>top</dt><dd>Pixel value used for an axis with a <code>position</code> of <code>bottom</code>. The default value is 4.</dd>
+         *                      <dt>right</dt><dd>Pixel value used for an axis with a <code>position</code> of <code>left</code>. The default value is 4.</dd>
+         *                      <dt>bottom</dt><dd>Pixel value used for an axis with a <code>position</code> of <code>top</code>. The default value is 4.</dd>
+         *                      <dt>left</dt><dd>Pixel value used for an axis with a <code>position</code> of <code>right</code>. The default value is 4.</dd>
+         *                  </dl>
+         *              </dd>
+         *          </dl>
+         *      </dd>
+         *  </dl>
+         *
+         * @attribute styles
+         * @type Object
+         */
     }
 });

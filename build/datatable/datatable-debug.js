@@ -32,13 +32,12 @@ var YLang = Y.Lang,
     TEMPLATE_COL = '<col></col>',
     TEMPLATE_THEAD = '<thead class="'+CLASS_COLUMNS+'"></thead>',
     TEMPLATE_TBODY = '<tbody class="'+CLASS_DATA+'"></tbody>',
-    TEMPLATE_TH = '<th id="{id}" rowspan="{rowspan}" colspan="{colspan}" class="{classnames}"><div class="'+CLASS_LINER+'">{value}</div></th>',
+    TEMPLATE_TH = '<th id="{id}" rowspan="{rowspan}" colspan="{colspan}" class="{classnames}" abbr="{abbr}"><div class="'+CLASS_LINER+'">{value}</div></th>',
     TEMPLATE_TR = '<tr id="{id}"></tr>',
     TEMPLATE_TD = '<td headers="{headers}" class="{classnames}"><div class="'+CLASS_LINER+'">{value}</div></td>',
     TEMPLATE_VALUE = '{value}',
     TEMPLATE_MSG = '<tbody class="'+CLASS_MSG+'"></tbody>';
     
-
 
 
 /**
@@ -79,11 +78,11 @@ Y.mix(Column, {
         * @attribute id
         * @description Unique internal identifier, used to stamp ID on TH element.
         * @type String
-        * @writeOnce
+        * @readOnly
         */
         id: {
             valueFn: "_defaultId",
-            writeOnce: true
+            readOnly: true
         },
         
         /**
@@ -131,7 +130,7 @@ Y.mix(Column, {
         * @type String
         */
         abbr: {
-            value: null
+            value: ""
         },
 
         //TODO: support custom classnames
@@ -246,7 +245,7 @@ Y.extend(Column, Y.Widget, {
     keyIndex: null,
     
     /**
-    * @attribute headers
+    * @property headers
     * @description Array of TH IDs associated with this column, for TD "headers"
     * attribute. Value is set by Columnset code
     * @type String[]
@@ -413,7 +412,6 @@ Y.extend(Column, Y.Widget, {
 });
 
 Y.Column = Column;
-
 /**
  * The Columnset class defines and manages a collection of Columns.
  *
@@ -796,8 +794,7 @@ Y.extend(Columnset, Y.Base, {
             i=0, len = allKeys.length;
 
         function recurseAncestorsForHeaders(headers, column) {
-            headers.push(column.get("key"));
-            //headers[i].push(column.getSanitizedKey());
+            headers.push(column.get("id"));
             if(column.parent) {
                 recurseAncestorsForHeaders(headers, column.parent);
             }
@@ -816,7 +813,6 @@ Y.extend(Columnset, Y.Base, {
 });
 
 Y.Columnset = Columnset;
-
 /**
  * The DataTable widget provides a progressively enhanced DHTML control for
  * displaying tabular data across A-grade browsers.
@@ -966,7 +962,7 @@ Y.extend(DTBase, Y.Widget, {
     * @property thTemplate
     * @description Tokenized markup template for TH node creation.
     * @type String
-    * @default '<th id="{id}" rowspan="{rowspan}" colspan="{colspan}"><div class="'+CLASS_LINER+'">{value}</div></th>'
+    * @default '<th id="{id}" rowspan="{rowspan}" colspan="{colspan}" class="{classnames}" abbr="{abbr}"><div class="'+CLASS_LINER+'">{value}</div></th>'
     */
     thTemplate: TEMPLATE_TH,
 
@@ -1250,8 +1246,8 @@ Y.extend(DTBase, Y.Widget, {
     * @private
     */
     bindUI: function() {
-        var tableNode = this._tableNode,
-            contentBox = this.get("contentBox"),
+        var contentBox = this.get("contentBox"),
+            boundingBox = this.get("boundingBox"),
             theadFilter = "thead."+CLASS_COLUMNS+">tr>th",
             tbodyFilter ="tbody."+CLASS_DATA+">tr>td",
             msgFilter = "tbody."+CLASS_MSG+">tr>td";
@@ -1729,37 +1725,37 @@ Y.extend(DTBase, Y.Widget, {
 
 
         // Bind to THEAD DOM events
-        tableNode.delegate(FOCUS, this._onDomEvent, theadFilter, this, "theadCellFocus");
-        tableNode.delegate(KEYDOWN, this._onDomEvent, theadFilter, this, "theadCellKeydown");
-        tableNode.delegate(MOUSEENTER, this._onDomEvent, theadFilter, this, "theadCellMouseenter");
-        tableNode.delegate(MOUSELEAVE, this._onDomEvent, theadFilter, this, "theadCellMouseleave");
-        tableNode.delegate(MOUSEUP, this._onDomEvent, theadFilter, this, "theadCellMouseup");
-        tableNode.delegate(MOUSEDOWN, this._onDomEvent, theadFilter, this, "theadCellMousedown");
-        tableNode.delegate(CLICK, this._onDomEvent, theadFilter, this, "theadCellClick");
+        contentBox.delegate(FOCUS, this._onDomEvent, theadFilter, this, "theadCellFocus");
+        contentBox.delegate(KEYDOWN, this._onDomEvent, theadFilter, this, "theadCellKeydown");
+        contentBox.delegate(MOUSEENTER, this._onDomEvent, theadFilter, this, "theadCellMouseenter");
+        contentBox.delegate(MOUSELEAVE, this._onDomEvent, theadFilter, this, "theadCellMouseleave");
+        contentBox.delegate(MOUSEUP, this._onDomEvent, theadFilter, this, "theadCellMouseup");
+        contentBox.delegate(MOUSEDOWN, this._onDomEvent, theadFilter, this, "theadCellMousedown");
+        contentBox.delegate(CLICK, this._onDomEvent, theadFilter, this, "theadCellClick");
         // Since we can't listen for click and dblclick on the same element...
-        contentBox.delegate(DBLCLICK, this._onDomEvent, theadFilter, this, "theadCellDblclick");
+        boundingBox.delegate(DBLCLICK, this._onDomEvent, theadFilter, this, "theadCellDblclick");
 
         // Bind to TBODY DOM events
-        tableNode.delegate(FOCUS, this._onDomEvent, tbodyFilter, this, "tbodyCellFocus");
-        tableNode.delegate(KEYDOWN, this._onDomEvent, tbodyFilter, this, "tbodyCellKeydown");
-        tableNode.delegate(MOUSEENTER, this._onDomEvent, tbodyFilter, this, "tbodyCellMouseenter");
-        tableNode.delegate(MOUSELEAVE, this._onDomEvent, tbodyFilter, this, "tbodyCellMouseleave");
-        tableNode.delegate(MOUSEUP, this._onDomEvent, tbodyFilter, this, "tbodyCellMouseup");
-        tableNode.delegate(MOUSEDOWN, this._onDomEvent, tbodyFilter, this, "tbodyCellMousedown");
-        tableNode.delegate(CLICK, this._onDomEvent, tbodyFilter, this, "tbodyCellClick");
+        contentBox.delegate(FOCUS, this._onDomEvent, tbodyFilter, this, "tbodyCellFocus");
+        contentBox.delegate(KEYDOWN, this._onDomEvent, tbodyFilter, this, "tbodyCellKeydown");
+        contentBox.delegate(MOUSEENTER, this._onDomEvent, tbodyFilter, this, "tbodyCellMouseenter");
+        contentBox.delegate(MOUSELEAVE, this._onDomEvent, tbodyFilter, this, "tbodyCellMouseleave");
+        contentBox.delegate(MOUSEUP, this._onDomEvent, tbodyFilter, this, "tbodyCellMouseup");
+        contentBox.delegate(MOUSEDOWN, this._onDomEvent, tbodyFilter, this, "tbodyCellMousedown");
+        contentBox.delegate(CLICK, this._onDomEvent, tbodyFilter, this, "tbodyCellClick");
         // Since we can't listen for click and dblclick on the same element...
-        contentBox.delegate(DBLCLICK, this._onDomEvent, tbodyFilter, this, "tbodyCellDblclick");
+        boundingBox.delegate(DBLCLICK, this._onDomEvent, tbodyFilter, this, "tbodyCellDblclick");
 
         // Bind to message TBODY DOM events
-        tableNode.delegate(FOCUS, this._onDomEvent, msgFilter, this, "msgCellFocus");
-        tableNode.delegate(KEYDOWN, this._onDomEvent, msgFilter, this, "msgCellKeydown");
-        tableNode.delegate(MOUSEENTER, this._onDomEvent, msgFilter, this, "msgCellMouseenter");
-        tableNode.delegate(MOUSELEAVE, this._onDomEvent, msgFilter, this, "msgCellMouseleave");
-        tableNode.delegate(MOUSEUP, this._onDomEvent, msgFilter, this, "msgCellMouseup");
-        tableNode.delegate(MOUSEDOWN, this._onDomEvent, msgFilter, this, "msgCellMousedown");
-        tableNode.delegate(CLICK, this._onDomEvent, msgFilter, this, "msgCellClick");
+        contentBox.delegate(FOCUS, this._onDomEvent, msgFilter, this, "msgCellFocus");
+        contentBox.delegate(KEYDOWN, this._onDomEvent, msgFilter, this, "msgCellKeydown");
+        contentBox.delegate(MOUSEENTER, this._onDomEvent, msgFilter, this, "msgCellMouseenter");
+        contentBox.delegate(MOUSELEAVE, this._onDomEvent, msgFilter, this, "msgCellMouseleave");
+        contentBox.delegate(MOUSEUP, this._onDomEvent, msgFilter, this, "msgCellMouseup");
+        contentBox.delegate(MOUSEDOWN, this._onDomEvent, msgFilter, this, "msgCellMousedown");
+        contentBox.delegate(CLICK, this._onDomEvent, msgFilter, this, "msgCellClick");
         // Since we can't listen for click and dblclick on the same element...
-        contentBox.delegate(DBLCLICK, this._onDomEvent, msgFilter, this, "msgCellDblclick");
+        boundingBox.delegate(DBLCLICK, this._onDomEvent, msgFilter, this, "msgCellDblclick");
     },
     
     /**
@@ -1962,7 +1958,7 @@ Y.extend(DTBase, Y.Widget, {
         o.id = column.get("id");//TODO: validate 1 column ID per document
         o.colspan = column.colSpan;
         o.rowspan = column.rowSpan;
-        //TODO o.abbr = column.get("abbr");
+        o.abbr = column.get("abbr");
         o.classnames = column.get("classnames");
         o.value = Ysubstitute(this.get("thValueTemplate"), o);
 
@@ -2002,14 +1998,21 @@ Y.extend(DTBase, Y.Widget, {
     _uiSetRecordset: function(rs) {
         var i = 0,//TODOthis.get("state.offsetIndex")
             len = rs.getLength(), //TODOthis.get("state.pageLength")
-            tbody = this._tbodyNode,
-            parent = tbody.get("parentNode"),
-            nextSibling = tbody.next(),
-            o = {tbody:tbody}; //TODO: not sure best time to do this -- depends on sdt
+            oldTbody = this._tbodyNode,
+            parent = oldTbody.get("parentNode"),
+            nextSibling = oldTbody.next(),
+            o = {},
+            newTbody;
 
-        // Move TBODY off DOM
-        tbody.remove();
-
+        // Replace TBODY with a new one
+        //TODO: split _addTbodyNode into create/attach
+        oldTbody.remove();
+        oldTbody = null;
+        newTbody = this._addTbodyNode(this._tableNode);
+        newTbody.remove();
+        this._tbodyNode = newTbody;
+        o.tbody = newTbody;
+        
         // Iterate Recordset to use existing TR when possible or add new TR
         for(; i<len; ++i) {
             o.record = rs.getRecord(i);
@@ -2017,8 +2020,8 @@ Y.extend(DTBase, Y.Widget, {
             this._addTbodyTrNode(o); //TODO: sometimes rowindex != recordindex
         }
         
-        // Re-attach TBODY to DOM
-        parent.insert(tbody, nextSibling);
+        // TBODY to DOM
+        parent.insert(this._tbodyNode, nextSibling);
     },
 
     /**
@@ -2106,7 +2109,7 @@ Y.extend(DTBase, Y.Widget, {
     _createTbodyTdNode: function(o) {
         var column = o.column;
         //TODO: attributes? or methods?
-        o.headers = column.get("headers");
+        o.headers = column.headers;
         o.classnames = column.get("classnames");
         o.value = this.formatDataCell(o);
         return Ycreate(Ysubstitute(this.tdTemplate, o));
@@ -2130,19 +2133,23 @@ Y.extend(DTBase, Y.Widget, {
      * @param @param o {Object} {record, column, tr, headers, classnames}.
      */
     formatDataCell: function(o) {
-        var record = o.record;
+        var record = o.record,
+            column = o.column,
+            formatter = column.get("formatter");
         o.data = record.get("data");
-        o.value = record.getValue(o.column.get("field"));
-        return Ysubstitute(this.get("tdValueTemplate"), o);
+        o.value = record.getValue(column.get("field"));
+        return YLang.isString(formatter) ?
+            Ysubstitute(formatter, o) : // Custom template
+            YLang.isFunction(formatter) ?
+                formatter.call(this, o) :  // Custom function
+                Ysubstitute(this.get("tdValueTemplate"), o);  // Default template
     }
 });
 
 Y.namespace("DataTable").Base = DTBase;
 
 
-
 }, '@VERSION@' ,{requires:['substitute','widget','recordset-base']});
-
 YUI.add('datatable-datasource', function(Y) {
 
 /**
@@ -2323,9 +2330,7 @@ Y.namespace("Plugin").DataTableDataSource = DataTableDataSource;
 
 
 
-
 }, '@VERSION@' ,{requires:['plugin','datatable-base','datasource-local']});
-
 YUI.add('datatable-sort', function(Y) {
 
 /**
@@ -2635,9 +2640,7 @@ Y.namespace("Plugin").DataTableSort = DataTableSort;
 
 
 
-
 }, '@VERSION@' ,{lang:['en'], requires:['plugin','datatable-base','recordset-sort']});
-
 YUI.add('datatable-scroll', function(Y) {
 
 /**
@@ -2647,16 +2650,13 @@ YUI.add('datatable-scroll', function(Y) {
  */
 
 
-var YDo = Y.Do,
-	YNode = Y.Node,
+var YNode = Y.Node,
 	YLang = Y.Lang,
 	YUA = Y.UA,
-	YStyleSheet = Y.StyleSheet,
 	YgetClassName = Y.ClassNameManager.getClassName,
 	DATATABLE = "datatable",
 	CLASS_HEADER = YgetClassName(DATATABLE, "hd"),
 	CLASS_BODY = YgetClassName(DATATABLE, "bd"),
-	CLASS_LINER = YgetClassName(DATATABLE, "liner"),
 	CLASS_SCROLLABLE = YgetClassName(DATATABLE, "scrollable"),
 	CONTAINER_HEADER = '<div class="'+CLASS_HEADER+'"></div>',
 	CONTAINER_BODY = '<div class="'+CLASS_BODY+'"></div>',
@@ -2679,37 +2679,56 @@ Y.mix(DataTableScroll, {
     ATTRS: {
 	
 		/**
-	    * @description The width for the table. Set to a string (ex: "200px", "20em")
+	    * @description The width for the table. Set to a string (ex: "200px", "20em") if you want the table to scroll in the x direction.
 	    *
 	    * @attribute width
 	    * @public
 	    * @type string
 	    */
         width: {
-			value: undefined
+			value: undefined,
+			writeOnce: "initOnly"
 		},
 		
 		/**
-	    * @description The height for the table. Set to a string (ex: "200px", "20em")
+	    * @description The height for the table. Set to a string (ex: "200px", "20em") if you want the table to scroll in the y-direction.
 	    *
 	    * @attribute height
 	    * @public
 	    * @type string
 	    */
 		height: {
-			value: undefined
+			value: undefined,
+			writeOnce: "initOnly"
 		},
 		
 		
 		/**
-	    * @description The scrolling direction for the table. Can be set to 'x', 'y', or 'xy'
+	    * @description The scrolling direction for the table.
 	    *
 	    * @attribute scroll
-	    * @public
+	    * @private
 	    * @type string
 	    */
-		scroll: {
-			value: 'y'
+		_scroll: {
+			//value: 'y',
+			valueFn: function() {
+			    var w = this.get('width'),
+			    h = this.get('height');
+			    
+			    if (w && h) {
+			        return 'xy';
+			    }
+			    else if (w) {
+			        return 'x';
+			    }
+			    else if (h) {
+			        return 'y';
+			    }
+			    else {
+			        return null;
+			    }
+			}
 		},
 		
 		
@@ -2830,7 +2849,6 @@ Y.extend(DataTableScroll, Y.Plugin.Base, {
     * @private
     */			
 	_setUpNodes: function() {
-		var dt = this.get('host');
 		
 		this.afterHostMethod("_addTableNode", this._setUpParentTableNode);
 		this.afterHostMethod("_addTheadNode", this._setUpParentTheadNode); 
@@ -2840,7 +2858,7 @@ Y.extend(DataTableScroll, Y.Plugin.Base, {
 		this.afterHostMethod("renderUI", this.renderUI);
 		this.afterHostMethod("syncUI", this.syncUI);
 		
-		if (this.get('scroll') !== 'x') {
+		if (this.get('_scroll') !== 'x') {
 			this.afterHostMethod('_attachTheadThNode', this._attachTheadThNode);
 			this.afterHostMethod('_attachTbodyTdNode', this._attachTbodyTdNode);
 		}
@@ -2848,7 +2866,7 @@ Y.extend(DataTableScroll, Y.Plugin.Base, {
 	},
 		
 	/**
-    * @description Stores the main <table> node provided by the host as a private property
+    * @description Stores the main &lt;table&gt; node provided by the host as a private property
     *
     * @method _setUpParentTableNode
     * @private
@@ -2859,7 +2877,7 @@ Y.extend(DataTableScroll, Y.Plugin.Base, {
 	
 	
 	/**
-    * @description Stores the main <thead> node provided by the host as a private property
+    * @description Stores the main &lt;thead&gt; node provided by the host as a private property
     *
     * @method _setUpParentTheadNode
     * @private
@@ -2869,7 +2887,7 @@ Y.extend(DataTableScroll, Y.Plugin.Base, {
 	},
 	
 	/**
-    * @description Stores the main <tbody> node provided by the host as a private property
+    * @description Stores the main &lt;tbody&gt; node provided by the host as a private property
     *
     * @method _setUpParentTbodyNode
     * @private
@@ -2880,7 +2898,7 @@ Y.extend(DataTableScroll, Y.Plugin.Base, {
 	
 	
 	/**
-    * @description Stores the main <tbody> message node provided by the host as a private property
+    * @description Stores the main &lt;tbody&gt; message node provided by the host as a private property
     *
     * @method _setUpParentMessageNode
     * @private
@@ -2897,7 +2915,7 @@ Y.extend(DataTableScroll, Y.Plugin.Base, {
 	
 	/**
     * @description Primary rendering method that takes the datatable rendered in
-    * the host, and splits it up into two separate <divs> each containing two 
+    * the host, and splits it up into two separate &lt;divs&gt; each containing two 
 	* separate tables (one containing the head and one containing the body). 
 	* This method fires after renderUI is called on datatable-base.
 	* 
@@ -2916,8 +2934,8 @@ Y.extend(DataTableScroll, Y.Plugin.Base, {
 	
 	/**
     * @description Post rendering method that is responsible for creating a column
-	* filler, and performing width and scroll synchronization between the <th> 
-	* elements and the <td> elements.
+	* filler, and performing width and scroll synchronization between the &lt;th&gt; 
+	* elements and the &lt;td&gt; elements.
 	* This method fires after syncUI is called on datatable-base
 	* 
     * @method syncUI
@@ -3039,7 +3057,7 @@ Y.extend(DataTableScroll, Y.Plugin.Base, {
 		var w = o.column.get('width') || 'auto';
 		
 		if (w !== 'auto') {
-			o.th.get('firstChild').setStyles({'width': w, 'overflow':'hidden'}); //TODO: use liner API but liner is undefined here (not created?)
+			o.th.get('firstChild').setStyles({width: w, overflow:'hidden'}); //TODO: use liner API but liner is undefined here (not created?)
 		}
 		return o;
 	},
@@ -3054,7 +3072,7 @@ Y.extend(DataTableScroll, Y.Plugin.Base, {
 		var w = o.column.get('width') || 'auto';
 		
 		if (w !== 'auto') {
-			o.td.get('firstChild').setStyles({'width': w, 'overflow': 'hidden'}); //TODO: use liner API but liner is undefined here (not created?)
+			o.td.get('firstChild').setStyles({width: w, overflow: 'hidden'}); //TODO: use liner API but liner is undefined here (not created?)
 			//o.td.setStyles({'width': w, 'overflow': 'hidden'});
 		}
 		return o;
@@ -3079,7 +3097,7 @@ Y.extend(DataTableScroll, Y.Plugin.Base, {
 	},
 	
 	/**
-    * @description Creates the DIV that contains a <table> with all the headers. 
+    * @description Creates the DIV that contains a &lt;table&gt; with all the headers. 
 	*
     * @method _createHeaderContainer
     * @private
@@ -3105,25 +3123,31 @@ Y.extend(DataTableScroll, Y.Plugin.Base, {
     * @private
     */
 	_setStylesForTbody: function() {
-		var dir = this.get('scroll'),
+		var dir = this.get('_scroll'),
 			w = this.get('width') || "",
 			h = this.get('height') || "",
 			el = this._bodyContainerNode,
-			styles = {'width':"", 'height':h};
+			styles = {width:"", height:h};
 				
 		if (dir === 'x') {
 			//X-Scrolling tables should not have a Y-Scrollbar so overflow-y is hidden. THe width on x-scrolling tables must be set by user.
-			styles['overflowY'] = 'hidden';
-			styles['width'] = w;
+			styles.overflowY = 'hidden';
+			styles.width = w;
 		}
 		else if (dir === 'y') {
 			//Y-Scrolling tables should not have a X-Scrollbar so overflow-x is hidden. The width isn't neccessary because it can be auto.
-			styles['overflowX'] = 'hidden';
+			styles.overflowX = 'hidden';
+		}
+		
+		else if (dir === 'xy') {
+			styles.width = w;
 		}
 		
 		else {
-			//assume xy - the width must be set on xy.
-			styles['width'] = w;
+		    //scrolling is set to 'null' - ie: width and height are not set. Don't have any type of scrolling.
+		    styles.overflowX = 'hidden';
+		    styles.overflowY = 'hidden';
+		    styles.width = w;
 		}
 		
 		el.setStyles(styles);
@@ -3138,8 +3162,7 @@ Y.extend(DataTableScroll, Y.Plugin.Base, {
     * @private
     */
 	_setStylesForThead: function() {
-		var dir = this.get('scroll'),
-			w = this.get('width') || "",
+		var w = this.get('width') || "",
 			el = this._headerContainerNode;
 		
 		//if (dir !== 'y') {
@@ -3155,7 +3178,7 @@ Y.extend(DataTableScroll, Y.Plugin.Base, {
     */
 	_setContentBoxDimensions: function() {
 		
-		if (this.get('scroll') === 'y' || (!this.get('width'))) {
+		if (this.get('_scroll') === 'y' || (!this.get('width'))) {
 			this._parentContainer.setStyle('width', 'auto');
 		}
 		
@@ -3271,8 +3294,8 @@ Y.extend(DataTableScroll, Y.Plugin.Base, {
 		
 		//After the widths have synced, there is a wrapping issue in the headerContainer in IE6. The header does not span the full
 		//length of the table (does not cover all of the y-scrollbar). By adding this line in when there is a y-scroll, the header will span correctly.
-		//TODO: this should not really occur on this.get('scroll') === y - it should occur when scrollHeight > clientHeight, but clientHeight is not getting recognized in IE6?
-		if (YUA.ie !== 0 && this.get('scroll') === 'y' && this._bodyContainerNode.get('scrollHeight') > this._bodyContainerNode.get('offsetHeight'))
+		//TODO: this should not really occur on this.get('_scroll') === y - it should occur when scrollHeight > clientHeight, but clientHeight is not getting recognized in IE6?
+		if (YUA.ie !== 0 && this.get('_scroll') === 'y' && this._bodyContainerNode.get('scrollHeight') > this._bodyContainerNode.get('offsetHeight'))
 		{
 			this._headerContainerNode.setStyle('width', this._parentContainer.get('width'));
 		}
@@ -3306,9 +3329,7 @@ Y.namespace("Plugin").DataTableScroll = DataTableScroll;
 
 
 
-
 }, '@VERSION@' ,{requires:['plugin','datatable-base','stylesheet']});
-
 
 
 YUI.add('datatable', function(Y){}, '@VERSION@' ,{use:['datatable-base','datatable-datasource','datatable-sort','datatable-scroll']});

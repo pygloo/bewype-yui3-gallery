@@ -190,5 +190,4 @@ YUI.add('align-plugin', function(Y) {
 
 
 
-
 }, '@VERSION@' ,{requires:['node-region']});

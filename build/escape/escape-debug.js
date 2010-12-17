@@ -84,5 +84,4 @@ Escape.regexp = Escape.regex;
 Y.Escape = Escape;
 
 
-
 }, '@VERSION@' );

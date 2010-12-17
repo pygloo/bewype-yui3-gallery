@@ -579,5 +579,4 @@ YUI.add('base-base', function(Y) {
     Y.Base = Base;
 
 
-
 }, '@VERSION@' ,{requires:['attribute-base']});

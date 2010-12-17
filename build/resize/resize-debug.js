@@ -1462,9 +1462,7 @@ Y.each(Y.Resize.prototype.ALL_HANDLES, function(handle, i) {
 });
 
 
-
-}, '@VERSION@' ,{skinnable:true, requires:['base', 'widget', 'substitute', 'event', 'oop', 'dd-drag', 'dd-delegate', 'dd-drop']});
-
+}, '@VERSION@' ,{requires:['base', 'widget', 'substitute', 'event', 'oop', 'dd-drag', 'dd-delegate', 'dd-drop'], skinnable:true});
 YUI.add('resize-proxy', function(Y) {
 
 var ACTIVE_HANDLE_NODE = 'activeHandleNode',
@@ -1610,9 +1608,7 @@ Y.namespace('Plugin');
 Y.Plugin.ResizeProxy = ResizeProxy;
 
 
-
-}, '@VERSION@' ,{skinnable:false, requires:['resize-base', 'plugin']});
-
+}, '@VERSION@' ,{requires:['resize-base', 'plugin'], skinnable:false});
 YUI.add('resize-constrain', function(Y) {
 
 var Lang = Y.Lang,
@@ -2076,9 +2072,7 @@ Y.namespace('Plugin');
 Y.Plugin.ResizeConstrained = ResizeConstrained;
 
 
-
-}, '@VERSION@' ,{skinnable:false, requires:['resize-base', 'plugin']});
-
+}, '@VERSION@' ,{requires:['resize-base', 'plugin'], skinnable:false});
 
 
 YUI.add('resize', function(Y){}, '@VERSION@' ,{use:['resize-base', 'resize-proxy', 'resize-constrain']});

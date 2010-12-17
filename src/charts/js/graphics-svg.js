@@ -21,17 +21,16 @@ Graphic.prototype = {
      * Indicates whether or not the instance will size itself based on its contents.
      *
      * @property autoSize 
-     * @type string
+     * @type String
      */
     autoSize: true,
 
     /**
-    * Initializer.
-    *
-    * @method initializer
-    * @param config {Object} Config object.
-    * @private
-    */
+     * Initializes the class.
+     *
+     * @method initializer
+     * @private
+     */
     initializer: function(config) {
         config = config || {};
         var w = config.width || 0,
@@ -52,8 +51,8 @@ Graphic.prototype = {
     /** 
      * Specifies a bitmap fill used by subsequent calls to other drawing methods.
      * 
-     * @param {Object} config
      * @method beginBitmapFill
+     * @param {Object} config
      */
     beginBitmapFill: function(config) {
        
@@ -137,6 +136,10 @@ Graphic.prototype = {
     },
     
     /**
+     * Removes all child nodes.
+     *
+     * @method _removeChildren
+     * @param {HTMLElement} node
      * @private
      */
     _removeChildren: function(node)
@@ -165,6 +168,11 @@ Graphic.prototype = {
     },
 
     /**
+     * Toggles visibility
+     *
+     * @method _toggleVisible
+     * @param {HTMLElement} node element to toggle
+     * @param {Boolean} val indicates visibilitye
      * @private
      */
     _toggleVisible: function(node, val)
@@ -384,9 +392,11 @@ Graphic.prototype = {
     },
 
     /**
-     * @private
-     * Not implemented
      * Specifies a gradient to use for the stroke when drawing lines.
+     * Not implemented
+     *
+     * @method lineGradientStyle
+     * @private
      */
     lineGradientStyle: function() {
         Y.log('lineGradientStyle not implemented', 'warn', 'graphics-canvas');
@@ -450,8 +460,12 @@ Graphic.prototype = {
     },
 
     /**
+     * Generates a path string for a wedge shape
+     *
+     * @method _getWedgePath
+     * @param {Object} config attributes used to create the path
+     * @return String
      * @private
-     * @description Generates a path string for a wedge shape
      */
     _getWedgePath: function(config)
     {
@@ -538,8 +552,12 @@ Graphic.prototype = {
     },
 
     /**
-     * @private
      * Updates the size of the graphics object
+     *
+     * @method _trackSize
+     * @param {Number} w width
+     * @param {Number} h height
+     * @private
      */
     _trackSize: function(w, h) {
         if (w > this._width) {
@@ -568,7 +586,7 @@ Graphic.prototype = {
      * Adds the graphics node to the dom.
      * 
      * @method render
-     * @param parentNode node in which to render the graphics node into.
+     * @param {HTMLElement} parentNode node in which to render the graphics node into.
      */
     render: function(parentNode) {
         var w = parentNode.get("width") || parentNode.get("offsetWidth"),
@@ -581,8 +599,10 @@ Graphic.prototype = {
     },
 
     /**
-     * @private
      * Clears the properties
+     *
+     * @method _initProps
+     * @private
      */
     _initProps: function() {
         this._shape = null;
@@ -612,8 +632,10 @@ Graphic.prototype = {
     },
 
     /**
-     * @private
      * Clears path properties
+     * 
+     * @method _clearPath
+     * @private
      */
     _clearPath: function()
     {
@@ -629,8 +651,10 @@ Graphic.prototype = {
     },
 
     /**
+     * Completes a shape
+     *
+     * @method _draw
      * @private 
-     * Completes a vml shape
      */
     _draw: function()
     {
@@ -686,8 +710,10 @@ Graphic.prototype = {
     },
 
     /**
-     * @private
      * Returns ths actual fill object to be used in a drawing or shape
+     *
+     * @method _getFill
+     * @private
      */
     _getFill: function() {
         var type = this._fillType,
@@ -708,8 +734,11 @@ Graphic.prototype = {
     },
 
     /**
-     * @private
      * Returns a linear gradient fill
+     *
+     * @method _getLinearGradient
+     * @param {String} type gradient type
+     * @private
      */
     _getLinearGradient: function(type) {
         var fill = this._createGraphicNode("linearGradient"),
@@ -807,8 +836,10 @@ Graphic.prototype = {
     },
 
     /**
-     * @private
      * Creates a group element
+     *
+     * @method _createGraphics
+     * @private
      */
     _createGraphics: function() {
         var group = this._createGraphicNode("svg");
@@ -817,6 +848,9 @@ Graphic.prototype = {
     },
 
     /**
+     * Styles a group element
+     *
+     * @method _styleGroup
      * @private
      */
     _styleGroup: function(group)
@@ -829,6 +863,12 @@ Graphic.prototype = {
     },
 
     /**
+     * Creates a graphic node
+     *
+     * @method _createGraphicNode
+     * @param {String} type node type to create
+     * @param {String} pe specified pointer-events value
+     * @return HTMLElement
      * @private
      */
     _createGraphicNode: function(type, pe)
@@ -855,6 +895,7 @@ Graphic.prototype = {
      *
      * @method getShape
      * @param {Object} config Object literal of properties used to construct a Shape.
+     * @return Shape
      */
     getShape: function(config) {
         config.graphic = this;

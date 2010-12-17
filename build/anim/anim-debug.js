@@ -656,9 +656,7 @@ YUI.add('anim-base', function(Y) {
     Y.extend(Y.Anim, Y.Base, proto);
 
 
-
 }, '@VERSION@' ,{requires:['base-base', 'node-style']});
-
 YUI.add('anim-color', function(Y) {
 
 /**
@@ -706,9 +704,7 @@ Y.each(['backgroundColor',
 );
 
 
-
 }, '@VERSION@' ,{requires:['anim-base']});
-
 YUI.add('anim-curve', function(Y) {
 
 /**
@@ -765,9 +761,7 @@ Y.Anim.getBezier = function(points, t) {
 };
 
 
-
 }, '@VERSION@' ,{requires:['anim-xy']});
-
 YUI.add('anim-easing', function(Y) {
 
 /*
@@ -1117,9 +1111,7 @@ var Easing = {
 Y.Easing = Easing;
 
 
-
 }, '@VERSION@' ,{requires:['anim-base']});
-
 YUI.add('anim-node-plugin', function(Y) {
 
 /**
@@ -1145,9 +1137,7 @@ Y.namespace('Plugin');
 Y.Plugin.NodeFX = NodeFX;
 
 
-
 }, '@VERSION@' ,{requires:['node-pluginhost', 'anim-base']});
-
 YUI.add('anim-scroll', function(Y) {
 
 /**
@@ -1185,9 +1175,7 @@ Y.Anim.behaviors.scroll = {
 
 
 
-
 }, '@VERSION@' ,{requires:['anim-base']});
-
 YUI.add('anim-xy', function(Y) {
 
 /**
@@ -1213,9 +1201,7 @@ Y.Anim.behaviors.xy = {
 
 
 
-
 }, '@VERSION@' ,{requires:['anim-base', 'node-screen']});
-
 
 
 YUI.add('anim', function(Y){}, '@VERSION@' ,{use:['anim-base', 'anim-color', 'anim-curve', 'anim-easing', 'anim-node-plugin', 'anim-scroll', 'anim-xy'], skinnable:false});

@@ -11,7 +11,6 @@ if (!GLOBAL_ENV._ready) {
     // }
 }
 
-
 YUI.add('event-base', function(Y) {
 
 /*
@@ -51,7 +50,6 @@ if (GLOBAL_ENV.DOMReady) {
 } else {
     Y.Do.before(function() { Y.fire('domready'); }, YUI.Env, '_ready');
 }
-
 
 /**
  * Custom event engine, DOM event listener abstraction layer, synthetic DOM
@@ -313,7 +311,6 @@ Y.DOMEventFacade = DOMEventFacade;
      * @param immediate {boolean} if true additional listeners
      * on the current target will not be executed
      */
-
 (function() {
 /**
  * DOM event listener abstraction layer
@@ -1210,7 +1207,6 @@ Event._poll();
 
 })();
 
-
 /**
  * DOM event listener abstraction layer
  * @module event
@@ -1264,10 +1260,7 @@ Y.Env.evt.plugins.contentready = {
 };
 
 
-
 }, '@VERSION@' ,{requires:['event-custom-base']});
-
-
 YUI.add('event-delegate', function(Y) {
 
 /**
@@ -1579,9 +1572,7 @@ delegate._applyFilter = function (filter, args, ce) {
 Y.delegate = Y.Event.delegate = delegate;
 
 
-
 }, '@VERSION@' ,{requires:['node-base']});
-
 YUI.add('event-synthetic', function(Y) {
 
 /**
@@ -2332,9 +2323,7 @@ Y.Event.define = function (type, config, force) {
 };
 
 
-
 }, '@VERSION@' ,{requires:['node-base', 'event-custom']});
-
 YUI.add('event-mousewheel', function(Y) {
 
 /**
@@ -2384,9 +2373,7 @@ Y.Env.evt.plugins.mousewheel = {
 };
 
 
-
 }, '@VERSION@' ,{requires:['node-base']});
-
 YUI.add('event-mouseenter', function(Y) {
 
 /**
@@ -2448,9 +2435,7 @@ Y.Event.define("mouseenter", config, true);
 Y.Event.define("mouseleave", Y.merge(config, { proxyType: "mouseout" }), true);
 
 
-
 }, '@VERSION@' ,{requires:['event-synthetic']});
-
 YUI.add('event-key', function(Y) {
 
 /**
@@ -2549,9 +2534,7 @@ Y.Env.evt.plugins.key = {
 };
 
 
-
 }, '@VERSION@' ,{requires:['node-base']});
-
 YUI.add('event-focus', function(Y) {
 
 /**
@@ -2699,9 +2682,7 @@ if (useActivate) {
 }
 
 
-
 }, '@VERSION@' ,{requires:['event-synthetic']});
-
 YUI.add('event-resize', function(Y) {
 
 /**
@@ -2765,9 +2746,7 @@ Y.Env.evt.plugins.windowresize = {
 })();
 
 
-
 }, '@VERSION@' ,{requires:['node-base']});
-
 YUI.add('event-hover', function(Y) {
 
 /**
@@ -2822,9 +2801,7 @@ conf.detachDelegate = conf.detach;
 Y.Event.define("hover", conf);
 
 
-
 }, '@VERSION@' ,{requires:['event-mouseenter']});
-
 
 
 YUI.add('event', function(Y){}, '@VERSION@' ,{use:['event-base', 'event-delegate', 'event-synthetic', 'event-mousewheel', 'event-mouseenter', 'event-key', 'event-focus', 'event-resize', 'event-hover']});

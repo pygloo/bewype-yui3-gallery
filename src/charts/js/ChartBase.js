@@ -10,17 +10,17 @@ ChartBase.ATTRS = {
     /**
      * Reference to the default tooltip available for the chart.
      * <p>Contains the following properties:</p>
-     *  <ul>
-     *      <li>node: reference to the actual dom node</li>
-     *      <li>showEvent: event that should trigger the tooltip</li>
-     *      <li>hideEvent: event that should trigger the removal of a tooltip (can be an event or an array of events)</li>
-     *      <li>styles: hash of style properties that will be applied to the tooltip node</li>
-     *      <li>show: indicates whether or not to show the tooltip</li>
-     *      <li>markerEventHandler: displays and hides tooltip based on marker events</li>
-     *      <li>planarEventHandler: displays and hides tooltip based on planar events</li>
-     *      <li>markerLabelFunction: reference to the function used to format a marker event triggered tooltip's text</li>
-     *      <li>planarLabelFunction: reference to the function used to format a planar event triggered tooltip's text</li>
-     *  </ul>
+     *  <dl>
+     *      <dt>node</dt><dd>Reference to the actual dom node</dd>
+     *      <dt>showEvent</dt><dd>Event that should trigger the tooltip</dd>
+     *      <dt>hideEvent</dt><dd>Event that should trigger the removal of a tooltip (can be an event or an array of events)</dd>
+     *      <dt>styles</dt><dd>A hash of style properties that will be applied to the tooltip node</dd>
+     *      <dt>show</dt><dd>Indicates whether or not to show the tooltip</dd>
+     *      <dt>markerEventHandler</dt><dd>Displays and hides tooltip based on marker events</dd>
+     *      <dt>planarEventHandler</dt><dd>Displays and hides tooltip based on planar events</dd>
+     *      <dt>markerLabelFunction</dt><dd>Reference to the function used to format a marker event triggered tooltip's text</dd>
+     *      <dt>planarLabelFunction</dt><dd>Reference to the function used to format a planar event triggered tooltip's text</dd>
+     *  </dl>
      * @attribute tooltip
      * @type Object
      */
@@ -38,6 +38,7 @@ ChartBase.ATTRS = {
      *
      * @attribute categoryKey
      * @type String
+     * @default category
      */
     categoryKey: {
         value: "category"
@@ -46,13 +47,14 @@ ChartBase.ATTRS = {
     /**
      * Indicates the type of axis to use for the category axis.
      *
-     *  <ul>
-     *      <li>category</li>
-     *      <li>time</li>
-     *  </ul>
+     *  <dl>
+     *      <dt>category</dt><dd>Specifies a <code>CategoryAxis</code>.</dd>
+     *      <dt>time</dt><dd>Specifies a <code>TimeAxis</dd>
+     *  </dl>
      *
      * @attribute categoryType
      * @type String
+     * @default category
      */
     categoryType:{
         value:"category"
@@ -61,14 +63,15 @@ ChartBase.ATTRS = {
     /**
      * Indicates the the type of interactions that will fire events.
      *
-     *  <ul>
-     *      <li>marker</li>
-     *      <li>planar</li>
-     *      <li>none</li>
-     *  </ul>
+     *  <dl>
+     *      <dt>marker</dt><dd>Events will be broadcasted when the mouse interacts with individual markers.</dd>
+     *      <dt>planar</dt><dd>Events will be broadcasted when the mouse intersects the plane of any markers on the chart.</dd>
+     *      <dt>none</dt><dd>No events will be broadcasted.</dd>
+     *  </dl>
      *
      * @attribute interactionType
      * @type String
+     * @default marker
      */
     interactionType: {
         value: "marker"
@@ -135,6 +138,7 @@ ChartBase.prototype = {
      *
      * @method getSeries
      * @param val
+     * @return CartesianSeries
      */
     getSeries: function(val)
     {
@@ -155,10 +159,14 @@ ChartBase.prototype = {
     },
 
     /**
-     * Returns axis by key reference
+     * Returns an <code>Axis</code> instance by key reference. If the axis was explicitly set through the <code>axes</code> attribute,
+     * the key will be the same as the key used in the <code>axes</code> object. For default axes, the key for
+     * the category axis is the value of the <code>categoryKey</code> (<code>category</code>). For the value axis, the default 
+     * key is <code>values</code>.
      *
      * @method getAxisByKey
      * @param {String} val Key reference used to look up the axis.
+     * @return Axis
      */
     getAxisByKey: function(val)
     {
@@ -175,6 +183,7 @@ ChartBase.prototype = {
      * Returns the category axis for the chart.
      *
      * @method getCategoryAxis
+     * @return Axis
      */
     getCategoryAxis: function()
     {
@@ -245,6 +254,7 @@ ChartBase.prototype = {
     {
         return this._axisClass[t];
     },
+  
     /**
      * @private
      */
@@ -363,6 +373,97 @@ ChartBase.prototype = {
         }
         series.updateMarkerState(type, index);
         e.halt();
+        /**
+         * Broadcasts when <code>interactionType</code> is set to <code>marker</code> and a series marker has received a mouseover event.
+         * 
+         *
+         * @event markerEvent:mouseover
+         * @preventable false
+         * @param {EventFacade} e Event facade with the following additional
+         *   properties:
+         *  <dl>
+         *      <dt>categoryItem</dt><dd>Hash containing information about the category <code>Axis</code>.</dd>
+         *      <dt>valueItem</dt><dd>Hash containing information about the value <code>Axis</code>.</dd>
+         *      <dt>node</dt><dd>The dom node of the marker.</dd>
+         *      <dt>x</dt><dd>The x-coordinate of the mouse in relation to the Chart.</dd>
+         *      <dt>y</dt><dd>The y-coordinate of the mouse in relation to the Chart.</dd>
+         *      <dt>series</dt><dd>Reference to the series of the marker.</dd>
+         *      <dt>index</dt><dd>Index of the marker in the series.</dd>
+         *      <dt>seriesIndex</dt><dd>The <code>order</code> of the marker's series.</dd>
+         *  </dl>
+         */
+        /**
+         * Broadcasts when <code>interactionType</code> is set to <code>marker</code> and a series marker has received a mouseout event.
+         *
+         * @event markerEvent:mouseout
+         * @preventable false
+         * @param {EventFacade} e Event facade with the following additional
+         *   properties:
+         *  <dl>
+         *      <dt>categoryItem</dt><dd>Hash containing information about the category <code>Axis</code>.</dd>
+         *      <dt>valueItem</dt><dd>Hash containing information about the value <code>Axis</code>.</dd>
+         *      <dt>node</dt><dd>The dom node of the marker.</dd>
+         *      <dt>x</dt><dd>The x-coordinate of the mouse in relation to the Chart.</dd>
+         *      <dt>y</dt><dd>The y-coordinate of the mouse in relation to the Chart.</dd>
+         *      <dt>series</dt><dd>Reference to the series of the marker.</dd>
+         *      <dt>index</dt><dd>Index of the marker in the series.</dd>
+         *      <dt>seriesIndex</dt><dd>The <code>order</code> of the marker's series.</dd>
+         *  </dl>
+         */
+        /**
+         * Broadcasts when <code>interactionType</code> is set to <code>marker</code> and a series marker has received a mousedown event.
+         *
+         * @event markerEvent:mousedown
+         * @preventable false
+         * @param {EventFacade} e Event facade with the following additional
+         *   properties:
+         *  <dl>
+         *      <dt>categoryItem</dt><dd>Hash containing information about the category <code>Axis</code>.</dd>
+         *      <dt>valueItem</dt><dd>Hash containing information about the value <code>Axis</code>.</dd>
+         *      <dt>node</dt><dd>The dom node of the marker.</dd>
+         *      <dt>x</dt><dd>The x-coordinate of the mouse in relation to the Chart.</dd>
+         *      <dt>y</dt><dd>The y-coordinate of the mouse in relation to the Chart.</dd>
+         *      <dt>series</dt><dd>Reference to the series of the marker.</dd>
+         *      <dt>index</dt><dd>Index of the marker in the series.</dd>
+         *      <dt>seriesIndex</dt><dd>The <code>order</code> of the marker's series.</dd>
+         *  </dl>
+         */
+        /**
+         * Broadcasts when <code>interactionType</code> is set to <code>marker</code> and a series marker has received a mouseup event.
+         *
+         * @event markerEvent:mouseup
+         * @preventable false
+         * @param {EventFacade} e Event facade with the following additional
+         *   properties:
+         *  <dl>
+         *      <dt>categoryItem</dt><dd>Hash containing information about the category <code>Axis</code>.</dd>
+         *      <dt>valueItem</dt><dd>Hash containing information about the value <code>Axis</code>.</dd>
+         *      <dt>node</dt><dd>The dom node of the marker.</dd>
+         *      <dt>x</dt><dd>The x-coordinate of the mouse in relation to the Chart.</dd>
+         *      <dt>y</dt><dd>The y-coordinate of the mouse in relation to the Chart.</dd>
+         *      <dt>series</dt><dd>Reference to the series of the marker.</dd>
+         *      <dt>index</dt><dd>Index of the marker in the series.</dd>
+         *      <dt>seriesIndex</dt><dd>The <code>order</code> of the marker's series.</dd>
+         *  </dl>
+         */
+        /**
+         * Broadcasts when <code>interactionType</code> is set to <code>marker</code> and a series marker has received a click event.
+         *
+         * @event markerEvent:click
+         * @preventable false
+         * @param {EventFacade} e Event facade with the following additional
+         *   properties:
+         *  <dl>
+         *      <dt>categoryItem</dt><dd>Hash containing information about the category <code>Axis</code>.</dd>
+         *      <dt>valueItem</dt><dd>Hash containing information about the value <code>Axis</code>.</dd>
+         *      <dt>node</dt><dd>The dom node of the marker.</dd>
+         *      <dt>x</dt><dd>The x-coordinate of the mouse in relation to the Chart.</dd>
+         *      <dt>y</dt><dd>The y-coordinate of the mouse in relation to the Chart.</dd>
+         *      <dt>series</dt><dd>Reference to the series of the marker.</dd>
+         *      <dt>index</dt><dd>Index of the marker in the series.</dd>
+         *      <dt>seriesIndex</dt><dd>The <code>order</code> of the marker's series.</dd>
+         *  </dl>
+         */
         this.fire("markerEvent:" + type, {categoryItem:items.category, valueItem:items.value, node:markerNode, x:x, y:y, series:series, index:index, seriesIndex:seriesIndex});
     },
 
@@ -473,7 +574,8 @@ ChartBase.prototype = {
             i,
             styles = val.styles,
             props = {
-                labelFunction:"labelFunction",
+                markerLabelFunction:"markerLabelFunction",
+                planarLabelFunction:"planarLabelFunction",
                 showEvent:"showEvent",
                 hideEvent:"hideEvent",
                 markerEventHandler:"markerEventHandler",

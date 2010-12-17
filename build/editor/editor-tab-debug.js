@@ -68,5 +68,4 @@ YUI.add('editor-tab', function(Y) {
     Y.Plugin.EditorTab = EditorTab;
 
 
-
 }, '@VERSION@' ,{requires:['editor-base'], skinnable:false});

@@ -545,5 +545,4 @@ YUI.add('dd-drop', function(Y) {
 
 
 
-
 }, '@VERSION@' ,{requires:['dd-ddm-drop', 'dd-drag'], skinnable:false});

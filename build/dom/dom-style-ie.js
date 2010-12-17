@@ -300,5 +300,4 @@ if (!testFeature('style', 'computedStyle')) {
 })(Y);
 
 
-
 }, '@VERSION@' ,{requires:['dom-style']});

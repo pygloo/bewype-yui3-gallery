@@ -204,5 +204,4 @@ Y.mix( ArrayList, {
 Y.ArrayList = ArrayList;
 
 
-
 }, '@VERSION@' );

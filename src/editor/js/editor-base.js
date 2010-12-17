@@ -160,7 +160,7 @@
                 case 'keydown':
                     if (!Y.UA.gecko) {
                         if (!EditorBase.NC_KEYS[e.changedEvent.keyCode] && !e.changedEvent.shiftKey && !e.changedEvent.ctrlKey && (e.changedEvent.keyCode !== 13)) {
-                            inst.later(100, inst, inst.Selection.cleanCursor);
+                            //inst.later(100, inst, inst.Selection.cleanCursor);
                         }
                     }
                     break;
@@ -172,13 +172,9 @@
                             this.execCommand('inserttext', '\t');
                         } else if (Y.UA.gecko) {
                             this.frame.exec._command('inserthtml', '<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>');
-                        } else {
+                        } else if (Y.UA.ie) {
                             sel = new inst.Selection();
-                            sel.setCursor();
-                            cur = sel.getCursor();
-                            cur.insert(EditorBase.TABKEY, 'before');
-                            sel.focusCursor();
-                            inst.Selection.cleanCursor();
+                            sel._selection.pasteHTML(EditorBase.TABKEY);
                         }
                     }
                     break;

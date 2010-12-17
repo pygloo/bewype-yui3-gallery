@@ -406,7 +406,6 @@ Y.mix(Y_DOM, {
 });
 
 })(Y);
-
 (function(Y) {
 var TOP = 'top',
     RIGHT = 'right',
@@ -581,7 +580,6 @@ Y.mix(DOM, {
     }
 });
 })(Y);
-
 
 
 }, '@VERSION@' ,{requires:['dom-base', 'dom-style', 'event-base']});

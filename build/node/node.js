@@ -315,7 +315,7 @@ Y_Node.one = function(node) {
 };
 
 /**
- * Creates a new dom node using the provided markup string.
+ * Returns a new dom node using the provided markup string.
  * @method create
  * @static
  * @param {String} html The markup used to create the element
@@ -1181,7 +1181,6 @@ Y.mix(Y_Node.prototype, {
 
 Y.Node = Y_Node;
 Y.one = Y.Node.one;
-
 /**
  * The NodeList module provides support for managing collections of Nodes.
  * @module node
@@ -1483,6 +1482,9 @@ Y.mix(NodeList.prototype, {
      * @param {Function} fn The handler to call when the event fires
      * @param {Object} context The context to call the handler with.
      * Default is the NodeList instance.
+     * @param {Object} context The context to call the handler with.
+     * param {mixed} arg* 0..n additional arguments to supply to the subscriber
+     * when the event fires.
      * @return {Object} Returns an event handle that can later be use to detach().
      * @see Event.on
      */
@@ -1705,7 +1707,6 @@ Y.all = function(nodes) {
 };
 
 Y.Node.all = Y.all;
-
 Y.Array.each([
     /**
      * Passes through to DOM method.
@@ -1922,7 +1923,6 @@ Y.NodeList.importMethod(Y.Node.prototype, [
  */
     'generateID'
 ]);
-
 (function(Y) {
     var methods = [
     /**
@@ -1930,7 +1930,7 @@ Y.NodeList.importMethod(Y.Node.prototype, [
      * @method hasClass
      * @for Node
      * @param {String} className the class name to search for
-     * @return {Array} An array of booleans for each node bound to the NodeList. 
+     * @return {Boolean} Whether or not the element has the specified class 
      */
      'hasClass',
 
@@ -1964,6 +1964,7 @@ Y.NodeList.importMethod(Y.Node.prototype, [
      * If the className exists on the node it is removed, if it doesn't exist it is added.
      * @method toggleClass  
      * @param {String} className the class name to be toggled
+     * @param {Boolean} force Option to force adding or removing the class. 
      * @chainable
      */
      'toggleClass'
@@ -2014,7 +2015,6 @@ Y.NodeList.importMethod(Y.Node.prototype, [
      */
     Y.NodeList.importMethod(Y.Node.prototype, methods);
 })(Y);
-
 
 if (!Y.config.doc.documentElement.hasAttribute) { // IE < 8
     Y.Node.prototype.hasAttribute = function(attr) {
@@ -2073,7 +2073,6 @@ if (Y.config.doc.createElement('form').elements.nodeType) {
     };
 }
 
-
 Y.mix(Y.Node.ATTRS, {
     offsetHeight: {
         setter: function(h) {
@@ -2113,7 +2112,6 @@ Y.mix(Y.Node.prototype, {
         });
     }
 });
-
 var Y_NodeList = Y.NodeList,
     ArrayProto = Array.prototype,
     ArrayMethods = [
@@ -2188,9 +2186,7 @@ Y.Array.each(ArrayMethods, function(name) {
 });
 
 
-
 }, '@VERSION@' ,{requires:['dom-base', 'selector-css2', 'event-base']});
-
 YUI.add('node-style', function(Y) {
 
 (function(Y) {
@@ -2273,9 +2269,7 @@ Y.NodeList.importMethod(Y.Node.prototype, methods);
 })(Y);
 
 
-
 }, '@VERSION@' ,{requires:['dom-style', 'node-base']});
-
 YUI.add('node-screen', function(Y) {
 
 /**
@@ -2436,7 +2430,6 @@ Y.Node.importMethod(Y.DOM, [
     'swapXY'
 ]);
 
-
 /**
  * Returns a region object for the node
  * @config region
@@ -2509,9 +2502,7 @@ Y.Node.prototype.inRegion = function(node2, all, altRegion) {
 };
 
 
-
 }, '@VERSION@' ,{requires:['dom-screen']});
-
 YUI.add('node-pluginhost', function(Y) {
 
 /**
@@ -2565,9 +2556,7 @@ Y.NodeList.prototype.unplug = function() {
 };
 
 
-
 }, '@VERSION@' ,{requires:['node-base', 'pluginhost']});
-
 YUI.add('node-event-delegate', function(Y) {
 
 /**
@@ -2621,10 +2610,8 @@ Y.Node.prototype.delegate = function(type) {
 };
 
 
-
 }, '@VERSION@' ,{requires:['node-base', 'event-delegate']});
 
 
-
-YUI.add('node', function(Y){}, '@VERSION@' ,{use:['node-base', 'node-style', 'node-screen', 'node-pluginhost', 'node-event-delegate'], requires:['dom', 'event-base', 'event-delegate', 'pluginhost'], skinnable:false});
+YUI.add('node', function(Y){}, '@VERSION@' ,{skinnable:false, requires:['dom', 'event-base', 'event-delegate', 'pluginhost'], use:['node-base', 'node-style', 'node-screen', 'node-pluginhost', 'node-event-delegate']});
 

@@ -1,5 +1,8 @@
 /**
  * Contains algorithms for rendering a top axis.
+ *
+ * @class TopAxisLayout
+ * @constructor
  */
 function TopAxisLayout(config)
 {
@@ -7,14 +10,35 @@ function TopAxisLayout(config)
 }
 
 TopAxisLayout.ATTRS = {
+    /**
+     * Reference to the <code>Axis</code> using the strategy.
+     *
+     * @attribute axisRenderer
+     * @type Axis
+     * @protected
+     */
     axisRenderer: {
         value: null
+    },
+
+    /**
+     * Length in pixels of largest text bounding box. Used to calculate the height of the axis.
+     *
+     * @attribute maxLabelSize
+     * @type Number
+     * @protected
+     */
+    maxLabelSize: {
+        value: 0
     }
 };
 
 Y.extend(TopAxisLayout, Y.Base, {
     /**
      * Sets the length of the tick on either side of the axis line.
+     *
+     * @method setTickOffsets
+     * @protected
      */
     setTickOffsets: function()
     {
@@ -25,7 +49,6 @@ Y.extend(TopAxisLayout, Y.Base, {
             display = majorTicks.display;
         ar.set("leftTickOffset",  0);
         ar.set("rightTickOffset",  0);
-        
         switch(display)
         {
             case "inside" :
@@ -43,6 +66,9 @@ Y.extend(TopAxisLayout, Y.Base, {
 
     /**
      * Calculates the coordinates for the first point on an axis.
+     *
+     * @method getLineStart
+     * @protected
      */
     getLineStart: function()
     {
@@ -66,6 +92,11 @@ Y.extend(TopAxisLayout, Y.Base, {
     
     /**
      * Draws a tick
+     *
+     * @method drawTick
+     * @param {Object} pt hash containing x and y coordinates
+     * @param {Object} tickStyles hash of properties used to draw the tick
+     * @protected
      */
     drawTick: function(pt, tickStyles)
     {
@@ -80,6 +111,11 @@ Y.extend(TopAxisLayout, Y.Base, {
     
     /**
      * Calculates the point for a label.
+     *
+     * @method getLabelPoint
+     * @param {Object} pt hash containing x and y coordinates
+     * @return Object
+     * @protected
      */
     getLabelPoint: function(pt)
     {
@@ -87,6 +123,13 @@ Y.extend(TopAxisLayout, Y.Base, {
         return {x:pt.x, y:pt.y - ar.get("topTickOffset")};
     },
     
+    /**
+     * Updates the value for the <code>maxLabelSize</code> for use in calculating total size.
+     *
+     * @method updateMaxLabelSize
+     * @param {HTMLElement} label to measure
+     * @protected
+     */
     updateMaxLabelSize: function(label)
     {
         var ar = this.get("axisRenderer"),
@@ -120,6 +163,15 @@ Y.extend(TopAxisLayout, Y.Base, {
         }
     },
 
+    /**
+     * Rotate and position labels.
+     *
+     * @method positionLabel
+     * @param {HTMLElement} label to rotate position
+     * @param {Object} pt hash containing the x and y coordinates in which the label will be positioned
+     * against.
+     * @protected
+     */
     positionLabel: function(label, pt)
     {
         var ar = this.get("axisRenderer"),
@@ -175,8 +227,8 @@ Y.extend(TopAxisLayout, Y.Base, {
             }
             topOffset -= margin;
             label.style.left = leftOffset;
-            label.style.top = topOffset;
-            if(Y.Lang.isNumber(labelAlpha))
+            label.style.top = (this.get("maxLabelSize") + topOffset);
+            if(Y.Lang.isNumber(labelAlpha) && labelAlpha < 1 && labelAlpha > -1 && !isNaN(labelAlpha))
             {
                 filterString = "progid:DXImageTransform.Microsoft.Alpha(Opacity=" + Math.round(labelAlpha * 100) + ")";
             }
@@ -229,7 +281,7 @@ Y.extend(TopAxisLayout, Y.Base, {
         }
         topOffset -= margin;
         label.style.left = leftOffset + "px";
-        label.style.top =  topOffset + "px";
+        label.style.top = (this.get("maxLabelSize") + topOffset) + "px";
         label.style.MozTransformOrigin =  "0 0";
         label.style.MozTransform = "rotate(" + rot + "deg)";
         label.style.webkitTransformOrigin = "0 0";
@@ -242,12 +294,18 @@ Y.extend(TopAxisLayout, Y.Base, {
 
     /**
      * Calculates the size and positions the content elements.
+     *
+     * @method setSizeAndPosition
+     * @protected
      */
-    setSizeAndPosition: function(labelSize)
+    setSizeAndPosition: function()
     {
-        var ar = this.get("axisRenderer"),
+        var labelSize = this.get("maxLabelSize"),
+            ar = this.get("axisRenderer"),
             style = ar.get("styles"),
-            sz = style.line.weight,
+            margin = style.label.margin,
+            graphic = ar.get("graphic"),
+            sz = style.line.weight || 0,
             majorTicks = style.majorTicks,
             display = majorTicks.display,
             tickLen = majorTicks.length;
@@ -259,27 +317,51 @@ Y.extend(TopAxisLayout, Y.Base, {
         {
             sz += tickLen * 0.5;
         }
+        if(margin && margin.bottom)
+        {
+            sz += margin.bottom;
+        }
         sz += labelSize;
-        ar.get("contentBox").setStyle("top", labelSize + "px");
         ar.set("height", sz);
+        Y.one(graphic.node).setStyle("top", labelSize);
     },
     
+    /**
+     * Adjusts position for inner ticks.
+     *
+     * @method offsetNodeForTick
+     * @param {Node} cb contentBox of the axis
+     * @protected
+     */
     offsetNodeForTick: function(cb)
     {
         var ar = this.get("axisRenderer"),
-            majorTicks = ar.get("styles").majorTicks,
+            styles = ar.get("styles"),
+            label = styles.label,
+            margin = label && label.margin && label.margin.bottom ? label.margin.bottom : 0,
+            majorTicks = styles.majorTicks,
             tickLength = majorTicks.length,
             display = majorTicks.display;
         if(display === "inside")
         {
-            cb.setStyle("marginBottom", (0 - tickLength) + "px");
+            cb.setStyle("top", tickLength + "px");
         }
         else if (display === "cross")
         {
-            cb.setStyle("marginBottom", (0 - (tickLength * 0.5)) + "px");
+            cb.setStyle("top", (tickLength * 0.5) + "px");
+        }
+        else
+        {
+            cb.setStyle("top", margin + "px");
         }
     },
 
+    /**
+     * Assigns a height based on the size of the contents.
+     *
+     * @method setCalculatedSize
+     * @protected
+     */
     setCalculatedSize: function()
     {
         var ar = this.get("axisRenderer"),

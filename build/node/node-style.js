@@ -80,5 +80,4 @@ Y.NodeList.importMethod(Y.Node.prototype, methods);
 })(Y);
 
 
-
 }, '@VERSION@' ,{requires:['dom-style', 'node-base']});

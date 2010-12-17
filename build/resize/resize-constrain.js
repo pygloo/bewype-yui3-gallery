@@ -461,5 +461,4 @@ Y.namespace('Plugin');
 Y.Plugin.ResizeConstrained = ResizeConstrained;
 
 
-
-}, '@VERSION@' ,{skinnable:false, requires:['resize-base', 'plugin']});
+}, '@VERSION@' ,{requires:['resize-base', 'plugin'], skinnable:false});

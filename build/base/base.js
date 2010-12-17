@@ -579,9 +579,7 @@ YUI.add('base-base', function(Y) {
     Y.Base = Base;
 
 
-
 }, '@VERSION@' ,{requires:['attribute-base']});
-
 YUI.add('base-pluginhost', function(Y) {
 
     /**
@@ -617,9 +615,7 @@ YUI.add('base-pluginhost', function(Y) {
     Base.unplug = PluginHost.unplug;
 
 
-
 }, '@VERSION@' ,{requires:['base-base', 'pluginhost']});
-
 YUI.add('base-build', function(Y) {
 
     /**
@@ -921,9 +917,7 @@ YUI.add('base-build', function(Y) {
     };
 
 
-
 }, '@VERSION@' ,{requires:['base-base']});
-
 
 
 YUI.add('base', function(Y){}, '@VERSION@' ,{after:['attribute-complex'], use:['base-base', 'base-pluginhost', 'base-build']});

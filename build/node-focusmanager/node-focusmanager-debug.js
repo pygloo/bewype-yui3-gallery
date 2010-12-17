@@ -1065,5 +1065,4 @@ Y.namespace("Plugin");
 Y.Plugin.NodeFocusManager = NodeFocusManager;
 
 
-
 }, '@VERSION@' ,{requires:['attribute', 'node', 'plugin', 'node-event-simulate', 'event-key', 'event-focus']});
