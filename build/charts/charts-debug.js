@@ -6,6 +6,21 @@ YUI.add('charts', function(Y) {
  *
  * @module charts
  */
+var ISCHROME = Y.UA.chrome,
+    DRAWINGAPI,
+    canvas = document.createElement("canvas");
+if(document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1"))
+{
+    DRAWINGAPI = "svg";
+}
+else if(canvas && canvas.getContext && canvas.getContext("2d"))
+{
+    DRAWINGAPI = "canvas";
+}
+else
+{
+    DRAWINGAPI = "vml";
+}
 
 /**
  * Graphic is a simple drawing api that allows for basic drawing operations.
@@ -908,6 +923,1045 @@ Graphic.prototype = {
 Y.Graphic = Graphic;
 
 /**
+ * Set of drawing apis for canvas based classes.
+ *
+ * @class CanvasDrawingUtil
+ * @constructor
+ */
+function CanvasDrawingUtil()
+{
+    this.initializer.apply(this, arguments);
+}
+
+CanvasDrawingUtil.prototype = {
+    /**
+     * Initializes the class.
+     *
+     * @method initializer
+     * @private
+     */
+    initializer: function(config) {
+        this._dummy = this._createDummy();
+        this._canvas = this._createGraphic();
+        this._context = this._canvas.getContext('2d');
+        this._initProps();
+    },
+
+    /** 
+     * Specifies a bitmap fill used by subsequent calls to other drawing methods.
+     * 
+     * @method beginBitmapFill
+     * @param {Object} config
+     */
+    beginBitmapFill: function(config) {
+        var context = this._context,
+            bitmap = config.bitmap,
+            repeat = config.repeat || 'repeat';
+        this._fillWidth = config.width || null;
+        this._fillHeight = config.height || null;
+        this._fillX = !isNaN(config.tx) ? config.tx : NaN;
+        this._fillY = !isNaN(config.ty) ? config.ty : NaN;
+        this._fillType =  'bitmap';
+        this._bitmapFill = context.createPattern(bitmap, repeat);
+        return this;
+    },
+
+    /**
+     * Specifes a solid fill used by subsequent calls to other drawing methods.
+     *
+     * @method beginFill
+     * @param {String} color Hex color value for the fill.
+     * @param {Number} alpha Value between 0 and 1 used to specify the opacity of the fill.
+     */
+    beginFill: function(color, alpha) {
+        var context = this._context;
+        context.beginPath();
+        if (color) {
+            if (alpha) {
+               color = this._2RGBA(color, alpha);
+            } else {
+                color = this._2RGB(color);
+            }
+
+            this._fillColor = color;
+            this._fillType = 'solid';
+        }
+        return this;
+    },
+
+    /** 
+     * Specifies a gradient fill used by subsequent calls to other drawing methods.
+     *
+     * @method beginGradientFill
+     * @param {Object} config
+     */
+    beginGradientFill: function(config) {
+        var color,
+            alpha,
+            i = 0,
+            colors = config.colors,
+            alphas = config.alphas || [],
+            len = colors.length;
+        this._fillAlphas = alphas;
+        this._fillColors = colors;
+        this._fillType =  config.type || "linear";
+        this._fillRatios = config.ratios || [];
+        this._fillRotation = config.rotation || 0;
+        this._fillWidth = config.width || null;
+        this._fillHeight = config.height || null;
+        this._fillX = !isNaN(config.tx) ? config.tx : NaN;
+        this._fillY = !isNaN(config.ty) ? config.ty : NaN;
+        for(;i < len; ++i)
+        {
+            alpha = alphas[i];
+            color = colors[i];
+            if (alpha) {
+               color = this._2RGBA(color, alpha);
+            } else {
+                color = this._2RGB(color);
+            }
+            colors[i] = color;
+        }
+        this._context.beginPath();
+        return this;
+    },
+    
+    /**
+     * Specifies a line style used for subsequent calls to drawing methods.
+     * 
+     * @method lineStyle
+     * @param {Number} thickness indicates the thickness of the line
+     * @param {String} color hex color value for the line
+     * @param {Number} alpha Value between 0 and 1 used to specify the opacity of the fill.
+     */
+    lineStyle: function(thickness, color, alpha, pixelHinting, scaleMode, caps, joints, miterLimit) {
+        color = color || '#000000';
+        var context = this._context;
+        if(this._stroke)
+        {
+            context.stroke();
+        }
+        context.lineWidth = thickness;
+
+        if (thickness) {
+            this._stroke = 1;
+        } else {
+            this._stroke = 0;
+        }
+
+        if (color) {
+            this._strokeStyle = color;
+            if (alpha) {
+                this._strokeStyle = this._2RGBA(this._strokeStyle, alpha);
+            }
+        }
+        
+        if(!this._fill)
+        {
+            context.beginPath();
+        }
+
+        if (caps === 'butt') {
+            caps = 'none';
+        }
+        
+        if (context.lineCap) { // FF errors when trying to set
+            //context.lineCap = caps;
+        }
+        this._drawingComplete = false;
+        return this;
+    },
+
+    /**
+     * Draws a line segment using the current line style from the current drawing position to the specified x and y coordinates.
+     * 
+     * @method lineTo
+     * @param {Number} point1 x-coordinate for the end point.
+     * @param {Number} point2 y-coordinate for the end point.
+     */
+    lineTo: function(point1, point2, etc) {
+        var args = arguments, 
+            context = this._context,
+            i, len;
+        if (typeof point1 === 'string' || typeof point1 === 'number') {
+            args = [[point1, point2]];
+        }
+
+        for (i = 0, len = args.length; i < len; ++i) {
+            context.lineTo(args[i][0], args[i][1]);
+            this._updateShapeProps.apply(this, args[i]);
+            this._trackSize.apply(this, args[i]);
+        }
+        this._drawingComplete = false;
+        return this;
+    },
+
+    /**
+     * Moves the current drawing position to specified x and y coordinates.
+     *
+     * @method moveTo
+     * @param {Number} x x-coordinate for the end point.
+     * @param {Number} y y-coordinate for the end point.
+     */
+    moveTo: function(x, y) {
+        this._context.moveTo(x, y);
+        this._trackPos(x, y);
+        this._updateShapeProps(x, y);
+        this._drawingComplete = false;
+        return this;
+    },
+   
+    /**
+     * Clears the graphics object.
+     *
+     * @method clear
+     */
+    clear: function() {
+        this._initProps();
+        this._canvas.width = this._canvas.width;
+        this._canvas.height = this._canvas.height;
+        return this;
+    },
+
+    /**
+     * Draws a bezier curve.
+     *
+     * @method curveTo
+     * @param {Number} cp1x x-coordinate for the first control point.
+     * @param {Number} cp1y y-coordinate for the first control point.
+     * @param {Number} cp2x x-coordinate for the second control point.
+     * @param {Number} cp2y y-coordinate for the second control point.
+     * @param {Number} x x-coordinate for the end point.
+     * @param {Number} y y-coordinate for the end point.
+     */
+    curveTo: function(cp1x, cp1y, cp2x, cp2y, x, y) {
+        this._context.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
+        this._drawingComplete = false;
+        this._updateShapeProps(x, y);
+        this._trackSize(x, y);
+        this._trackPos(x, y);
+        return this;
+    },
+
+    /**
+     * Draws a quadratic bezier curve.
+     *
+     * @method quadraticCurveTo
+     * @param {Number} cpx x-coordinate for the control point.
+     * @param {Number} cpy y-coordinate for the control point.
+     * @param {Number} x x-coordinate for the end point.
+     * @param {Number} y y-coordinate for the end point.
+     */
+    quadraticCurveTo: function(controlX, controlY, anchorX, anchorY) {
+        this._context.quadraticCurveTo(controlX, controlY, anchorX, anchorY);
+        this._drawingComplete = false;
+        this._updateShapeProps(anchorX, anchorY);
+        return this;
+    },
+
+    /**
+     * Draws a circle.
+     *
+     * @method drawCircle
+     * @param {Number} x y-coordinate
+     * @param {Number} y x-coordinate
+     * @param {Number} r radius
+     */
+	drawCircle: function(x, y, radius) {
+        var context = this._context,
+            startAngle = 0,
+            endAngle = 2 * Math.PI;
+        this._shape = {
+            x:x - radius,
+            y:y - radius,
+            w:radius * 2,
+            h:radius * 2
+        };
+        this._drawingComplete = false;
+        this._trackPos(x, y);
+        this._trackSize(radius * 2, radius * 2);
+        context.beginPath();
+        context.arc(x, y, radius, startAngle, endAngle, false);
+        this._draw();
+        return this;
+    },
+    
+    /**
+     * Draws an ellipse.
+     *
+     * @method drawEllipse
+     * @param {Number} x x-coordinate
+     * @param {Number} y y-coordinate
+     * @param {Number} w width
+     * @param {Number} h height
+     */
+	drawEllipse: function(x, y, w, h) {
+        this._shape = {
+            x:x,
+            y:y,
+            w:w,
+            h:h
+        };
+        if(this._stroke && this._context.lineWidth > 0)
+        {
+            w -= this._context.lineWidth * 2;
+            h -= this._context.lineWidth * 2;
+            x += this._context.lineWidth;
+            y += this._context.lineWidth;
+        }
+        var context = this._context,
+            l = 8,
+            theta = -(45/180) * Math.PI,
+            angle = 0,
+            angleMid,
+            radius = w/2,
+            yRadius = h/2,
+            i = 0,
+            centerX = x + radius,
+            centerY = y + yRadius,
+            ax, ay, bx, by, cx, cy;
+        this._drawingComplete = false;
+        this._trackPos(x, y);
+        this._trackSize(x + w, y + h);
+
+        context.beginPath();
+        ax = centerX + Math.cos(0) * radius;
+        ay = centerY + Math.sin(0) * yRadius;
+        context.moveTo(ax, ay);
+        
+        for(; i < l; i++)
+        {
+            angle += theta;
+            angleMid = angle - (theta / 2);
+            bx = centerX + Math.cos(angle) * radius;
+            by = centerY + Math.sin(angle) * yRadius;
+            cx = centerX + Math.cos(angleMid) * (radius / Math.cos(theta / 2));
+            cy = centerY + Math.sin(angleMid) * (yRadius / Math.cos(theta / 2));
+            context.quadraticCurveTo(cx, cy, bx, by);
+        }
+        this._draw();
+        return this;
+	},
+
+    /**
+     * Draws a rectangle.
+     *
+     * @method drawRect
+     * @param {Number} x x-coordinate
+     * @param {Number} y y-coordinate
+     * @param {Number} w width
+     * @param {Number} h height
+     */
+    drawRect: function(x, y, w, h) {
+        var ctx = this._context;
+        this._shape = {
+            x:x,
+            y:y,
+            w:w,
+            h:h
+        };
+        this._drawingComplete = false;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + w, y);
+        ctx.lineTo(x + w, y + h);
+        ctx.lineTo(x, y + h);
+        ctx.lineTo(x, y);
+        this._trackPos(x, y);
+        this._trackSize(w, h);
+        this._draw();
+        return this;
+    },
+
+    /**
+     * Draws a rectangle with rounded corners.
+     * 
+     * @method drawRect
+     * @param {Number} x x-coordinate
+     * @param {Number} y y-coordinate
+     * @param {Number} w width
+     * @param {Number} h height
+     * @param {Number} ew width of the ellipse used to draw the rounded corners
+     * @param {Number} eh height of the ellipse used to draw the rounded corners
+     */
+    drawRoundRect: function(x, y, w, h, ew, eh) {
+        this._shape = {
+            x:x,
+            y:y,
+            w:w,
+            h:h
+        };
+        var ctx = this._context;
+        this._drawingComplete = false;
+        ctx.beginPath();
+        ctx.moveTo(x, y + eh);
+        ctx.lineTo(x, y + h - eh);
+        ctx.quadraticCurveTo(x, y + h, x + ew, y + h);
+        ctx.lineTo(x + w - ew, y + h);
+        ctx.quadraticCurveTo(x + w, y + h, x + w, y + h - eh);
+        ctx.lineTo(x + w, y + eh);
+        ctx.quadraticCurveTo(x + w, y, x + w - ew, y);
+        ctx.lineTo(x + ew, y);
+        ctx.quadraticCurveTo(x, y, x, y + eh);
+        this._trackPos(x, y);
+        this._trackSize(w, h);
+        this._draw();
+        return this;
+    },
+
+    /**
+     * @private
+     * Draws a wedge.
+     * 
+     * @param x				x component of the wedge's center point
+     * @param y				y component of the wedge's center point
+     * @param startAngle	starting angle in degrees
+     * @param arc			sweep of the wedge. Negative values draw clockwise.
+     * @param radius		radius of wedge. If [optional] yRadius is defined, then radius is the x radius.
+     * @param yRadius		[optional] y radius for wedge.
+     */
+    drawWedge: function(cfg)
+    {
+        var x = cfg.x,
+            y = cfg.y, 
+            startAngle = cfg.startAngle, 
+            arc = cfg.arc, 
+            radius = cfg.radius, 
+            yRadius = cfg.yRadius,
+            segs,
+            segAngle,
+            theta,
+            angle,
+            angleMid,
+            ax,
+            ay,
+            bx,
+            by,
+            cx,
+            cy,
+            i = 0;
+
+        this._drawingComplete = false;
+        // move to x,y position
+        this.moveTo(x, y);
+        
+        yRadius = yRadius || radius;
+        
+        // limit sweep to reasonable numbers
+        if(Math.abs(arc) > 360)
+        {
+            arc = 360;
+        }
+        
+        // First we calculate how many segments are needed
+        // for a smooth arc.
+        segs = Math.ceil(Math.abs(arc) / 45);
+        
+        // Now calculate the sweep of each segment.
+        segAngle = arc / segs;
+        
+        // The math requires radians rather than degrees. To convert from degrees
+        // use the formula (degrees/180)*Math.PI to get radians.
+        theta = -(segAngle / 180) * Math.PI;
+        
+        // convert angle startAngle to radians
+        angle = (startAngle / 180) * Math.PI;
+        
+        // draw the curve in segments no larger than 45 degrees.
+        if(segs > 0)
+        {
+            // draw a line from the center to the start of the curve
+            ax = x + Math.cos(startAngle / 180 * Math.PI) * radius;
+            ay = y + Math.sin(startAngle / 180 * Math.PI) * yRadius;
+            this.lineTo(ax, ay);
+            // Loop for drawing curve segments
+            for(; i < segs; ++i)
+            {
+                angle += theta;
+                angleMid = angle - (theta / 2);
+                bx = x + Math.cos(angle) * radius;
+                by = y + Math.sin(angle) * yRadius;
+                cx = x + Math.cos(angleMid) * (radius / Math.cos(theta / 2));
+                cy = y + Math.sin(angleMid) * (yRadius / Math.cos(theta / 2));
+                this.quadraticCurveTo(cx, cy, bx, by);
+            }
+            // close the wedge by drawing a line to the center
+            this.lineTo(x, y);
+        }
+        this._trackPos(x, y);
+        this._trackSize(radius, radius);
+        this._draw();
+    },
+
+    /**
+     * Completes a drawing operation. 
+     *
+     * @method end
+     */
+    end: function() {
+        this._draw();
+        this._initProps();
+        return this;
+    },
+    
+    /**
+     * @private
+     * Not implemented
+     * Specifies a gradient to use for the stroke when drawing lines.
+     */
+    lineGradientStyle: function() {
+        Y.log('lineGradientStyle not implemented', 'warn', 'graphics-canvas');
+        return this;
+    },
+
+    /**
+     * Sets the size of the graphics object.
+     * 
+     * @method setSize
+     * @param w {Number} width to set for the instance.
+     * @param h {Number} height to set for the instance.
+     */
+    setSize: function(w, h)
+    {
+        this._canvas.width = w;
+        this._canvas.height = h;
+    },
+
+    /**
+     * Clears all values
+     *
+     * @method _initProps
+     * @private
+     */
+    _initProps: function() {
+        var context = this._context;
+        
+        context.fillStyle = 'rgba(0, 0, 0, 1)'; // use transparent when no fill
+        context.lineWidth = 1;
+        //context.lineCap = 'butt';
+        context.lineJoin = 'miter';
+        context.miterLimit = 3;
+        this._strokeStyle = 'rgba(0, 0, 0, 1)';
+
+        this._width = 0;
+        this._height = 0;
+        //this._shape = null;
+        this._x = 0;
+        this._y = 0;
+        this._fillType = null;
+        this._stroke = null;
+        this._bitmapFill = null;
+        this._drawingComplete = false;
+    },
+
+    /**
+     * Returns ths actual fill object to be used in a drawing or shape
+     *
+     * @method _getFill
+     * @private
+     */
+    _getFill: function() {
+        var type = this._fillType,
+            fill;
+
+        switch (type) {
+            case 'linear': 
+                fill = this._getLinearGradient('fill');
+                break;
+
+            case 'radial': 
+                fill = this._getRadialGradient('fill');
+                break;
+            case 'bitmap':
+                fill = this._bitmapFill;
+                break;
+            case 'solid': 
+                fill = this._fillColor;
+                break;
+        }
+        return fill;
+    },
+
+    /**
+     * Returns a linear gradient fill
+     *
+     * @method _getLinearGradient
+     * @private
+     */
+    _getLinearGradient: function(type) {
+        var prop = '_' + type,
+            colors = this[prop + 'Colors'],
+            ratios = this[prop + 'Ratios'],
+            x = !isNaN(this._fillX) ? this._fillX : this._shape.x,
+            y = !isNaN(this._fillY) ? this._fillY : this._shape.y,
+            w = this._fillWidth || (this._shape.w),
+            h = this._fillHeight || (this._shape.h),
+            ctx = this._context,
+            r = this[prop + 'Rotation'],
+            i,
+            l,
+            color,
+            ratio,
+            def,
+            grad,
+            x1, x2, y1, y2,
+            cx = x + w/2,
+            cy = y + h/2,
+            radCon = Math.PI/180,
+            tanRadians = parseFloat(parseFloat(Math.tan(r * radCon)).toFixed(8));
+        if(Math.abs(tanRadians) * w/2 >= h/2)
+        {
+            if(r < 180)
+            {
+                y1 = y;
+                y2 = y + h;
+            }
+            else
+            {
+                y1 = y + h;
+                y2 = y;
+            }
+            x1 = cx - ((cy - y1)/tanRadians);
+            x2 = cx - ((cy - y2)/tanRadians); 
+        }
+        else
+        {
+            if(r > 90 && r < 270)
+            {
+                x1 = x + w;
+                x2 = x;
+            }
+            else
+            {
+                x1 = x;
+                x2 = x + w;
+            }
+            y1 = ((tanRadians * (cx - x1)) - cy) * -1;
+            y2 = ((tanRadians * (cx - x2)) - cy) * -1;
+        }
+        grad = ctx.createLinearGradient(x1, y1, x2, y2);
+        l = colors.length;
+        def = 0;
+        for(i = 0; i < l; ++i)
+        {
+            color = colors[i];
+            ratio = ratios[i] || i/(l - 1);
+            grad.addColorStop(ratio, color);
+            def = (i + 1) / l;
+        }
+        
+        return grad;
+    },
+
+    /**
+     * Returns a radial gradient fill
+     *
+     * @method _getRadialGradient
+     * @private
+     */
+    _getRadialGradient: function(type) {
+        var prop = '_' + type,
+            colors = this[prop + "Colors"],
+            ratios = this[prop + "Ratios"],
+            i,
+            l,
+            w = this._fillWidth || this._shape.w,
+            h = this._fillHeight || this._shape.h,
+            x = !isNaN(this._fillX) ? this._fillX : this._shape.x,
+            y = !isNaN(this._fillY) ? this._fillY : this._shape.y,
+            color,
+            ratio,
+            def,
+            grad,
+            ctx = this._context;
+            x += w/2;
+            y += h/2;
+        grad = ctx.createRadialGradient(x, y, 1, x, y, w/2);
+        l = colors.length;
+        def = 0;
+        for(i = 0; i < l; ++i) {
+            color = colors[i];
+            ratio = ratios[i] || i/(l - 1);
+            grad.addColorStop(ratio, color);
+        }
+        return grad;
+    },
+   
+    /**
+     * Completes a shape or drawing
+     *
+     * @method _draw
+     * @private
+     */
+    _draw: function()
+    {
+        if(this._drawingComplete || !this._shape)
+        {
+            return;
+        }
+        var context = this._context,
+            fill;
+
+        if (this._fillType) {
+            fill = this._getFill();
+            if (fill) {
+                context.fillStyle = fill;
+            }
+            context.closePath();
+        }
+
+        if (this._fillType) {
+            context.fill();
+        }
+
+        if (this._stroke) {
+            context.strokeStyle = this._strokeStyle;
+            context.stroke();
+        }
+        this._drawingComplete = true;
+    },
+
+    /**
+     * @private
+     */
+    _drawingComplete: false,
+
+    /**
+     * Regex expression used for converting hex strings to rgb
+     *
+     * @property _reHex
+     * @private
+     */
+    _reHex: /^#?([0-9A-F]{2})([0-9A-F]{2})([0-9A-F]{2})$/i,
+
+    /**
+     * Parses hex color string and alpha value to rgba
+     *
+     * @method _2RGBA
+     * @private
+     */
+    _2RGBA: function(val, alpha) {
+        alpha = (alpha !== undefined) ? alpha : 1;
+        if (this._reHex.exec(val)) {
+            val = 'rgba(' + [
+                parseInt(RegExp.$1, 16),
+                parseInt(RegExp.$2, 16),
+                parseInt(RegExp.$3, 16)
+            ].join(',') + ',' + alpha + ')';
+        }
+        return val;
+    },
+
+    /**
+     * Creates dom element used for converting color string to rgb
+     *
+     * @method _createDummy
+     * @private
+     */
+    _createDummy: function() {
+        var dummy = Y.config.doc.createElement('div');
+        dummy.style.height = 0;
+        dummy.style.width = 0;
+        dummy.style.overflow = 'hidden';
+        Y.config.doc.documentElement.appendChild(dummy);
+        return dummy;
+    },
+
+    /**
+     * Creates canvas element
+     *
+     * @method _createGraphic
+     * @private
+     */
+    _createGraphic: function(config) {
+        var graphic = Y.config.doc.createElement('canvas');
+        // no size until drawn on
+        graphic.width = 600;
+        graphic.height = 600;
+        return graphic;
+    },
+
+    /**
+     * Converts color to rgb format
+     *
+     * @method _2RGB
+     * @private 
+     */
+    _2RGB: function(val) {
+        this._dummy.style.background = val;
+        return this._dummy.style.backgroundColor;
+    },
+    
+    /**
+     * Updates the size of the graphics object
+     *
+     * @method _trackSize
+     * @param {Number} w width
+     * @param {Number} h height
+     * @private
+     */
+    _trackSize: function(w, h) {
+        if (w > this._width) {
+            this._width = w;
+        }
+        if (h > this._height) {
+            this._height = h;
+        }
+    },
+
+    /**
+     * Updates the position of the current drawing
+     *
+     * @method _trackPos
+     * @param {Number} x x-coordinate
+     * @param {Number} y y-coordinate
+     * @private
+     */
+    _trackPos: function(x, y) {
+        if (x > this._x) {
+            this._x = x;
+        }
+        if (y > this._y) {
+            this._y = y;
+        }
+    },
+
+    /**
+     * Updates the position and size of the current drawing
+     *
+     * @method _updateShapeProps
+     * @param {Number} x x-coordinate
+     * @param {Number} y y-coordinate
+     * @private
+     */
+    _updateShapeProps: function(x, y)
+    {
+        var w,h;
+        if(!this._shape)
+        {
+            this._shape = {};
+        }
+        if(!this._shape.x)
+        {
+            this._shape.x = x;
+        }
+        else
+        {
+            this._shape.x = Math.min(this._shape.x, x);
+        }
+        if(!this._shape.y)
+        {
+            this._shape.y = y;
+        }
+        else
+        {
+            this._shape.y = Math.min(this._shape.y, y);
+        }
+        w = Math.abs(x - this._shape.x);
+        if(!this._shape.w)
+        {
+            this._shape.w = w;
+        }
+        else
+        {
+            this._shape.w = Math.max(w, this._shape.w);
+        }
+        h = Math.abs(y - this._shape.y);
+        if(!this._shape.h)
+        {
+            this._shape.h = h;
+        }
+        else
+        {
+            this._shape.h = Math.max(h, this._shape.h);
+        }
+    },
+    
+    /**
+     * Creates a Shape instance and adds it to the graphics object.
+     *
+     * @method getShape
+     * @param {Object} config Object literal of properties used to construct a Shape.
+     * @return Shape
+     */
+    getShape: function(config) {
+        config.graphic = this;
+        return new Y.Shape(config); 
+    }
+};
+
+Y.CanvasDrawingUtil = CanvasDrawingUtil;
+/**
+ * CanvasGraphics is a fallback drawing api used for basic drawing operations when SVG is not available.
+ *
+ * @class CanvasGraphics
+ * @constructor
+ */
+Y.CanvasGraphic = Y.Base.create("graphic",  Y.CanvasDrawingUtil, [], {
+    autoSize: true,
+
+    /**
+     * Sets the size of the graphics object.
+     * 
+     * @method setSize
+     * @param w {Number} width to set for the instance.
+     * @param h {Number} height to set for the instance.
+     */
+    setSize: function(w, h) {
+        if(this.autoSize)
+        {
+            if(w > this.node.getAttribute("width"))
+            {
+                this.node.style.width = w + "px";
+                this._canvas.style.width = w + "px";
+                this._canvas.width = w;
+                this.node.setAttribute("width", w);
+            }
+            if(h > this.node.getAttribute("height"))
+            {
+                this.node.style.height = h + "px";
+                this._canvas.style.height = h + "px";
+                this._canvas.height = h;
+                this.node.setAttribute("height", h);
+            }
+        }
+    },
+
+    /**
+     * Updates the size of the graphics object
+     *
+     * @method _trackSize
+     * @param {Number} w width
+     * @param {Number} h height
+     * @private
+     */
+    _trackSize: function(w, h) {
+        if (w > this._width) {
+            this._width = w;
+        }
+        if (h > this._height) {
+            this._height = h;
+        }
+        this.setSize(w, h);
+    },
+
+    /**
+     * Sets the positon of the graphics object.
+     *
+     * @method setPosition
+     * @param {Number} x x-coordinate for the object.
+     * @param {Number} y y-coordinate for the object.
+     */
+    setPosition: function(x, y)
+    {
+        this.node.style.left = x + "px";
+        this.node.style.top = y + "px";
+    },
+
+    /**
+     * Adds the graphics node to the dom.
+     * 
+     * @method render
+     * @param {HTMLElement} parentNode node in which to render the graphics node into.
+     */
+    render: function(node) {
+        node = node || Y.config.doc.body;
+        this.node = document.createElement("div");
+        this.node.style.width = node.offsetWidth + "px";
+        this.node.style.height = node.offsetHeight + "px";
+        this.node.style.display = "block";
+        this.node.style.position = "absolute";
+        this.node.style.left = node.getStyle("left");
+        this.node.style.top = node.getStyle("top");
+        this.node.style.pointerEvents = "none";
+        node.appendChild(this.node);
+        this.node.appendChild(this._canvas);
+        this._canvas.width = node.offsetWidth > 0 ? node.offsetWidth : 100;
+        this._canvas.height = node.offsetHeight > 0 ? node.offsetHeight : 100;
+        this._canvas.style.position = "absolute";
+
+        return this;
+    },
+    
+    /**
+     * Shows and and hides a the graphic instance.
+     *
+     * @method toggleVisible
+     * @param val {Boolean} indicates whether the instance should be visible.
+     */
+    toggleVisible: function(val)
+    {
+        this.node.style.visibility = val ? "visible" : "hidden";
+    },
+
+    /**
+     * Creates a graphic node
+     *
+     * @method _createGraphicNode
+     * @param {String} type node type to create
+     * @param {String} pe specified pointer-events value
+     * @return HTMLElement
+     * @private
+     */
+    _createGraphicNode: function(pe)
+    {
+        var node = Y.config.doc.createElement('canvas');
+        node.style.pointerEvents = pe || "none";
+        if(!this._graphicsList)
+        {
+            this._graphicsList = [];
+        }
+        this._graphicsList.push(node);
+        return node;
+    },
+
+    /**
+     * Removes all nodes.
+     *
+     * @method destroy
+     */
+    destroy: function()
+    {
+        this._removeChildren(this.node);
+        if(this.node && this.node.parentNode)
+        {
+            this.node.parentNode.removeChild(this.node);
+        }
+    },
+    
+    /**
+     * Removes all child nodes.
+     *
+     * @method _removeChildren
+     * @param {HTMLElement} node
+     * @private
+     */
+    _removeChildren: function(node)
+    {
+        if(node.hasChildNodes())
+        {
+            var child;
+            while(node.firstChild)
+            {
+                child = node.firstChild;
+                this._removeChildren(child);
+                node.removeChild(child);
+            }
+        }
+    },
+
+    /**
+     * @private
+     * Reference to the node for the graphics object
+     */
+    node: null
+});
+
+if(DRAWINGAPI == "canvas")
+{
+    Y.Graphic = Y.CanvasGraphic;
+}
+/**
  * VMLGraphics is a fallback drawing api used for basic drawing operations when SVG is not available.
  *
  * @class VMLGraphics
@@ -1692,7 +2746,7 @@ VMLGraphics.prototype = {
     }
 };
 
-if(!document.createElementNS)
+if(DRAWINGAPI == "vml")
 {
     var sheet = document.createStyleSheet();
     sheet.addRule(".vmlgroup", "behavior:url(#default#VML)", sheet.rules.length);
@@ -1809,13 +2863,12 @@ Y.extend(Shape, Y.Graphic, {
             this.node = this._createGraphicNode(this.nodetype, this.pointerEvents);
             parentNode.appendChild(this.node);
         }
+        if(this.type == "wedge")
+        {
+            this.path = this._getWedgePath(this.props);
+        }
         if(this.nodetype == "path")
         {
-            if(this.type == "wedge")
-            {
-                this.path = this._getWedgePath(this.props);
-            
-            }
             this._setPath();
         }
         if(this.border && this.border.weight && this.border.weight > 0)
@@ -2010,6 +3063,28 @@ Y.extend(Shape, Y.Graphic, {
     },
 
     /**
+     * Positions the parent node of the shape.
+     *
+     * @method setPosition
+     * @param {Number}, x The x-coordinate
+     * @param {Number}, y The y-coordinate
+     */
+    setPosition: function(x, y)
+    {
+        var pNode = Y.one(this.parentNode),
+            hotspot = this.hotspot;
+        pNode.setStyle("position", "absolute");
+        pNode.setStyle("left", x);
+        pNode.setStyle("top", y);
+        if(hotspot)
+        {
+            hotspot.setStyle("position", "absolute");
+            hotspot.setStyle("left", x);
+            hotspot.setStyle("top", y);
+        }
+    },
+
+    /**
      * Used to convert shape declarations to the appropriate node type.
      *
      * @property _typeConversionHash
@@ -2023,6 +3098,194 @@ Y.extend(Shape, Y.Graphic, {
 });
 
 Y.Shape = Shape;
+/**
+ * The Shape class creates a graphic object with editable 
+ * properties.
+ *
+ * @class CanvasShape
+ * @extends CanvasGraphic
+ * @constructor
+ */
+function CanvasShape(cfg)
+{
+    this._dummy = this._createDummy();
+    this._canvas = this._createGraphic();
+    this.node = this._canvas;
+    this._context = this._canvas.getContext('2d');
+    this._initialize(cfg);
+    this._validate();
+}
+
+Y.extend(CanvasShape, Y.CanvasDrawingUtil, {
+    /**
+     * Indicates the type of shape. 
+     *
+     * @property type 
+     * @type string
+     */
+    type: "shape",
+
+    /**
+     * Indicates whether or not the instance will size itself based on its contents.
+     *
+     * @property autoSize 
+     * @type string
+     */
+    autoSize: false,
+
+    /**
+     * Initializes the graphic instance.
+     *
+     * @method _initialize
+     * @private
+     */
+    _initialize: function(cfg) 
+    {
+        this._canvas.style.position = "absolute";
+        if(cfg.graphic)
+        {
+            cfg.graphic.node.appendChild(this._canvas);
+        }
+        this._setProps(cfg);
+    },
+  
+    /**
+     * Updates properties for the shape.
+     *
+     * @method _setProps
+     * @param {Object} cfg Properties to update.
+     * @private
+     */
+    _setProps: function(cfg)
+    {
+        this.autoSize = cfg.autoSize || this.autoSize; 
+        this.width = cfg.width || this.width;
+        this.height = cfg.height || this.height;
+        this.border = cfg.border || this.border;
+        this.graphics = cfg.graphic || this.graphics;
+        this.fill = cfg.fill || this.fill;
+        this.type = cfg.shape || this.type;
+        this.props = cfg.props || this.props;
+        this.path = cfg.path || this.path;
+        this.props = cfg.props || this.props;
+        this.parentNode = this.graphics.node;
+    },
+
+    /**
+     * Draws the graphic.
+     *
+     * @method _validate
+     * @private
+     */
+    _validate: function()
+    {
+        var w = this.width,
+            h = this.height,
+            border = this.border,
+            type = this.type,
+            fill = this.fill;
+        this.clear();
+        this.setSize(this.width, this.height);
+        this._canvas.style.top = "0px";
+        this._canvas.style.left = "0px";
+        if(border && border.weight && border.weight > 0)
+        {
+            border.color = border.color || "#000";
+            border.alpha = border.alpha || 1;
+            this.lineStyle(border.weight, border.color, border.alpha);
+        }
+        if(fill.type === "radial" || fill.type === "linear")
+        {
+            this.beginGradientFill(fill);
+        }
+        else if(fill.type === "bitmap")
+        {
+            this.beginBitmapFill(fill);
+        }   
+        else
+        {
+            this.beginFill(fill.color, fill.alpha);
+        }
+        switch(type)
+        {
+            case "circle" :
+                this.drawEllipse(0, 0, w, h);
+            break;
+            case "rect" :
+                this.drawRect(0, 0, w, h);
+            break;
+            case "wedge" :
+                this.drawWedge(this.props);
+            break;
+        }
+        return this;       
+    },
+
+    /**
+     * Updates the properties of the shape instance.
+     *
+     * @method update
+     * @param {Object} cfg Object literal containing properties to update.
+     */
+    update: function(cfg)
+    {
+        this._setProps(cfg);
+        this._validate();
+        return this;
+    },
+
+    /**
+     * Sets the visibility of a shape.
+     * 
+     * @method toggleVisible
+     * @param {Boolean} val indicates whether or not the shape is visible.
+     */
+    toggleVisible: function(val)
+    {
+        var visibility = val ? "visible" : "hidden";
+        if(this.node)
+        {
+            this.node.style.visibility = visibility;
+        }
+    },
+
+    /**
+     * Positions the parent node of the shape.
+     *
+     * @method setPosition
+     * @param {Number}, x The x-coordinate
+     * @param {Number}, y The y-coordinate
+     */
+    setPosition: function(x, y)
+    {
+        var pNode = Y.one(this.parentNode);
+        pNode.setStyle("position", "absolute");
+        pNode.setStyle("left", x);
+        pNode.setStyle("top", y);
+    },
+    
+    /**
+     * Adds a class to the shape's node.
+     *
+     * @method addClass
+     * @param {String} className Name of the class to add.
+     */
+    addClass: function(val)
+    {
+        if(this.node)
+        {
+            this.node.style.pointerEvents = "painted";
+            this.node.setAttribute("class", val);
+        }
+    }
+});
+
+Y.CanvasShape = CanvasShape;
+
+if(DRAWINGAPI == "canvas")
+{
+    Y.Shape = Y.CanvasShape;
+}
 /**
  * VMLShape is a fallback class for Shape. It creates a graphic object with editable properties when 
  * SVG is not available.
@@ -2249,6 +3512,21 @@ VMLShape.prototype = {
     },
 
     /**
+     * Positions the parent node of the shape.
+     *
+     * @method setPosition
+     * @param {Number}, x The x-coordinate
+     * @param {Number}, y The y-coordinate
+     */
+    setPosition: function(x, y)
+    {
+        var pNode = Y.one(this.parentNode);
+        pNode.setStyle("position", "absolute");
+        pNode.setStyle("left", x);
+        pNode.setStyle("top", y);
+    },
+    
+    /**
      * Updates the properties of the shape instance.
      *
      * @method update
@@ -2264,7 +3542,7 @@ VMLShape.prototype = {
 
 Y.VMLShape = VMLShape;
 
-if (!document.createElementNS) {
+if (DRAWINGAPI == "vml") {
     Y.Shape = VMLShape;
 }
 /**
@@ -3165,8 +4443,10 @@ Y.extend(LeftAxisLayout, Y.Base, {
         {
             case "inside" :
                 ar.set("rightTickOffset",  tickLength);
+                ar.set("leftTickOffset", 0);
             break;
             case "outside" : 
+                ar.set("rightTickOffset", 0);
                 ar.set("leftTickOffset",  tickLength);
             break;
             case "cross":
@@ -3256,14 +4536,19 @@ Y.extend(LeftAxisLayout, Y.Base, {
             radCon = Math.PI/180,
             sinRadians = parseFloat(parseFloat(Math.sin(absRot * radCon)).toFixed(8)),
             cosRadians = parseFloat(parseFloat(Math.cos(absRot * radCon)).toFixed(8)),
+            m11 = cosRadians,
+            m12 = rot > 0 ? -sinRadians : sinRadians,
+            m21 = -m12,
+            m22 = m11,
             max;
         if(!document.createElementNS)
         {
-            label.style.filter = "progid:DXImageTransform.Microsoft.BasicImage(rotation=" + rot + ")";
+            label.style.filter = 'progid:DXImageTransform.Microsoft.Matrix(M11=' + m11 + ' M12=' + m12 + ' M21=' + m21 + ' M22=' + m22 + ' sizingMethod="auto expand")';
             this.set("maxLabelSize", Math.max(this.get("maxLabelSize"), label.offsetWidth));
         }
         else
         {
+            label.style.msTransform = "rotate(0deg)";
             if(rot === 0)
             {
                 max = label.offsetWidth;
@@ -3292,6 +4577,7 @@ Y.extend(LeftAxisLayout, Y.Base, {
     positionLabel: function(label, pt)
     {
         var ar = this.get("axisRenderer"),
+            tickOffset = ar.get("leftTickOffset"),
             style = ar.get("styles").label,
             labelAlpha = style.alpha,
             filterString,
@@ -3307,6 +4593,7 @@ Y.extend(LeftAxisLayout, Y.Base, {
             m12 = rot > 0 ? -sinRadians : sinRadians,
             m21 = -m12,
             m22 = m11,
+            maxLabelSize = this.get("maxLabelSize"),
             labelWidth = Math.round(label.offsetWidth),
             labelHeight = Math.round(label.offsetHeight);
         if(style.margin && style.margin.right)
@@ -3316,33 +4603,30 @@ Y.extend(LeftAxisLayout, Y.Base, {
         if(!document.createElementNS)
         {
             label.style.filter = null; 
+            labelWidth = Math.round(label.offsetWidth);
+            labelHeight = Math.round(label.offsetHeight);
             if(rot === 0)
             {
-                leftOffset -= labelWidth;
-                topOffset -= label.offsetHeight * 0.5;
+                leftOffset = labelWidth;
+                topOffset -= labelHeight * 0.5;
             }
             else if(absRot === 90)
             {
-                leftOffset -= label.offsetHeight;
-                topOffset -= labelWidth * 0.5;
-            }
-            else if(rot === -90)
-            {
-                leftOffset -= label.offsetHeight;
+                leftOffset = labelHeight;
                 topOffset -= labelWidth * 0.5;
             }
             else if(rot > 0)
             {
-                leftOffset -= (cosRadians * labelWidth) + (label.offsetHeight * rot/90);
-                topOffset -= (sinRadians * labelWidth) + (cosRadians * (label.offsetHeight * 0.5));
+                leftOffset = (cosRadians * labelWidth) + (labelHeight * rot/90);
+                topOffset -= (sinRadians * labelWidth) + (cosRadians * (labelHeight * 0.5));
             }
             else
             {
-                leftOffset -= (cosRadians * labelWidth) + (absRot/90 * label.offsetHeight);
-                topOffset -= cosRadians * (label.offsetHeight * 0.5);
+                leftOffset = (cosRadians * labelWidth) + (absRot/90 * labelHeight);
+                topOffset -= cosRadians * (labelHeight * 0.5);
             }
-            leftOffset -= margin;
-            label.style.left = (this.get("maxLabelSize") + leftOffset) + "px";
+            leftOffset += tickOffset;
+            label.style.left = ((pt.x + maxLabelSize) - leftOffset) + "px";
             label.style.top = topOffset + "px";
             if(filterString)
             {
@@ -3371,12 +4655,12 @@ Y.extend(LeftAxisLayout, Y.Base, {
             return;
         }
         label.style.msTransform = "rotate(0deg)";
-        labelWidth = Math.round(labelWidth);
+        labelWidth = Math.round(label.offsetWidth);
         labelHeight = Math.round(label.offsetHeight);
         if(rot === 0)
         {
             leftOffset -= labelWidth;
-            topOffset -= label.offsetHeight * 0.5;
+            topOffset -= labelHeight * 0.5;
         }
         else if(rot === 90)
         {
@@ -3384,23 +4668,23 @@ Y.extend(LeftAxisLayout, Y.Base, {
         }
         else if(rot === -90)
         {
-            leftOffset -= label.offsetHeight;
+            leftOffset -= labelHeight;
             topOffset += labelWidth * 0.5;
         }
         else
         {
             if(rot < 0)
             {
-                leftOffset -= (cosRadians * labelWidth) + (sinRadians * label.offsetHeight);
-                topOffset += (sinRadians * labelWidth) - (cosRadians * (label.offsetHeight * 0.6)); 
+                leftOffset -= (cosRadians * labelWidth) + (sinRadians * labelHeight);
+                topOffset += (sinRadians * labelWidth) - (cosRadians * (labelHeight * 0.6)); 
             }
             else
             {
                 leftOffset -= (cosRadians * labelWidth);
-                topOffset -= (sinRadians * labelWidth) + (cosRadians * (label.offsetHeight * 0.6));
+                topOffset -= (sinRadians * labelWidth) + (cosRadians * (labelHeight * 0.6));
             }
         }
-        leftOffset -= margin;
+        leftOffset -= tickOffset;
         label.style.left = (this.get("maxLabelSize") + leftOffset) + "px";
         label.style.top = topOffset + "px";
         label.style.MozTransformOrigin =  "0 0";
@@ -3426,28 +4710,18 @@ Y.extend(LeftAxisLayout, Y.Base, {
         var labelSize = this.get("maxLabelSize"),
             ar = this.get("axisRenderer"),
             style = ar.get("styles"),
-            sz = style.line.weight,
+            leftTickOffset = ar.get("leftTickOffset"),
+            sz = labelSize + leftTickOffset,
             graphic = ar.get("graphic"),
-            majorTicks = style.majorTicks,
-            display = majorTicks.display,
-            tickLen = majorTicks.length,
             margin = style.label.margin;
-        if(display === "inside")
-        {
-            sz -= tickLen;
-        }
-        else if(display === "cross")
-        {
-            sz -= tickLen * 0.5;
-        }
         if(margin && margin.right)
         {
             sz += margin.right;
         }
-        sz += labelSize;
         sz = Math.round(sz);
         ar.set("width", sz);
-        Y.one(graphic.node).setStyle("left", sz);
+        ar.get("contentBox").setStyle("width", sz);
+        Y.one(graphic.node).setStyle("left", labelSize + margin.right);
     },
     
     /**
@@ -3459,29 +4733,6 @@ Y.extend(LeftAxisLayout, Y.Base, {
      */
     offsetNodeForTick: function(cb)
     {
-        var ar = this.get("axisRenderer"),
-            styles = ar.get("styles"),
-            majorTicks = styles.majorTicks,
-            line = styles.line,
-            weight,
-            tickLength = majorTicks.length,
-            display = majorTicks.display;
-        if(line)
-        {
-            weight = line.weight || 0;
-        }
-        if(display === "inside")
-        {
-            cb.setStyle("left", (tickLength - weight) + "px");
-        }
-        else if (display === "cross")
-        {
-            cb.setStyle("left", (tickLength * 0.5) + "px");
-        }
-        else 
-        {
-            cb.setStyle("left", (0 - weight) + "px");    
-        }
     },
 
     /**
@@ -3493,9 +4744,13 @@ Y.extend(LeftAxisLayout, Y.Base, {
     setCalculatedSize: function()
     {
         var ar = this.get("axisRenderer"),
-            style = ar.get("styles").label,
-            ttl = ar.get("leftTickOffset") + this.get("maxLabelSize") + style.margin.right;
-            ar.set("width", Math.round(ttl));
+            style = ar.get("styles"),
+            label = style.label,
+            tickOffset = ar.get("leftTickOffset"),
+            max = this.get("maxLabelSize"),
+            ttl = Math.round(tickOffset + max + label.margin.right);
+        ar.get("contentBox").setStyle("width", ttl);
+        ar.set("width", ttl);
     }
 });
 
@@ -3546,14 +4801,20 @@ Y.extend(RightAxisLayout, Y.Base, {
         switch(display)
         {
             case "inside" :
-                ar.set("leftTickOffset",  tickLength);
+                ar.set("leftTickOffset", tickLength);
+                ar.set("rightTickOffset", 0);
             break;
             case "outside" : 
-                ar.set("rightTickOffset",  tickLength);
+                ar.set("leftTickOffset", 0);
+                ar.set("rightTickOffset", tickLength);
             break;
-            case "cross":
-                ar.set("rightTickOffset",  halfTick);
-                ar.set("leftTickOffset",  halfTick);
+            case "cross" :
+                ar.set("rightTickOffset", halfTick);
+                ar.set("leftTickOffset", halfTick);
+            break;
+            default:
+                ar.set("leftTickOffset", 0);
+                ar.set("rightTickOffset", 0);
             break;
         }
     },
@@ -3634,14 +4895,19 @@ Y.extend(RightAxisLayout, Y.Base, {
             radCon = Math.PI/180,
             sinRadians = parseFloat(parseFloat(Math.sin(absRot * radCon)).toFixed(8)),
             cosRadians = parseFloat(parseFloat(Math.cos(absRot * radCon)).toFixed(8)),
+            m11 = cosRadians,
+            m12 = rot > 0 ? -sinRadians : sinRadians,
+            m21 = -m12,
+            m22 = m11,
             max;
         if(!document.createElementNS)
         {
-            label.style.filter = "progid:DXImageTransform.Microsoft.BasicImage(rotation=" + rot + ")";
+            label.style.filter = 'progid:DXImageTransform.Microsoft.Matrix(M11=' + m11 + ' M12=' + m12 + ' M21=' + m21 + ' M22=' + m22 + ' sizingMethod="auto expand")';
             this.set("maxLabelSize", Math.max(this.get("maxLabelSize"), label.offsetWidth));
         }
         else
         {
+            label.style.msTransform = "rotate(0deg)";
             if(rot === 0)
             {
                 max = label.offsetWidth;
@@ -3670,6 +4936,7 @@ Y.extend(RightAxisLayout, Y.Base, {
     positionLabel: function(label, pt)
     {
         var ar = this.get("axisRenderer"),
+            tickOffset = ar.get("rightTickOffset"),
             style = ar.get("styles").label,
             labelAlpha = style.alpha,
             filterString,
@@ -3711,6 +4978,7 @@ Y.extend(RightAxisLayout, Y.Base, {
                 topOffset -= (sinRadians * labelWidth) +  (cosRadians * (labelHeight * 0.5));
             }
             leftOffset += margin;
+            leftOffset += tickOffset;
             label.style.left = leftOffset + "px";
             label.style.top = topOffset + "px";
             if(Y.Lang.isNumber(labelAlpha) && labelAlpha < 1 && labelAlpha > -1 && !isNaN(labelAlpha))
@@ -3761,6 +5029,7 @@ Y.extend(RightAxisLayout, Y.Base, {
             leftOffset += sinRadians * labelHeight;
         }
         leftOffset += margin;
+        leftOffset += tickOffset;
         label.style.left = leftOffset + "px";
         label.style.top = topOffset + "px";
         label.style.MozTransformOrigin =  "0 0";
@@ -3782,22 +5051,16 @@ Y.extend(RightAxisLayout, Y.Base, {
     setSizeAndPosition: function()
     {
         var ar = this.get("axisRenderer"),
+            label = ar.get("styles").label,
             labelSize = this.get("maxLabelSize"),
-            style = ar.get("styles"),
-            sz = style.line.weight,
-            majorTicks = style.majorTicks,
-            display = majorTicks.display,
-            tickLen = majorTicks.length;
-        if(display === "outside")
+            tickOffset = ar.get("rightTickOffset"),
+            sz = tickOffset + labelSize;
+        if(label.margin && label.margin.weight)
         {
-            sz += tickLen;
+            sz += label.margin.weight;
         }
-        else if(display === "cross")
-        {
-            sz += tickLen * 0.5;
-        }
-        sz += labelSize;
         ar.set("width", sz);
+        ar.get("contentBox").setStyle("width", sz);
     },
     
     /**
@@ -3810,17 +5073,9 @@ Y.extend(RightAxisLayout, Y.Base, {
     offsetNodeForTick: function(cb)
     {
         var ar = this.get("axisRenderer"),
-            majorTicks = ar.get("styles").majorTicks,
-            tickLength = majorTicks.length,
-            display = majorTicks.display;
-        if(display === "inside")
-        {
-            cb.setStyle("left", 0 - tickLength + "px");
-        }
-        else if (display === "cross")
-        {
-            cb.setStyle("left", 0 - (tickLength * 0.5) + "px");
-        }
+            tickOffset = ar.get("leftTickOffset"),
+            offset = 0 - tickOffset;
+        cb.setStyle("left", offset);
     },
 
     /**
@@ -3833,8 +5088,8 @@ Y.extend(RightAxisLayout, Y.Base, {
     {
         var ar = this.get("axisRenderer"),
             style = ar.get("styles").label,
-            ttl = ar.get("rightTickOffset") + this.get("maxLabelSize") + style.margin.left;
-            ar.set("width", ttl);
+            ttl = Math.round(ar.get("rightTickOffset") + this.get("maxLabelSize") + style.margin.left);
+        ar.set("width", ttl);
     }
 });
 
@@ -3894,14 +5149,20 @@ Y.extend(BottomAxisLayout, Y.Base, {
         switch(display)
         {
             case "inside" :
-                ar.set("topTickOffset",  tickLength);
+                ar.set("topTickOffset", tickLength);
+                ar.set("bottomTickOffset", 0);
             break;
             case "outside" : 
-                ar.set("bottomTickOffset",  tickLength);
+                ar.set("topTickOffset", 0);
+                ar.set("bottomTickOffset", tickLength);
             break;
             case "cross":
                 ar.set("topTickOffset",  halfTick);
                 ar.set("bottomTickOffset",  halfTick);
+            break;
+            default:
+                ar.set("topTickOffset", 0);
+                ar.set("bottomTickOffset", 0);
             break;
         }
     },
@@ -3981,14 +5242,19 @@ Y.extend(BottomAxisLayout, Y.Base, {
             radCon = Math.PI/180,
             sinRadians = parseFloat(parseFloat(Math.sin(absRot * radCon)).toFixed(8)),
             cosRadians = parseFloat(parseFloat(Math.cos(absRot * radCon)).toFixed(8)),
+            m11 = cosRadians,
+            m12 = rot > 0 ? -sinRadians : sinRadians,
+            m21 = -m12,
+            m22 = m11,
             max;
         if(!document.createElementNS)
         {
-            label.style.filter = "progid:DXImageTransform.Microsoft.BasicImage(rotation=" + rot + ")";
+            label.style.filter = 'progid:DXImageTransform.Microsoft.Matrix(M11=' + m11 + ' M12=' + m12 + ' M21=' + m21 + ' M22=' + m22 + ' sizingMethod="auto expand")';
             this.set("maxLabelSize", Math.max(this.get("maxLabelSize"), label.offsetHeight));
         }
         else
         {
+            label.style.msTransform = "rotate(0deg)";
             if(rot === 0)
             {
                 max = label.offsetHeight;
@@ -4017,6 +5283,7 @@ Y.extend(BottomAxisLayout, Y.Base, {
     positionLabel: function(label, pt)
     {
         var ar = this.get("axisRenderer"),
+            tickOffset = ar.get("bottomTickOffset"),
             style = ar.get("styles").label,
             labelAlpha = style.alpha,
             filterString,
@@ -4045,6 +5312,8 @@ Y.extend(BottomAxisLayout, Y.Base, {
             m21 = -m12;
             m22 = m11;
             label.style.filter = null;
+            labelWidth = Math.round(label.offsetWidth);
+            labelHeight = Math.round(label.offsetHeight);
             if(absRot === 90)
             {
                 leftOffset -= labelHeight * 0.5;
@@ -4063,6 +5332,7 @@ Y.extend(BottomAxisLayout, Y.Base, {
                 leftOffset -= labelWidth * 0.5;
             }
             topOffset += margin;
+            topOffset += tickOffset;
             label.style.left = Math.round(leftOffset) + "px";
             label.style.top = Math.round(topOffset) + "px";
             if(Y.Lang.isNumber(labelAlpha) && labelAlpha < 1 && labelAlpha > -1 && !isNaN(labelAlpha))
@@ -4119,6 +5389,7 @@ Y.extend(BottomAxisLayout, Y.Base, {
             }
         }
         topOffset += margin;
+        topOffset += tickOffset;
         label.style.left = Math.round(leftOffset) + "px";
         label.style.top = Math.round(topOffset) + "px";
         label.style.MozTransformOrigin =  "0 0";
@@ -4141,25 +5412,14 @@ Y.extend(BottomAxisLayout, Y.Base, {
     {
         var labelSize = this.get("maxLabelSize"),
             ar = this.get("axisRenderer"),
+            tickLength = ar.get("bottomTickLength"),
             style = ar.get("styles"),
-            sz = style.line.weight,
-            majorTicks = style.majorTicks,
-            display = majorTicks.display,
-            tickLen = majorTicks.length,
+            sz = tickLength + labelSize,
             margin = style.label.margin;
-        if(display === "outside")
-        {
-            sz += tickLen;
-        }
-        else if(display === "cross")
-        {
-            sz += tickLen * 0.5;
-        }
         if(margin && margin.top)
         {   
             sz += margin.top;
         }
-        sz += labelSize;
         sz = Math.round(sz);
         ar.set("height", sz);
     },
@@ -4173,25 +5433,8 @@ Y.extend(BottomAxisLayout, Y.Base, {
      */
     offsetNodeForTick: function(cb)
     {
-        var ar = this.get("axisRenderer"),
-            styles = ar.get("styles"),
-            majorTicks = styles.majorTicks,
-            tickLength = majorTicks.length,
-            display = majorTicks.display,
-            line = styles.line,
-            weight;
-        if(line)
-        {
-            weight = line.weight || 0;
-        }
-        if(display === "inside")
-        {
-            cb.setStyle("marginTop", (0 - (tickLength - weight/2)) + "px");
-        }
-        else if (display === "cross")
-        {
-            cb.setStyle("marginTop", (0 - (tickLength * 0.5)) + "px");
-        }
+        var ar = this.get("axisRenderer");
+        ar.get("contentBox").setStyle("top", 0 - ar.get("topTickOffset"));
     },
 
     /**
@@ -4204,8 +5447,8 @@ Y.extend(BottomAxisLayout, Y.Base, {
     {
         var ar = this.get("axisRenderer"),
             style = ar.get("styles").label,
-            ttl = ar.get("bottomTickOffset") + this.get("maxLabelSize") + style.margin.top;
-            ar.set("height", Math.round(ttl));
+            ttl = Math.round(ar.get("bottomTickOffset") + this.get("maxLabelSize") + style.margin.top);
+        ar.set("height", ttl);
     }
 });
 
@@ -4264,14 +5507,20 @@ Y.extend(TopAxisLayout, Y.Base, {
         switch(display)
         {
             case "inside" :
-                ar.set("bottomTickOffset",  tickLength);
+                ar.set("bottomTickOffset", tickLength);
+                ar.set("topTickOffset", 0);
             break;
             case "outside" : 
+                ar.set("bottomTickOffset", 0);
                 ar.set("topTickOffset",  tickLength);
             break;
-            case "cross":
-                ar.set("topTickOffset",  halfTick);
-                ar.set("bottomTickOffset",  halfTick);
+            case "cross" :
+                ar.set("topTickOffset", halfTick);
+                ar.set("bottomTickOffset", halfTick);
+            break;
+            default:
+                ar.set("topTickOffset", 0);
+                ar.set("bottomTickOffset", 0);
             break;
         }
     },
@@ -4351,14 +5600,19 @@ Y.extend(TopAxisLayout, Y.Base, {
             radCon = Math.PI/180,
             sinRadians = parseFloat(parseFloat(Math.sin(absRot * radCon)).toFixed(8)),
             cosRadians = parseFloat(parseFloat(Math.cos(absRot * radCon)).toFixed(8)),
+            m11 = cosRadians,
+            m12 = rot > 0 ? -sinRadians : sinRadians,
+            m21 = -m12,
+            m22 = m11,
             max;
         if(!document.createElementNS)
         {
-            label.style.filter = "progid:DXImageTransform.Microsoft.BasicImage(rotation=" + rot + ")";
+            label.style.filter = 'progid:DXImageTransform.Microsoft.Matrix(M11=' + m11 + ' M12=' + m12 + ' M21=' + m21 + ' M22=' + m22 + ' sizingMethod="auto expand")';
             this.set("maxLabelSize", Math.max(this.get("maxLabelSize"), label.offsetHeight));
         }
         else
         {
+            label.style.msTransform = "rotate(0deg)";
             if(rot === 0)
             {
                 max = label.offsetHeight;
@@ -4387,6 +5641,7 @@ Y.extend(TopAxisLayout, Y.Base, {
     positionLabel: function(label, pt)
     {
         var ar = this.get("axisRenderer"),
+            tickOffset = ar.get("topTickOffset"),
             style = ar.get("styles").label,
             labelAlpha = style.alpha,
             filterString,
@@ -4402,6 +5657,7 @@ Y.extend(TopAxisLayout, Y.Base, {
             m12,
             m21,
             m22,
+            maxLabelSize = this.get("maxLabelSize"),
             labelWidth = Math.round(label.offsetWidth),
             labelHeight = Math.round(label.offsetHeight);
         rot = Math.min(90, rot);
@@ -4413,6 +5669,8 @@ Y.extend(TopAxisLayout, Y.Base, {
         if(!document.createElementNS)
         {
             label.style.filter = null;
+            labelWidth = Math.round(label.offsetWidth);
+            labelHeight = Math.round(label.offsetHeight);
             m11 = cosRadians;
             m12 = rot > 0 ? -sinRadians : sinRadians;
             m21 = -m12;
@@ -4420,26 +5678,26 @@ Y.extend(TopAxisLayout, Y.Base, {
             if(rot === 0)
             {
                 leftOffset -= labelWidth * 0.5;
-                topOffset -= labelHeight;
             }
             else if(absRot === 90)
             {
                 leftOffset -= labelHeight * 0.5;
-                topOffset -= labelWidth;
             }
             else if(rot > 0)
             {
                 leftOffset -= (cosRadians * labelWidth) + Math.min((sinRadians * labelHeight), (rot/180 * labelHeight));
                 topOffset -= (sinRadians * labelWidth) + (cosRadians * (labelHeight));
+                topOffset += maxLabelSize;
             }
             else
             {
                 leftOffset -= sinRadians * (labelHeight * 0.5);
                 topOffset -= (sinRadians * labelWidth) + (cosRadians * (labelHeight));
+                topOffset += maxLabelSize;
             }
-            topOffset -= margin;
+            topOffset -= tickOffset;
             label.style.left = leftOffset;
-            label.style.top = (this.get("maxLabelSize") + topOffset);
+            label.style.top = topOffset;
             if(Y.Lang.isNumber(labelAlpha) && labelAlpha < 1 && labelAlpha > -1 && !isNaN(labelAlpha))
             {
                 filterString = "progid:DXImageTransform.Microsoft.Alpha(Opacity=" + Math.round(labelAlpha * 100) + ")";
@@ -4491,7 +5749,7 @@ Y.extend(TopAxisLayout, Y.Base, {
             leftOffset -= (cosRadians * labelWidth) - (sinRadians * (labelHeight * 0.6));
             topOffset -= (sinRadians * labelWidth) + (cosRadians * labelHeight);
         }
-        topOffset -= margin;
+        topOffset -= tickOffset;
         label.style.left = leftOffset + "px";
         label.style.top = (this.get("maxLabelSize") + topOffset) + "px";
         label.style.MozTransformOrigin =  "0 0";
@@ -4514,28 +5772,17 @@ Y.extend(TopAxisLayout, Y.Base, {
     {
         var labelSize = this.get("maxLabelSize"),
             ar = this.get("axisRenderer"),
+            tickOffset = ar.get("topTickOffset"),
             style = ar.get("styles"),
             margin = style.label.margin,
             graphic = ar.get("graphic"),
-            sz = style.line.weight || 0,
-            majorTicks = style.majorTicks,
-            display = majorTicks.display,
-            tickLen = majorTicks.length;
-        if(display === "outside")
-        {
-            sz += tickLen;
-        }
-        else if(display === "cross")
-        {
-            sz += tickLen * 0.5;
-        }
+            sz = tickOffset + labelSize;
         if(margin && margin.bottom)
         {
             sz += margin.bottom;
         }
-        sz += labelSize;
         ar.set("height", sz);
-        Y.one(graphic.node).setStyle("top", labelSize);
+        Y.one(graphic.node).setStyle("top", labelSize + margin.bottom);
     },
     
     /**
@@ -4547,25 +5794,6 @@ Y.extend(TopAxisLayout, Y.Base, {
      */
     offsetNodeForTick: function(cb)
     {
-        var ar = this.get("axisRenderer"),
-            styles = ar.get("styles"),
-            label = styles.label,
-            margin = label && label.margin && label.margin.bottom ? label.margin.bottom : 0,
-            majorTicks = styles.majorTicks,
-            tickLength = majorTicks.length,
-            display = majorTicks.display;
-        if(display === "inside")
-        {
-            cb.setStyle("top", tickLength + "px");
-        }
-        else if (display === "cross")
-        {
-            cb.setStyle("top", (tickLength * 0.5) + "px");
-        }
-        else
-        {
-            cb.setStyle("top", margin + "px");
-        }
     },
 
     /**
@@ -4578,8 +5806,8 @@ Y.extend(TopAxisLayout, Y.Base, {
     {
         var ar = this.get("axisRenderer"),
             style = ar.get("styles").label,
-            ttl = ar.get("topTickOffset") + this.get("maxLabelSize") + style.margin.bottom;
-            ar.set("height", ttl);
+            ttl = Math.round(ar.get("topTickOffset") + this.get("maxLabelSize") + style.margin.bottom);
+        ar.set("height", ttl);
     }
 });
 
@@ -5380,6 +6608,7 @@ Y.extend(NumericAxis, Y.AxisType,
                 else if(maxGreaterThanZero && !minGreaterThanZero)
                 {
                         topTicks = Math.round( units / ((-1 * min)/max + 1)    );
+                        topTicks = Math.max(Math.min(topTicks, units - 1), 1);
                         botTicks = units - topTicks;
                         tempMax = Math.ceil( max/topTicks );
 
@@ -5425,6 +6654,7 @@ Y.extend(NumericAxis, Y.AxisType,
                     if(alwaysShowZero)
                     {
                         topTicks = Math.round( units / ( (-1 * min) /max + 1) );
+                        topTicks = Math.max(Math.min(topTicks, units - 1), 1);
                         botTicks = units - topTicks;
 
                         if(useIntegers)
@@ -6913,12 +8143,13 @@ Plots.prototype = {
             top = ycoords[0],
             left,
             marker,
-            mnode,
             offsetWidth = w/2,
             offsetHeight = h/2,
             fillColors = null,
             borderColors = null,
-            graphOrder = this.get("graphOrder");
+            graphOrder = this.get("graphOrder"),
+            hotspot,
+            isChrome = ISCHROME;
         if(Y.Lang.isArray(style.fill.color))
         {
             fillColors = style.fill.color.concat(); 
@@ -6928,6 +8159,10 @@ Plots.prototype = {
             borderColors = style.border.colors.concat();
         }
         this._createMarkerCache();
+        if(isChrome)
+        {
+            this._createHotspotCache();
+        }
         for(; i < len; ++i)
         {
             top = (ycoords[i] - offsetHeight);
@@ -6938,8 +8173,6 @@ Plots.prototype = {
                 this._graphicNodes.push(null);
                 continue;
             }
-            top += "px";
-            left += "px";
             if(fillColors)
             {
                 style.fill.color = fillColors[i % fillColors.length];
@@ -6949,12 +8182,19 @@ Plots.prototype = {
                 style.border.colors = borderColors[i % borderColors.length];
             }
             marker = this.getMarker(style, graphOrder, i);
-            mnode = Y.one(marker.parentNode);
-            mnode.setStyle("position", "absolute"); 
-            mnode.setStyle("top", top);
-            mnode.setStyle("left", left);
+            marker.setPosition(left, top);
+            if(isChrome)
+            {
+                hotspot = this.getHotspot(style, graphOrder, i);
+                hotspot.setPosition(left, top);
+                hotspot.parentNode.style.zIndex = 5;
+            }
         }
         this._clearMarkerCache();
+        if(isChrome)
+        {
+            this._clearHotspotCache();
+        }
     },
 
     /**
@@ -7056,10 +8296,10 @@ Plots.prototype = {
             cfg = Y.clone(styles);
         graphic.render(this.get("graph").get("contentBox"));
         graphic.node.setAttribute("id", "markerParent_" + order + "_" + index);
-        marker = graphic.getShape(cfg);
+        cfg.graphic = graphic;
+        marker = new Y.Shape(cfg); 
         marker.addClass("yui3-seriesmarker");
         marker.node.setAttribute("id", "series_" + order + "_" + index);
-        graphic.render(this.get("graph").get("contentBox"));
         return marker;
     },
     
@@ -7224,8 +8464,137 @@ Plots.prototype = {
         }
         return state;
     },
+    
+    /**
+     * @private
+     */
+    _stateSyles: null,
 
-    _stateSyles: null
+    /**
+     * Collection of hotspots to be used in the series.
+     *
+     * @private
+     */
+    _hotspots: null,
+
+    /**
+     * Collection of hotspots to be re-used on a series redraw.
+     *
+     * @private
+     */
+    _hotspotCache: null,
+    
+    /**
+     * Gets and styles a hotspot. If there is a hotspot in cache, it will use it. Otherwise
+     * it will create one.
+     *
+     * @method getHotspot
+     * @param {Object} styles Hash of style properties.
+     * @param {Number} order Order of the series.
+     * @param {Number} index Index within the series associated with the hotspot.
+     * @return Shape
+     * @protected
+     */
+    getHotspot: function(hotspotStyles, order, index)
+    {
+        var hotspot,
+            styles = Y.clone(hotspotStyles);
+        styles.fill = {
+            type: "solid",
+            color: "#000",
+            alpha: 0
+        };
+        styles.border = {
+            weight: 0
+        };
+        if(this._hotspotCache.length > 0)
+        {
+            while(!hotspot)
+            {
+                if(this._hotspotCache.length < 1)
+                {
+                    hotspot = this._createHotspot(styles, order, index);
+                    break;
+                }
+                hotspot = this._hotspotCache.shift();
+
+            }
+            hotspot.update(styles);
+        }
+        else
+        {
+            hotspot = this._createHotspot(styles, order, index);
+        }
+        this._hotspots.push(hotspot);
+        return hotspot;
+    },   
+    
+    /**
+     * Creates a shape to be used as a hotspot.
+     *
+     * @method _createHotspot
+     * @param {Object} styles Hash of style properties.
+     * @param {Number} order Order of the series.
+     * @param {Number} index Index within the series associated with the hotspot.
+     * @return Shape
+     * @private
+     */
+    _createHotspot: function(styles, order, index)
+    {
+        var graphic = new Y.Graphic(),
+            hotspot,
+            cfg = Y.clone(styles);
+        graphic.render(this.get("graph").get("contentBox"));
+        graphic.node.setAttribute("id", "hotspotParent_" + order + "_" + index);
+        cfg.graphic = graphic;
+        hotspot = new Y.Shape(cfg); 
+        hotspot.addClass("yui3-seriesmarker");
+        hotspot.node.setAttribute("id", "hotspot_" + order + "_" + index);
+        return hotspot;
+    },
+    
+    /**
+     * Creates a cache of hotspots for reuse.
+     *
+     * @method _createHotspotCache
+     * @private
+     */
+    _createHotspotCache: function()
+    {
+        if(this._hotspots && this._hotspots.length > 0)
+        {
+            this._hotspotCache = this._hotspots.concat();
+        }
+        else
+        {
+            this._hotspotCache = [];
+        }
+        this._hotspots = [];
+    },
+    
+    /**
+     * Removes unused hotspots from the hotspot cache
+     *
+     * @method _clearHotspotCache
+     * @private
+     */
+    _clearHotspotCache: function()
+    {
+        var len = this._hotspotCache.length,
+            i = 0,
+            graphic,
+            hotspot;
+        for(; i < len; ++i)
+        {
+            hotspot = this._hotspotCache[i];
+            if(hotspot)
+            {
+                graphic = hotspot.graphics;
+                graphic.destroy();
+            }
+        }
+        this._hotspotCache = [];
+    }
 };
 
 Y.augment(Plots, Y.Attribute);
@@ -7278,28 +8647,33 @@ Histogram.prototype = {
             config,
             fillColors = null,
             borderColors = null,
-            mnode;
-            if(Y.Lang.isArray(style.fill.color))
-            {
-                fillColors = style.fill.color.concat(); 
-            }
-            if(Y.Lang.isArray(style.border.color))
-            {
-                borderColors = style.border.colors.concat();
-            }
-            if(this.get("direction") == "vertical")
-            {
-                setSizeKey = "height";
-                calculatedSizeKey = "width";
-            }
-            else
-            {
-                setSizeKey = "width";
-                calculatedSizeKey = "height";
-            }
-            setSize = style[setSizeKey];
-            calculatedSize = style[calculatedSizeKey];
-            this._createMarkerCache();
+            hotspot,
+            isChrome = ISCHROME;
+        if(Y.Lang.isArray(style.fill.color))
+        {
+            fillColors = style.fill.color.concat(); 
+        }
+        if(Y.Lang.isArray(style.border.color))
+        {
+            borderColors = style.border.colors.concat();
+        }
+        if(this.get("direction") == "vertical")
+        {
+            setSizeKey = "height";
+            calculatedSizeKey = "width";
+        }
+        else
+        {
+            setSizeKey = "width";
+            calculatedSizeKey = "height";
+        }
+        setSize = style[setSizeKey];
+        calculatedSize = style[calculatedSizeKey];
+        this._createMarkerCache();
+        if(isChrome)
+        {
+            this._createHotspotCache();
+        }
         for(; i < seriesLen; ++i)
         {
             renderer = seriesCollection[i];
@@ -7336,12 +8710,19 @@ Histogram.prototype = {
                 style.border.colors = borderColors[i % borderColors.length];
             }
             marker = this.getMarker(style, graphOrder, i);
-            mnode = Y.one(marker.parentNode);
-            mnode.setStyle("position", "absolute"); 
-            mnode.setStyle("top", top);
-            mnode.setStyle("left", left);
+            marker.setPosition(left, top);
+            if(isChrome)
+            {
+                hotspot = this.getHotspot(style, graphOrder, i);
+                hotspot.setPosition(left, top);
+                hotspot.parentNode.style.zIndex = 5;
+            }
         }
         this._clearMarkerCache();
+        if(isChrome)
+        {
+            this._clearHotspotCache();
+        }
     },
     
     /**
@@ -9413,8 +10794,13 @@ Y.StackedColumnSeries = Y.Base.create("stackedColumnSeries", Y.ColumnSeries, [Y.
             positiveBaseValues,
             useOrigin = order === 0,
             totalWidth = len * w,
-            mnode;
+            hotspot,
+            isChrome = ISCHROME;
         this._createMarkerCache();
+        if(isChrome)
+        {
+            this._createHotspotCache();
+        }
         if(totalWidth > this.get("width"))
         {
             ratio = this.width/totalWidth;
@@ -9439,7 +10825,7 @@ Y.StackedColumnSeries = Y.Base.create("stackedColumnSeries", Y.ColumnSeries, [Y.
             top = ycoords[i];
             if(useOrigin)
             {
-                h = this._bottomOrigin - top;
+                h = Math.abs(this._bottomOrigin - top);
                 if(top < this._bottomOrigin)
                 {
                     positiveBaseValues[i] = top;
@@ -9449,6 +10835,7 @@ Y.StackedColumnSeries = Y.Base.create("stackedColumnSeries", Y.ColumnSeries, [Y.
                 {
                     positiveBaseValues[i] = this._bottomOrigin;
                     negativeBaseValues[i] = top;
+                    top -= h;
                 }
                 else
                 {
@@ -9461,10 +10848,11 @@ Y.StackedColumnSeries = Y.Base.create("stackedColumnSeries", Y.ColumnSeries, [Y.
                 if(top > this._bottomOrigin)
                 {
                     top += (negativeBaseValues[i] - this._bottomOrigin);
-                    h = negativeBaseValues[i] - top;
+                    h = top - negativeBaseValues[i];
                     negativeBaseValues[i] = top;
+                    top -= h;
                 }
-                else if(top < this._bottomOrigin)
+                else if(top <= this._bottomOrigin)
                 {
                     top = positiveBaseValues[i] - (this._bottomOrigin - ycoords[i]);
                     h = positiveBaseValues[i] - top;
@@ -9475,12 +10863,19 @@ Y.StackedColumnSeries = Y.Base.create("stackedColumnSeries", Y.ColumnSeries, [Y.
             style.width = w;
             style.height = h;
             marker = this.getMarker(style, graphOrder, i);
-            mnode = Y.one(marker.parentNode);
-            mnode.setStyle("position", "absolute");
-            mnode.setStyle("left", left);
-            mnode.setStyle("top", top);
+            marker.setPosition(left, top);
+            if(isChrome)
+            {
+                hotspot = this.getHotspot(style, graphOrder, i);
+                hotspot.setPosition(left, top);
+                hotspot.parentNode.style.zIndex = 5;
+            }
         }
         this._clearMarkerCache();
+        if(isChrome)
+        {
+            this._clearHotspotCache();
+        }
     },
 
     /**
@@ -9659,8 +11054,13 @@ Y.StackedBarSeries = Y.Base.create("stackedBarSeries", Y.BarSeries, [Y.StackingU
             positiveBaseValues,
             useOrigin = order === 0,
             totalHeight = len * h,
-            mnode;
+            hotspot,
+            isChrome = ISCHROME;
         this._createMarkerCache();
+        if(isChrome)
+        {
+            this._createHotspotCache();
+        }
         if(totalHeight > this.get("height"))
         {
             ratio = this.height/totalHeight;
@@ -9687,11 +11087,12 @@ Y.StackedBarSeries = Y.Base.create("stackedBarSeries", Y.BarSeries, [Y.StackingU
             
             if(useOrigin)
             {
-                w = left - this._leftOrigin;
+                w = Math.abs(left - this._leftOrigin);
                 if(left > this._leftOrigin)
                 {
                     positiveBaseValues[i] = left;
                     negativeBaseValues[i] = this._leftOrigin;
+                    left -= w;
                 }
                 else if(left < this._leftOrigin)
                 {   
@@ -9703,7 +11104,6 @@ Y.StackedBarSeries = Y.Base.create("stackedBarSeries", Y.BarSeries, [Y.StackingU
                     positiveBaseValues[i] = left;
                     negativeBaseValues[i] = this._leftOrigin;
                 }
-                left -= w;
             }
             else
             {
@@ -9713,7 +11113,7 @@ Y.StackedBarSeries = Y.Base.create("stackedBarSeries", Y.BarSeries, [Y.StackingU
                     w = negativeBaseValues[i] - left;
                     negativeBaseValues[i] = left;
                 }
-                else if(left > this._leftOrigin)
+                else if(left >= this._leftOrigin)
                 {
                     left += (positiveBaseValues[i] - this._leftOrigin);
                     w = left - positiveBaseValues[i];
@@ -9725,12 +11125,19 @@ Y.StackedBarSeries = Y.Base.create("stackedBarSeries", Y.BarSeries, [Y.StackingU
             style.width = w;
             style.height = h;
             marker = this.getMarker(style, graphOrder, i);
-            mnode = Y.one(marker.parentNode);
-            mnode.setStyle("position", "absolute");
-            mnode.setStyle("left", left);
-            mnode.setStyle("top", top);
+            marker.setPosition(left, top);
+            if(isChrome)
+            {
+                hotspot = this.getHotspot(style, graphOrder, i);
+                hotspot.setPosition(left, top);
+                hotspot.parentNode.style.zIndex = 5;
+            }
         }
         this._clearMarkerCache();
+        if(isChrome)
+        {
+            this._clearHotspotCache();
+        }
     },
 
     /**
@@ -9889,6 +11296,49 @@ Y.PieSeries = Y.Base.create("pieSeries", Y.MarkerSeries, [], {
     /**
      * @private
      */
+    _map: null,
+
+    /**
+     * @private
+     */
+    _image: null,
+
+    /**
+     * @private
+     */
+    _setMap: function()
+    {
+        var id = "pieHotSpotMapi_" + Math.round(100000 * Math.random()),
+            cb = this.get("graph").get("contentBox"),
+            areaNode;
+        if(this._image)
+        {
+            cb.removeChild(this._image);
+            while(this._areaNodes && this._areaNodes.length > 0)
+            {
+                areaNode = this._areaNodes.shift();
+                this._map.removeChild(areaNode);
+            }
+            cb.removeChild(this._map);
+        }
+        this._image = document.createElement("img"); 
+        this._image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAABCAYAAAD9yd/wAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAABJJREFUeNpiZGBgSGPAAgACDAAIkABoFyloZQAAAABJRU5ErkJggg==";
+        cb.appendChild(this._image);
+        this._image.setAttribute("usemap", "#" + id);
+        this._image.style.zIndex = 3;
+        this._image.style.opacity = 0;
+        this._image.setAttribute("alt", "imagemap");
+        this._map = document.createElement("map");
+        this._map.style.zIndex = 5;
+        cb.appendChild(this._map);
+        this._map.setAttribute("name", id);
+        this._map.setAttribute("id", id);
+        this._areaNodes = [];
+    },
+
+    /**
+     * @private
+     */
     _categoryDisplayName: null,
     
     /**
@@ -10037,7 +11487,8 @@ Y.PieSeries = Y.Base.create("pieSeries", Y.MarkerSeries, [], {
             wedgeStyle,
             marker,
             graphOrder = this.get("graphOrder"),
-            mnode;
+            isCanvas = DRAWINGAPI == "canvas";
+
         for(; i < itemCount; ++i)
         {
             value = values[i];
@@ -10052,6 +11503,12 @@ Y.PieSeries = Y.Base.create("pieSeries", Y.MarkerSeries, [], {
         tfc = fillColors ? fillColors.concat() : null;
         tfa = fillAlphas ? fillAlphas.concat() : null;
         this._createMarkerCache();
+        if(isCanvas)
+        {
+            this._setMap();
+            this._image.width = w;
+            this._image.height = h;
+        }
         for(i = 0; i < itemCount; i++)
         {
             value = values[i];
@@ -10110,16 +11567,66 @@ Y.PieSeries = Y.Base.create("pieSeries", Y.MarkerSeries, [], {
                 height: h
             };
             marker = this.getMarker(wedgeStyle, graphOrder, i);
-            mnode = Y.one(marker.parent);
+            if(isCanvas)
+            {
+                this._addHotspot(wedgeStyle.props, graphOrder, i);
+            }
         }
         this._clearMarkerCache();
     },
 
+    _addHotspot: function(cfg, seriesIndex, index)
+    {
+        var areaNode = document.createElement("area"),
+            i = 1,
+            x = cfg.x,
+            y = cfg.y, 
+            arc = cfg.arc,
+            startAngle = cfg.startAngle - arc, 
+            endAngle = cfg.startAngle,
+            radius = cfg.radius, 
+            ax = x + Math.cos(startAngle / 180 * Math.PI) * radius,
+            ay = y + Math.sin(startAngle / 180 * Math.PI) * radius,
+            bx = x + Math.cos(endAngle / 180 * Math.PI) * radius,
+            by = y + Math.sin(endAngle / 180 * Math.PI) * radius,
+            numPoints = Math.floor(arc/10) - 1,
+            divAngle = (arc/(Math.floor(arc/10)) / 180) * Math.PI,
+            angleCoord = Math.atan((ay - y)/(ax - x)),
+            pts = x + ", " + y + ", " + ax + ", " + ay,
+            cosAng,
+            sinAng,
+            multDivAng;
+        for(i = 1; i <= numPoints; ++i)
+        {
+            multDivAng = divAngle * i;
+            cosAng = Math.cos(angleCoord + multDivAng);
+            sinAng = Math.sin(angleCoord + multDivAng);
+            if(startAngle <= 90)
+            {
+                pts += ", " + (x + (radius * Math.cos(angleCoord + (divAngle * i))));
+                pts += ", " + (y + (radius * Math.sin(angleCoord + (divAngle * i))));
+            }
+            else
+            {
+                pts += ", " + (x - (radius * Math.cos(angleCoord + (divAngle * i))));
+                pts += ", " + (y - (radius * Math.sin(angleCoord + (divAngle * i))));
+            }
+        }
+        pts += ", " + bx + ", " + by;
+        pts += ", " + x + ", " + y;
+        this._map.appendChild(areaNode);
+        areaNode.setAttribute("class", "yui3-seriesmarker");
+        areaNode.setAttribute("id", "hotSpot_" + seriesIndex + "_" + index);
+        areaNode.setAttribute("shape", "polygon");
+        areaNode.setAttribute("coords", pts);
+        this._areaNodes.push(areaNode);
+
+    },
+
     /**
-     * @protected
-     *
      * Resizes and positions markers based on a mouse interaction.
      *
+     * @protected
      * @method updateMarkerState
      * @param {String} type state of the marker
      * @param {Number} i index of the marker
@@ -10132,21 +11639,12 @@ Y.PieSeries = Y.Base.create("pieSeries", Y.MarkerSeries, [], {
                 markerStyles,
                 indexStyles,
                 marker = this._markers[i],
-                graphicNode = this._graphicNodes[i],
                 styles = this.get("styles").marker; 
             markerStyles = state == "off" || !styles[state] ? styles : styles[state]; 
             indexStyles = this._mergeStyles(markerStyles, {});
             indexStyles.fill.color = indexStyles.fill.colors[i % indexStyles.fill.colors.length];
             indexStyles.fill.alpha = indexStyles.fill.alphas[i % indexStyles.fill.alphas.length];
             marker.update(indexStyles);
-            if(state == "over" || state == "down")
-            {
-                Y.one(graphicNode).setStyle("zIndex", 3);
-            }
-            else
-            {
-                Y.one(graphicNode).setStyle("zIndex", 2);
-            }
         }
     },
     
@@ -10155,9 +11653,10 @@ Y.PieSeries = Y.Base.create("pieSeries", Y.MarkerSeries, [], {
      */
     _createMarker: function(styles, order, index)
     {
-        var graphic = this.get("graphic"),
-            cfg = Y.clone(styles),
-            marker = graphic.getShape(cfg);
+        var cfg = Y.clone(styles),
+            marker;
+        cfg.graphic = this.get("graphic");
+        marker = new Y.Shape(cfg);
         marker.addClass("yui3-seriesmarker");
         marker.node.setAttribute("id", "series_" + order + "_" + index);
         return marker;
@@ -10634,8 +12133,8 @@ Y.Graph = Y.Base.create("graph", Y.Widget, [Y.Renderer], {
                 h += weight * 2;
                 bg.height = h;
             }
-            this._background = graphic.getShape(bg);
             graphic.render(cb);
+            this._background = graphic.getShape(bg);
             graphicNode = Y.one(graphic.node);
             graphicNode.setStyle("left", 0 - weight);
             graphicNode.setStyle("top", 0 - weight);
@@ -11848,6 +13347,7 @@ ChartBase.prototype = {
         node.setStyle("paddingLeft", "2px");
         node.setStyle("backgroundColor", "#fff");
         node.setStyle("border", "1px solid #dbdccc");
+        node.setStyle("pointerEvents", "none");
         node.setStyle("zIndex", 3);
         node.setStyle("whiteSpace", "noWrap");
         node.addClass("yui3-widget-hidden");

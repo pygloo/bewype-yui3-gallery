@@ -30,7 +30,7 @@ YUI.add('selection', function(Y) {
     	    sel = Y.config.doc.selection.createRange();
         }
         this._selection = sel;
-        
+
         if (sel.pasteHTML) {
             this.isCollapsed = (sel.compareEndPoints('StartToEnd', sel)) ? false : true;
             if (this.isCollapsed) {
@@ -39,7 +39,6 @@ YUI.add('selection', function(Y) {
                 if (domEvent) {
                     ieNode = Y.config.doc.elementFromPoint(domEvent.clientX, domEvent.clientY);
                 }
-                
                 if (!ieNode) {
                     par = sel.parentElement();
                     nodes = par.childNodes;
@@ -77,6 +76,18 @@ YUI.add('selection', function(Y) {
                 }
                 
                 
+            } else {
+                //This helps IE deal with a selection and nodeChange events
+                if (sel.htmlText) {
+                    var n = Y.Node.create(sel.htmlText);
+                    if (n.get('id')) {
+                        var id = n.get('id');
+                        this.anchorNode = this.focusNode = Y.one('#' + id);
+                    } else {
+                        n = n.get('childNodes');
+                        this.anchorNode = this.focusNode = n.item(0);
+                    }
+                }
             }
 
             //var self = this;
@@ -115,8 +126,7 @@ YUI.add('selection', function(Y) {
 
         var nodes = Y.all(Y.Selection.ALL),
             baseNodes = Y.all('strong,em'),
-            doc = Y.config.doc,
-            hrs = doc.getElementsByTagName('hr'),
+            doc = Y.config.doc, hrs,
             classNames = {}, cssString = '',
             ls;
 
@@ -126,7 +136,8 @@ YUI.add('selection', function(Y) {
             if (raw.style[FONT_FAMILY]) {
                 classNames['.' + n._yuid] = raw.style[FONT_FAMILY];
                 n.addClass(n._yuid);
-                raw.style[FONT_FAMILY] = 'inherit';
+                //This was causing issues in IE
+                //raw.style[FONT_FAMILY] = 'inherit';
 
                 raw.removeAttribute('face');
                 if (raw.getAttribute('style') === '') {
@@ -159,27 +170,30 @@ YUI.add('selection', function(Y) {
         Y.log('Node Filter Timer: ' + (endTime1 - startTime1) + 'ms', 'info', 'selection');
 
         Y.all('.hr').addClass('yui-skip').addClass('yui-non');
-
-        Y.each(hrs, function(hr) {
-            var el = doc.createElement('div');
-                el.className = 'hr yui-non yui-skip';
-                
-                el.setAttribute('readonly', true);
-                el.setAttribute('contenteditable', false); //Keep it from being Edited
-                if (hr.parentNode) {
-                    hr.parentNode.replaceChild(el, hr);
-                }
-                //Had to move to inline style. writes for ie's < 8. They don't render el.setAttribute('style');
-                var s = el.style;
-                s.border = '1px solid #ccc';
-                s.lineHeight = '0';
-                s.fontSize = '0';
-                s.marginTop = '5px';
-                s.marginBottom = '5px';
-                s.marginLeft = '0px';
-                s.marginRight = '0px';
-                s.padding = '0';
-        });
+        
+        if (Y.UA.ie) {
+            hrs = doc.getElementsByTagName('hr');
+            Y.each(hrs, function(hr) {
+                var el = doc.createElement('div');
+                    el.className = 'hr yui-non yui-skip';
+                    
+                    el.setAttribute('readonly', true);
+                    el.setAttribute('contenteditable', false); //Keep it from being Edited
+                    if (hr.parentNode) {
+                        hr.parentNode.replaceChild(el, hr);
+                    }
+                    //Had to move to inline style. writes for ie's < 8. They don't render el.setAttribute('style');
+                    var s = el.style;
+                    s.border = '1px solid #ccc';
+                    s.lineHeight = '0';
+                    s.fontSize = '0';
+                    s.marginTop = '5px';
+                    s.marginBottom = '5px';
+                    s.marginLeft = '0px';
+                    s.marginRight = '0px';
+                    s.padding = '0';
+            });
+        }
         
 
         Y.each(classNames, function(v, k) {

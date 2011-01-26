@@ -340,6 +340,7 @@ proto = {
             useBrowserConsole: true,
             throwFail: true,
             bootstrap: true,
+            cacheUse: true,
             fetchCSS: true
         };
 
@@ -617,13 +618,15 @@ proto = {
         } else {
             key = args.join();
 
-            if (Y.Env.serviced[key]) {
+            if (Y.config.cacheUse && Y.Env.serviced[key]) {
                 Y.log('already provisioned: ' + key, 'info', 'yui');
                 Y._notify(callback, ALREADY_DONE, args);
             } else {
                 Y._use(args, function(Y, response) {
-                    Y.log('caching request: ' + key, 'info', 'yui');
-                    Y.Env.serviced[key] = true;
+                    if (Y.config.cacheUse) {
+                        Y.log('caching request: ' + key, 'info', 'yui');
+                        Y.Env.serviced[key] = true;
+                    }
                     Y._notify(callback, response, args);
                 });
             }
@@ -1485,6 +1488,7 @@ Y.log('Fetching loader: ' + config.base + config.loaderPath, 'info', 'yui');
  * @property loadErrorFn
  * @type Function
  */
+
 /**
  * When set to true, the YUI loader will expect that all modules
  * it is responsible for loading will be first-class YUI modules
@@ -1495,6 +1499,15 @@ Y.log('Fetching loader: ' + config.base + config.loaderPath, 'info', 'yui');
  * @since 3.3.0
  * @property requireRegistration
  * @type boolean
+ * @default false
+ */
+
+/**
+ * Cache serviced use() requests.
+ * @since 3.3.0
+ * @property cacheUse
+ * @type boolean
+ * @default true
  */
 
 /**
@@ -14678,6 +14691,68 @@ YUI.add('io-base', function(Y) {
 
 
 }, '@VERSION@' ,{requires:['event-custom-base', 'querystring-stringify-simple']});
+YUI.add('querystring-stringify-simple', function(Y) {
+
+/*global Y */
+/**
+ * <p>Provides Y.QueryString.stringify method for converting objects to Query Strings.
+ * This is a subset implementation of the full querystring-stringify.</p>
+ * <p>This module provides the bare minimum functionality (encoding a hash of simple values),
+ * without the additional support for nested data structures.  Every key-value pair is
+ * encoded by encodeURIComponent.</p>
+ * <p>This module provides a minimalistic way for io to handle  single-level objects
+ * as transaction data.</p>
+ *
+ * @module querystring
+ * @submodule querystring-stringify-simple
+ * @for QueryString
+ * @static
+ */
+
+var QueryString = Y.namespace("QueryString"),
+    EUC = encodeURIComponent;
+
+/**
+ * <p>Converts a simple object to a Query String representation.</p>
+ * <p>Nested objects, Arrays, and so on, are not supported.</p>
+ *
+ * @method stringify
+ * @for QueryString
+ * @public
+ * @submodule querystring-stringify-simple
+ * @param obj {Object} A single-level object to convert to a querystring.
+ * @param cfg {Object} (optional) Configuration object.  In the simple
+ *                                module, only the arrayKey setting is
+ *                                supported.  When set to true, the key of an
+ *                                array will have the '[]' notation appended
+ *                                to the key;.
+ * @static
+ */
+QueryString.stringify = function (obj, c) {
+    var qs = [],
+        // Default behavior is false; standard key notation.
+        s = c && c.arrayKey ? true : false,
+        key, i, l;
+
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            if (Y.Lang.isArray(obj[key])) {
+                for (i = 0, l = obj[key].length; i < l; i++) {
+                    qs.push(EUC(s ? key + '[]' : key) + '=' + EUC(obj[key][i]));
+                }
+            }
+            else {
+                qs.push(EUC(key) + '=' + EUC(obj[key]));
+            }
+        }
+    }
+
+    return qs.join('&');
+};
+
+
+
+}, '@VERSION@' );
 YUI.add('json-parse', function(Y) {
 
 /**
@@ -16387,5 +16462,5 @@ YUI.add('simpleyui', function(Y) {
 
 
 
-}, '@VERSION@' ,{use:['yui','oop','dom','event-custom-base','event-base','pluginhost','node','event-delegate','io-base','json-parse','transition','selector-css3','dom-style-ie']});
+}, '@VERSION@' ,{use:['yui','oop','dom','event-custom-base','event-base','pluginhost','node','event-delegate','io-base','json-parse','transition','selector-css3','dom-style-ie','querystring-stringify-simple']});
 var Y = YUI().use('*');

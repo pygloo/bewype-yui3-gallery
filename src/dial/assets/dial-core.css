@@ -7,7 +7,6 @@ v\:fill {
 }
 .yui3-dial{
 	position:relative;
-	
 	display:-moz-inline-stack;
 	display:inline-block;
 	zoom:1;
@@ -17,24 +16,26 @@ v\:fill {
 .yui3-dial-content{
 	position:relative;
 }
-.yui3-dial-ring .yui3-dial-ring-vml{
-	width:100%;
-	height:100%;
-	*background:none;
+.yui3-dial-ring-vml v\:oval {
+	width:100px;
+	height:100px;
 }
-.yui3-dial-center-button-vml{
-	position:absolute;
-	top:0%;
-	left:0%;
-	width:100%;
-	height:100%;
+.yui3-dial-center-button-vml v\:oval {
+	width:50px;
+	height:50px;
 	font-size:1px;
+}
+.yui3-dial-handle-user{
+	position:absolute; /*Ticket #2529852*/
 }
 .yui3-dial-marker{
 	position:absolute; 
 	width:10%; 
 	height:10%;
 }
-.marker-hidden{
-	visibility:hidden;
+.yui3-dial-marker-hidden{
+    visibility:hidden;
+}
+.yui3-skin-sam .yui3-dial-ring v\:oval {
+	position:absolute; top:0; left:0;
 }

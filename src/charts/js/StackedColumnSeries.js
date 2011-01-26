@@ -42,8 +42,13 @@ Y.StackedColumnSeries = Y.Base.create("stackedColumnSeries", Y.ColumnSeries, [Y.
             positiveBaseValues,
             useOrigin = order === 0,
             totalWidth = len * w,
-            mnode;
+            hotspot,
+            isChrome = ISCHROME;
         this._createMarkerCache();
+        if(isChrome)
+        {
+            this._createHotspotCache();
+        }
         if(totalWidth > this.get("width"))
         {
             ratio = this.width/totalWidth;
@@ -68,7 +73,7 @@ Y.StackedColumnSeries = Y.Base.create("stackedColumnSeries", Y.ColumnSeries, [Y.
             top = ycoords[i];
             if(useOrigin)
             {
-                h = this._bottomOrigin - top;
+                h = Math.abs(this._bottomOrigin - top);
                 if(top < this._bottomOrigin)
                 {
                     positiveBaseValues[i] = top;
@@ -78,6 +83,7 @@ Y.StackedColumnSeries = Y.Base.create("stackedColumnSeries", Y.ColumnSeries, [Y.
                 {
                     positiveBaseValues[i] = this._bottomOrigin;
                     negativeBaseValues[i] = top;
+                    top -= h;
                 }
                 else
                 {
@@ -90,10 +96,11 @@ Y.StackedColumnSeries = Y.Base.create("stackedColumnSeries", Y.ColumnSeries, [Y.
                 if(top > this._bottomOrigin)
                 {
                     top += (negativeBaseValues[i] - this._bottomOrigin);
-                    h = negativeBaseValues[i] - top;
+                    h = top - negativeBaseValues[i];
                     negativeBaseValues[i] = top;
+                    top -= h;
                 }
-                else if(top < this._bottomOrigin)
+                else if(top <= this._bottomOrigin)
                 {
                     top = positiveBaseValues[i] - (this._bottomOrigin - ycoords[i]);
                     h = positiveBaseValues[i] - top;
@@ -104,12 +111,19 @@ Y.StackedColumnSeries = Y.Base.create("stackedColumnSeries", Y.ColumnSeries, [Y.
             style.width = w;
             style.height = h;
             marker = this.getMarker(style, graphOrder, i);
-            mnode = Y.one(marker.parentNode);
-            mnode.setStyle("position", "absolute");
-            mnode.setStyle("left", left);
-            mnode.setStyle("top", top);
+            marker.setPosition(left, top);
+            if(isChrome)
+            {
+                hotspot = this.getHotspot(style, graphOrder, i);
+                hotspot.setPosition(left, top);
+                hotspot.parentNode.style.zIndex = 5;
+            }
         }
         this._clearMarkerCache();
+        if(isChrome)
+        {
+            this._clearHotspotCache();
+        }
     },
 
     /**

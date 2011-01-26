@@ -3,8 +3,8 @@ ul.layout-designer-places ,
 ul.layout-designer-places li  {
     border              : none;
     list-style-type     : none;
-    margin              : 0;
-    padding             : 0;
+    margin              : 0 !important;
+    padding             : 0 !important;
 }
 
 table.layout-designer-places {
@@ -14,8 +14,8 @@ table.layout-designer-places {
 
 table.layout-designer-places,
 table.layout-designer-places td {
-    margin              : 0;
-    padding             : 0;
+    margin              : 0 !important;
+    padding             : 0 !important;
     border              : none;
 }
 

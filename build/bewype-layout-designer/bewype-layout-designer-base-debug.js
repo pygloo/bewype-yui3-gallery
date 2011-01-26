@@ -163,5 +163,4 @@ YUI.add('bewype-layout-designer-base', function(Y) {
 
 
 
-
 }, '@VERSION@' ,{requires:['bewype-layout-designer-sources', 'bewype-layout-designer-target']});

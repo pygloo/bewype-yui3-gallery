@@ -17,17 +17,20 @@ YUI.add('bewype-layout-designer-places', function(Y) {
      */
     LayoutDesignerPlaces.H_PLACES_TEMPLATE  =  '<table class="{designerClass}-places ';
     LayoutDesignerPlaces.H_PLACES_TEMPLATE  += '{designerClass}-places-horizontal ';
-    LayoutDesignerPlaces.H_PLACES_TEMPLATE  += '{designerClass}-places-{placesLevel}">';
-    LayoutDesignerPlaces.H_PLACES_TEMPLATE  += '<tr />';
+    LayoutDesignerPlaces.H_PLACES_TEMPLATE  += '{designerClass}-places-{placesLevel}" ';
+    LayoutDesignerPlaces.H_PLACES_TEMPLATE  += 'style="border-collapse: collapse; border-spacing: 0;">';
+    LayoutDesignerPlaces.H_PLACES_TEMPLATE  += '<tr style="margin: 0; padding: 0;"></td>';
     LayoutDesignerPlaces.H_PLACES_TEMPLATE  += '</table>';
 
     LayoutDesignerPlaces.V_PLACES_TEMPLATE  = '<ul class="{designerClass}-places ';
     LayoutDesignerPlaces.V_PLACES_TEMPLATE  += '{designerClass}-places-vertical ';
-    LayoutDesignerPlaces.V_PLACES_TEMPLATE  += '{designerClass}-places-{placesLevel}"></ul>';
+    LayoutDesignerPlaces.V_PLACES_TEMPLATE  += '{designerClass}-places-{placesLevel}" ';
+    LayoutDesignerPlaces.V_PLACES_TEMPLATE  += 'style="margin: 0; padding: 0;"></ul>';
 
     LayoutDesignerPlaces.H_DEST_TEMPLATE    =  '<td class="{designerClass}-cell ';
     LayoutDesignerPlaces.H_DEST_TEMPLATE    += '{designerClass}-cell-horizontal ';
-    LayoutDesignerPlaces.H_DEST_TEMPLATE    += '{designerClass}-cell-{placesLevel}">';
+    LayoutDesignerPlaces.H_DEST_TEMPLATE    += '{designerClass}-cell-{placesLevel}" ';
+    LayoutDesignerPlaces.H_DEST_TEMPLATE    += 'style="margin: 0; padding: 0;">';
     LayoutDesignerPlaces.H_DEST_TEMPLATE    += '<div class="{designerClass}-container"></div>';
     LayoutDesignerPlaces.H_DEST_TEMPLATE    += '</td>';
 
@@ -237,7 +240,7 @@ YUI.add('bewype-layout-designer-places', function(Y) {
 
         _ulToTable : function () {
             // create table
-            var _table         = Y.Node.create( '<table />' ),
+            var _table         = Y.Node.create( '<table style="border-collapse: collapse; border-spacing: 0;" />' ),
                 _designerClass = this.get( 'designerClass' );
             // ...
             _table.addClass( _designerClass + '-places' );
@@ -245,8 +248,8 @@ YUI.add('bewype-layout-designer-places', function(Y) {
             _table.addClass( _designerClass + '-places-' + this.level );
             // populate table with tr's innerHTML
             this.placesNode.get( 'children' ).each( function ( v, k ) {
-                var _row = Y.Node.create( '<tr />' ),
-                    _cell = Y.Node.create( '<td />' );
+                var _row = Y.Node.create( '<tr style="margin: 0; padding: 0;" />' ),
+                    _cell = Y.Node.create( '<td style="margin: 0; padding: 0;" />' );
                 // update class
                 _cell.addClass( _designerClass + '-cell' );
                 _cell.addClass( _designerClass + '-cell-vertical' );
@@ -654,7 +657,6 @@ YUI.add('bewype-layout-designer-places', function(Y) {
 
     Y.namespace('Bewype');
     Y.Bewype.LayoutDesignerPlaces = LayoutDesignerPlaces;
-
 
 
 

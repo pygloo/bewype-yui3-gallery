@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-<title>Dial Widget</title>
+<title>Dial Widget Manual Test</title>
 
 <!-- Source File and Seed for YUI3-->
 <link rel="stylesheet" type="text/css" href="../../../../build/cssreset/reset-min.css">
@@ -21,6 +21,7 @@ body{
 }
 .steps li{margin-bottom:1em;}
 .steps li a {margin-right:2em; border:solid 1px #dddddd; background-color:#eeeeee; padding:3px 6px; cursor:pointer;}
+#myOtherNode {margin-bottom: 1em;}
 </style>
 </head>
 <body class="yui3-skin-sam"> 
@@ -30,8 +31,12 @@ body{
 		<li><a class="xx d_maj">-major</a><a class="xx i_maj">+major</a></li>
 		<li><a class="xx min">min</a><a class="xx max">max</a></li>
 		<li><a class="xx orig">origin</a></li>
-	 <ul>
-	 <input id="myOtherNode" value="hello">
+	<ul>
+	<input id="myOtherNode" value="hello">
+    <br>
+	<span id="dial_container_big">test a larger size. <p>increment controls don't affect this one.</p></span>
+	<span id="dial_container_small">test a small size. </span>
+	
 </body>
 </html>
 <script>
@@ -45,6 +50,29 @@ body{
             diameter: 100
         });
         dial.render("#dial_container");
+
+        var dialBig = new Y.Dial({
+            min:-220,
+            max:220,
+            stepsPerRev:100,
+            value: 80,
+            diameter: 439
+        });
+        dialBig.render("#dial_container_big");
+
+        var dialSmall = new Y.Dial({
+            min:-220,
+            max:220,
+            stepsPerRev:100,
+            value: 80,
+            diameter: 37,
+			strings: {label: 'My small pre-render label', resetStr: 'Reset Long', tooltipHandle: 'Drag small handle to set value'}
+        });
+        dialSmall.render("#dial_container_small");
+
+		dialBig._setLabelString('Label after render:');
+		dialBig._setTooltipString('Tooltip after render');
+		dialBig._setResetString('Reset Me');
 		
 		Y.on('click', function(e){
 			if(e.target.hasClass('i_min')){

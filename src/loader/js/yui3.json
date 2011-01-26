@@ -41,7 +41,11 @@
             }
         }
     }, 
-    "arraysort": {}, 
+    "arraysort": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
     "async-queue": {
         "requires": [
             "event-custom"
@@ -390,6 +394,12 @@
                     "cache-base", 
                     "json"
                 ]
+            }, 
+            "cache-plugin": {
+                "requires": [
+                    "plugin", 
+                    "cache-base"
+                ]
             }
         }
     }, 
@@ -637,6 +647,7 @@
             "datatable-datasource": {
                 "requires": [
                     "datatable-base", 
+                    "plugin", 
                     "datasource-local"
                 ]
             }, 
@@ -1240,6 +1251,25 @@
             "oop"
         ]
     }, 
+    "loader": {
+        "submodules": {
+            "loader-base": {
+                "requires": [
+                    "get"
+                ]
+            }, 
+            "loader-rollup": {
+                "requires": [
+                    "loader-base"
+                ]
+            }, 
+            "loader-yui3": {
+                "requires": [
+                    "loader-base"
+                ]
+            }
+        }
+    }, 
     "node": {
         "plugins": {
             "align-plugin": {
@@ -1269,17 +1299,6 @@
                 "requires": [
                     "node-style", 
                     "node-pluginhost"
-                ]
-            }, 
-            "transition": {
-                "requires": [
-                    "transition-native", 
-                    "node-style"
-                ]
-            }, 
-            "transition-native": {
-                "requires": [
-                    "node-base"
                 ]
             }
         }, 
