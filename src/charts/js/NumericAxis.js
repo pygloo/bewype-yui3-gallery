@@ -69,6 +69,25 @@ Y.extend(NumericAxis, Y.AxisType,
     _type: "numeric",
 
     /**
+     * Returns a value based of a key value and an index.
+     *
+     * @method getKeyValueAt
+     * @param {String} key value used to look up the correct array
+     * @param {Number} index within the array
+     * @return Object
+     */
+    getKeyValueAt: function(key, index)
+    {
+        var value = NaN,
+            keys = this.get("keys");
+        if(keys[key] && Y.Lang.isNumber(parseFloat(keys[key][index])))
+        {
+            value = keys[key][index];
+        }
+        return value;
+    },
+
+    /**
      * @private
      */
     _getMinimumUnit:function(max, min, units)
@@ -132,6 +151,7 @@ Y.extend(NumericAxis, Y.AxisType,
                         {
                             if(Y.Lang.isObject(num))
                             {
+                                min = max = 0;
                                 //hloc values
                                 for(key in num)
                                 {
@@ -142,6 +162,8 @@ Y.extend(NumericAxis, Y.AxisType,
                                    }
                                 }
                             }
+                            max = setMax ? this._setMaximum : max;
+                            min = setMin ? this._setMinimum : min;
                             continue;
                         }
                         max = setMax ? this._setMaximum : Math.max(num, max);
@@ -190,6 +212,7 @@ Y.extend(NumericAxis, Y.AxisType,
                 else if(maxGreaterThanZero && !minGreaterThanZero)
                 {
                         topTicks = Math.round( units / ((-1 * min)/max + 1)    );
+                        topTicks = Math.max(Math.min(topTicks, units - 1), 1);
                         botTicks = units - topTicks;
                         tempMax = Math.ceil( max/topTicks );
 
@@ -235,6 +258,7 @@ Y.extend(NumericAxis, Y.AxisType,
                     if(alwaysShowZero)
                     {
                         topTicks = Math.round( units / ( (-1 * min) /max + 1) );
+                        topTicks = Math.max(Math.min(topTicks, units - 1), 1);
                         botTicks = units - topTicks;
 
                         if(useIntegers)

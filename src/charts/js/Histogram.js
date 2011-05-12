@@ -46,28 +46,33 @@ Histogram.prototype = {
             config,
             fillColors = null,
             borderColors = null,
-            mnode;
-            if(Y.Lang.isArray(style.fill.color))
-            {
-                fillColors = style.fill.color.concat(); 
-            }
-            if(Y.Lang.isArray(style.border.color))
-            {
-                borderColors = style.border.colors.concat();
-            }
-            if(this.get("direction") == "vertical")
-            {
-                setSizeKey = "height";
-                calculatedSizeKey = "width";
-            }
-            else
-            {
-                setSizeKey = "width";
-                calculatedSizeKey = "height";
-            }
-            setSize = style[setSizeKey];
-            calculatedSize = style[calculatedSizeKey];
-            this._createMarkerCache();
+            hotspot,
+            isChrome = ISCHROME;
+        if(Y.Lang.isArray(style.fill.color))
+        {
+            fillColors = style.fill.color.concat(); 
+        }
+        if(Y.Lang.isArray(style.border.color))
+        {
+            borderColors = style.border.colors.concat();
+        }
+        if(this.get("direction") == "vertical")
+        {
+            setSizeKey = "height";
+            calculatedSizeKey = "width";
+        }
+        else
+        {
+            setSizeKey = "width";
+            calculatedSizeKey = "height";
+        }
+        setSize = style[setSizeKey];
+        calculatedSize = style[calculatedSizeKey];
+        this._createMarkerCache();
+        if(isChrome)
+        {
+            this._createHotspotCache();
+        }
         for(; i < seriesLen; ++i)
         {
             renderer = seriesCollection[i];
@@ -91,10 +96,9 @@ Histogram.prototype = {
         {
             config = this._getMarkerDimensions(xcoords[i], ycoords[i], calculatedSize, offset);
             top = config.top;
-            calculatedSize = config.calculatedSize;
             left = config.left;
             style[setSizeKey] = setSize;
-            style[calculatedSizeKey] = calculatedSize;
+            style[calculatedSizeKey] = config.calculatedSize;
             if(fillColors)
             {
                 style.fill.color = fillColors[i % fillColors.length];
@@ -104,12 +108,19 @@ Histogram.prototype = {
                 style.border.colors = borderColors[i % borderColors.length];
             }
             marker = this.getMarker(style, graphOrder, i);
-            mnode = Y.one(marker.parentNode);
-            mnode.setStyle("position", "absolute"); 
-            mnode.setStyle("top", top);
-            mnode.setStyle("left", left);
+            marker.setPosition(left, top);
+            if(isChrome)
+            {
+                hotspot = this.getHotspot(style, graphOrder, i);
+                hotspot.setPosition(left, top);
+                hotspot.parentNode.style.zIndex = 5;
+            }
         }
         this._clearMarkerCache();
+        if(isChrome)
+        {
+            this._clearHotspotCache();
+        }
     },
     
     /**

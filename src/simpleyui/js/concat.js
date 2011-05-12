@@ -259,7 +259,7 @@ proto = {
                 _uidx: 0,
                 _guidp: 'y',
                 _loaded: {},
-                serviced: {},
+                // serviced: {},
                 getBase: G_ENV && G_ENV.getBase ||
 
     function(srcPattern, comboPattern) {
@@ -340,6 +340,7 @@ proto = {
             useBrowserConsole: true,
             throwFail: true,
             bootstrap: true,
+            cacheUse: true,
             fetchCSS: true
         };
 
@@ -532,6 +533,15 @@ proto = {
                         }
                     }
 
+                    if (mod.fn) {
+                        try {
+                            mod.fn(Y, name);
+                        } catch (e) {
+                            Y.error('Attach error: ' + name, e, name);
+                            return false;
+                        }
+                    }
+
                     if (use) {
                         for (j = 0; j < use.length; j++) {
                             if (!done[use[j]]) {
@@ -543,14 +553,7 @@ proto = {
                         }
                     }
 
-                    if (mod.fn) {
-                        try {
-                            mod.fn(Y, name);
-                        } catch (e) {
-                            Y.error('Attach error: ' + name, e, name);
-                            return false;
-                        }
-                    }
+
 
                 }
             }
@@ -602,7 +605,10 @@ proto = {
         var args = SLICE.call(arguments, 0),
             callback = args[args.length - 1],
             Y = this,
-            key;
+            i = 0,
+            name,
+            Env = Y.Env,
+            provisioned = true;
 
         // The last argument supplied to use can be a load complete callback
         if (Y.Lang.isFunction(callback)) {
@@ -611,22 +617,30 @@ proto = {
             callback = null;
         }
 
+        if (Y.config.cacheUse) {
+            while ((name = args[i++])) {
+                if (!Env._attached[name]) {
+                    provisioned = false;
+                    break;
+                }
+            }
+
+            if (provisioned) {
+                if (args.length) {
+                    Y.log('already provisioned: ' + args, 'info', 'yui');
+                }
+                Y._notify(callback, ALREADY_DONE, args);
+                return Y;
+            }
+        }
+
         if (Y._loading) {
             Y._useQueue = Y._useQueue || new Y.Queue();
             Y._useQueue.add([args, callback]);
         } else {
-            key = args.join();
-
-            if (Y.Env.serviced[key]) {
-                Y.log('already provisioned: ' + key, 'info', 'yui');
-                Y._notify(callback, ALREADY_DONE, args);
-            } else {
-                Y._use(args, function(Y, response) {
-                    Y.log('caching request: ' + key, 'info', 'yui');
-                    Y.Env.serviced[key] = true;
-                    Y._notify(callback, response, args);
-                });
-            }
+            Y._use(args, function(Y, response) {
+                Y._notify(callback, response, args);
+            });
         }
 
         return Y;
@@ -650,7 +664,7 @@ proto = {
             this._attach(['yui-base']);
         }
 
-        var len, loader, handleBoot,
+        var len, loader, handleBoot, handleRLS,
             Y = this,
             G_ENV = YUI.Env,
             mods = G_ENV.mods,
@@ -812,13 +826,32 @@ Y.log('Modules missing: ' + missing + ', ' + missing.length, 'info', 'yui');
 
         } else if (len && Y.config.use_rls) {
 
+            G_ENV._rls_queue = G_ENV._rls_queue || new Y.Queue();
+
             // server side loader service
-            Y.Get.script(Y._rls(args), {
-                onEnd: function(o) {
-                    handleLoader(o);
-                },
-                data: args
-            });
+            handleRLS = function(instance, argz) {
+                G_ENV._rls_in_progress = true;
+                instance.Get.script(instance._rls(argz), {
+                    onEnd: function(o) {
+                        handleLoader(o);
+                        G_ENV._rls_in_progress = false;
+                        if (G_ENV._rls_queue.size()) {
+                            G_ENV._rls_queue.next()();
+                        }
+                    },
+                    data: argz
+                });
+            };
+
+            if (G_ENV._rls_in_progress) {
+                Y.log('queuing rls request');
+                G_ENV._rls_queue.add(function() {
+                    Y.log('executing queued rls request');
+                    handleRLS(Y, args);
+                });
+            } else {
+                handleRLS(Y, args);
+            }
 
         } else if (boot && len && Y.Get && !Env.bootstrapped) {
 
@@ -1485,6 +1518,7 @@ Y.log('Fetching loader: ' + config.base + config.loaderPath, 'info', 'yui');
  * @property loadErrorFn
  * @type Function
  */
+
 /**
  * When set to true, the YUI loader will expect that all modules
  * it is responsible for loading will be first-class YUI modules
@@ -1495,6 +1529,16 @@ Y.log('Fetching loader: ' + config.base + config.loaderPath, 'info', 'yui');
  * @since 3.3.0
  * @property requireRegistration
  * @type boolean
+ * @default false
+ */
+
+/**
+ * Cache serviced use() requests.
+ * @since 3.3.0
+ * @property cacheUse
+ * @type boolean
+ * @default true
+ * @deprecated no longer used
  */
 
 /**
@@ -2156,6 +2200,8 @@ YUI.Env._loaderQueue = YUI.Env._loaderQueue || new Queue();
 
 var CACHED_DELIMITER = '__',
 
+NOT_ENUMERATED = ['toString', 'valueOf'],
+
 /*
  * IE will not enumerate native functions in a derived object even if the
  * function was overridden.  This is a workaround for specific functions
@@ -2167,12 +2213,15 @@ var CACHED_DELIMITER = '__',
  * @private
  */
 _iefix = function(r, s) {
-    var fn = s.toString;
-    if (Y.Lang.isFunction(fn) && fn != Object.prototype.toString) {
-        r.toString = fn;
+    var i, fname, fn;
+    for (i = 0; i < NOT_ENUMERATED.length; i++) {
+        fname = NOT_ENUMERATED[i];
+        fn = s[fname];
+        if (L.isFunction(fn) && fn != Object.prototype[fname]) {
+            r[fname] = fn;
+        }
     }
 };
-
 
 /**
  * Returns a new object containing all of the properties of
@@ -2599,13 +2648,15 @@ O.isEmpty = function(o) {
 /**
  * YUI user agent detection.
  * Do not fork for a browser if it can be avoided.  Use feature detection when
- * you can.  Use the user agent as a last resort.  UA stores a version
- * number for the browser engine, 0 otherwise.  This value may or may not map
- * to the version number of the browser using the engine.  The value is
- * presented as a float so that it can easily be used for boolean evaluation
- * as well as for looking for a particular range of versions.  Because of this,
- * some of the granularity of the version info may be lost (e.g., Gecko 1.8.0.9
- * reports 1.8).
+ * you can.  Use the user agent as a last resort.  For all fields listed
+ * as @type float, UA stores a version number for the browser engine,
+ * 0 otherwise.  This value may or may not map to the version number of
+ * the browser using the engine.  The value is presented as a float so
+ * that it can easily be used for boolean evaluation as well as for
+ * looking for a particular range of versions.  Because of this,
+ * some of the granularity of the version info may be lost.  The fields that
+ * are @type string default to null.  The API docs list the values that
+ * these fields can have.
  * @class UA
  * @static
  */
@@ -2617,7 +2668,7 @@ O.isEmpty = function(o) {
 * @returns {Object} The Y.UA object
 */
 YUI.Env.parseUA = function(subUA) {
-    
+
     var numberify = function(s) {
             var c = 0;
             return parseFloat(s.replace(/\./g, function() {
@@ -2707,6 +2758,7 @@ YUI.Env.parseUA = function(subUA) {
          * devices with the WebKit-based browser, and Opera Mini.
          * @property mobile
          * @type string
+         * @default null
          * @static
          */
         mobile: null,
@@ -2743,6 +2795,7 @@ YUI.Env.parseUA = function(subUA) {
          * General truthy check for iPad, iPhone or iPod
          * @property ios
          * @type float
+         * @default null
          * @static
          */
         ios: null,
@@ -2780,6 +2833,7 @@ YUI.Env.parseUA = function(subUA) {
          * The operating system.  Currently only detecting windows or macintosh
          * @property os
          * @type string
+         * @default null
          * @static
          */
         os: null
@@ -2869,7 +2923,13 @@ YUI.Env.parseUA = function(subUA) {
             m = ua.match(/Opera[\s\/]([^\s]*)/);
             if (m && m[1]) {
                 o.opera = numberify(m[1]);
+                m = ua.match(/Version\/([^\s]*)/);
+                if (m && m[1]) {
+                    o.opera = numberify(m[1]); // opera 10+
+                }
+
                 m = ua.match(/Opera Mini[^;]*/);
+
                 if (m) {
                     o.mobile = m[0]; // ex: Opera Mini/2.0.4509/1316
                 }
@@ -3742,6 +3802,7 @@ Y.mix(Y.namespace('Features'), {
 var add = Y.Features.add;
 // autocomplete-list-keys-sniff.js
 add('load', '0', {
+    "name": "autocomplete-list-keys", 
     "test": function (Y) {
     // Only add keyboard support to autocomplete-list if this doesn't appear to
     // be an iOS or Android-based mobile device.
@@ -3760,6 +3821,7 @@ add('load', '0', {
 });
 // ie-style-test.js
 add('load', '1', {
+    "name": "dom-style-ie", 
     "test": function (Y) {
 
     var testFeature = Y.Features.test,
@@ -3790,11 +3852,13 @@ add('load', '1', {
 });
 // 0
 add('load', '2', {
+    "name": "widget-base-ie", 
     "trigger": "widget-base", 
     "ua": "ie"
 });
 // ie-base-test.js
 add('load', '3', {
+    "name": "event-base-ie", 
     "test": function(Y) {
     var imp = Y.config.doc && Y.config.doc.implementation;
     return (imp && (!imp.hasFeature('Events', '2.0')));
@@ -3803,6 +3867,7 @@ add('load', '3', {
 });
 // dd-gestures-test.js
 add('load', '4', {
+    "name": "dd-gestures", 
     "test": function(Y) {
     return (Y.config.win && ('ontouchstart' in Y.config.win && !Y.UA.chrome));
 }, 
@@ -3810,6 +3875,7 @@ add('load', '4', {
 });
 // history-hash-ie-test.js
 add('load', '5', {
+    "name": "history-hash-ie", 
     "test": function (Y) {
     var docMode = Y.config.doc.documentMode;
 
@@ -3866,8 +3932,8 @@ Y._rls = function(what) {
         url;
 
     // update the request
-    rls.m = what;
-    rls.env = Y.Object.keys(YUI.Env.mods);
+    rls.m = what.sort(); // cache proxy optimization
+    rls.env = Y.Object.keys(YUI.Env.mods).sort();
     rls.tests = Y.Features.all('load', [Y]);
 
     url = Y.Lang.sub(rls_base + rls_tmpl, rls);
@@ -4084,6 +4150,8 @@ YUI.add('yui-later', function(Y) {
  * @submodule yui-later
  */
 
+var NO_ARGS = [];
+
 /**
  * Executes the supplied function in the context of the supplied
  * object 'when' milliseconds later.  Executes the function a
@@ -4100,6 +4168,10 @@ YUI.add('yui-later', function(Y) {
  * the function is executed with one parameter for each array item.
  * If you need to pass a single array parameter, it needs to be wrapped
  * in an array [myarray].
+ *
+ * Note: native methods in IE may not have the call and apply methods.
+ * In this case, it will work, but you are limited to four arguments.
+ *
  * @param periodic {boolean} if true, executes continuously at supplied
  * interval until canceled.
  * @return {object} a timer object. Call the cancel() method on this
@@ -4107,20 +4179,17 @@ YUI.add('yui-later', function(Y) {
  */
 Y.later = function(when, o, fn, data, periodic) {
     when = when || 0;
+    data = (!Y.Lang.isUndefined(data)) ? Y.Array(data) : data;
 
-    var m = fn, f, id;
-
-    if (o && Y.Lang.isString(fn)) {
-        m = o[fn];
-    }
-
-    f = !Y.Lang.isUndefined(data) ? function() {
-        m.apply(o, Y.Array(data));
-    } : function() {
-        m.call(o);
-    };
-
-    id = (periodic) ? setInterval(f, when) : setTimeout(f, when);
+    var method = (o && Y.Lang.isString(fn)) ? o[fn] : fn,
+        wrapper = function() {
+            if (!method.apply) {
+                method(data[0], data[1], data[2], data[3]);
+            } else {
+                method.apply(o, data || NO_ARGS);
+            }
+        },
+        id = (periodic) ? setInterval(wrapper, when) : setTimeout(wrapper, when);
 
     return {
         id: id,
@@ -5543,7 +5612,7 @@ Y.mix(Y.DOM, {
 });
 
 
-}, '@VERSION@' ,{requires:['oop']});
+}, '@VERSION@' ,{requires:['oop','features']});
 YUI.add('dom-style', function(Y) {
 
 (function(Y) {
@@ -5901,7 +5970,7 @@ var DOCUMENT_ELEMENT = 'documentElement',
     SCROLL_NODE;
 
 if (Y.UA.ie) {
-    if (Y.config.doc[COMPAT_MODE] !== 'quirks') {
+    if (Y.config.doc[COMPAT_MODE] !== 'BackCompat') {
         SCROLL_NODE = DOCUMENT_ELEMENT; 
     } else {
         SCROLL_NODE = 'body';
@@ -6047,7 +6116,7 @@ Y.mix(Y_DOM, {
                             }
 
                         if ((scrollTop || scrollLeft)) {
-                            if (!Y.UA.ios) {
+                            if (!Y.UA.ios || (Y.UA.ios >= 4.2)) {
                                 xy[0] += scrollLeft;
                                 xy[1] += scrollTop;
                             }
@@ -6303,7 +6372,7 @@ Y.mix(DOM, {
      * @for DOM
      * @method region
      * @param {HTMLElement} element The DOM element. 
-     @return {Object} Object literal containing the following about this element: (top, right, bottom, left)
+     * @return {Object} Object literal containing the following about this element: (top, right, bottom, left)
      */
     region: function(node) {
         var xy = DOM.getXY(node),
@@ -6328,7 +6397,7 @@ Y.mix(DOM, {
      * @param {HTMLElement} element The first element 
      * @param {HTMLElement | Object} element2 The element or region to check the interect with
      * @param {Object} altRegion An object literal containing the region for the first element if we already have the data (for performance i.e. DragDrop)
-     @return {Object} Object literal containing the following intersection data: (top, right, bottom, left, area, yoff, xoff, inRegion)
+     * @return {Object} Object literal containing the following intersection data: (top, right, bottom, left, area, yoff, xoff, inRegion)
      */
     intersect: function(node, node2, altRegion) {
         var r = altRegion || DOM.region(node), region = {},
@@ -7220,7 +7289,22 @@ DO = {
     objs: {},
 
     /**
-     * Execute the supplied method before the specified function
+     * <p>Execute the supplied method before the specified function.  Wrapping
+     * function may optionally return an instance of the following classes to
+     * further alter runtime behavior:</p>
+     * <dl>
+     *     <dt></code>Y.Do.Halt(message, returnValue)</code></dt>
+     *         <dd>Immediatly stop execution and return
+     *         <code>returnValue</code>.  No other wrapping functions will be
+     *         executed.</dd>
+     *     <dt></code>Y.Do.AlterArgs(message, newArgArray)</code></dt>
+     *         <dd>Replace the arguments that the original function will be
+     *         called with.</dd>
+     *     <dt></code>Y.Do.Prevent(message)</code></dt>
+     *         <dd>Don't execute the wrapped function.  Other before phase
+     *         wrappers will be executed.</dd>
+     * </dl>
+     *
      * @method before
      * @param fn {Function} the function to execute
      * @param obj the object hosting the method to displace
@@ -7243,7 +7327,23 @@ DO = {
     },
 
     /**
-     * Execute the supplied method after the specified function
+     * <p>Execute the supplied method after the specified function.  Wrapping
+     * function may optionally return an instance of the following classes to
+     * further alter runtime behavior:</p>
+     * <dl>
+     *     <dt></code>Y.Do.Halt(message, returnValue)</code></dt>
+     *         <dd>Immediatly stop execution and return
+     *         <code>returnValue</code>.  No other wrapping functions will be
+     *         executed.</dd>
+     *     <dt></code>Y.Do.AlterReturn(message, returnValue)</code></dt>
+     *         <dd>Return <code>returnValue</code> instead of the wrapped
+     *         method's original return value.  This can be further altered by
+     *         other after phase wrappers.</dd>
+     * </dl>
+     *
+     * <p>The static properties <code>Y.Do.originalRetVal</code> and
+     * <code>Y.Do.currentRetVal</code> will be populated for reference.</p>
+     *
      * @method after
      * @param fn {Function} the function to execute
      * @param obj the object hosting the method to displace
@@ -7264,7 +7364,9 @@ DO = {
     },
 
     /**
-     * Execute the supplied method after the specified function
+     * Execute the supplied method before or after the specified function.
+     * Used by <code>before</code> and <code>after</code>.
+     *
      * @method _inject
      * @param when {string} before or after
      * @param fn {Function} the function to execute
@@ -7309,9 +7411,11 @@ DO = {
     },
 
     /**
-     * Detach a before or after subscription
+     * Detach a before or after subscription.
+     *
      * @method detach
      * @param handle {string} the subscription handle
+     * @static
      */
     detach: function(handle) {
 
@@ -7336,7 +7440,7 @@ Y.Do = DO;
  *
  * @property Do.originalRetVal
  * @static
- * @since 2.3.0
+ * @since 3.2.0
  */
 
 /**
@@ -7346,7 +7450,7 @@ Y.Do = DO;
  *
  * @property Do.currentRetVal
  * @static
- * @since 2.3.0
+ * @since 3.2.0
  */
 
 //////////////////////////////////////////////////////////////////////////
@@ -7395,8 +7499,18 @@ DO.Method.prototype._delete = function (sid) {
 };
 
 /**
- * Execute the wrapped method
+ * <p>Execute the wrapped method.  All arguments are passed into the wrapping
+ * functions.  If any of the before wrappers return an instance of
+ * <code>Y.Do.Halt</code> or <code>Y.Do.Prevent</code>, neither the wrapped
+ * function nor any after phase subscribers will be executed.</p>
+ *
+ * <p>The return value will be the return value of the wrapped function or one
+ * provided by a wrapper function via an instance of <code>Y.Do.Halt</code> or
+ * <code>Y.Do.AlterReturn</code>.
+ *
  * @method exec
+ * @param arg* {any} Arguments are passed to the wrapping and wrapped functions
+ * @return {any} Return value of wrapped function unless overwritten (see above)
  */
 DO.Method.prototype.exec = function () {
 
@@ -7457,9 +7571,14 @@ DO.Method.prototype.exec = function () {
 
 /**
  * Return an AlterArgs object when you want to change the arguments that
- * were passed into the function.  An example would be a service that scrubs
- * out illegal characters prior to executing the core business logic.
+ * were passed into the function.  Useful for Do.before subscribers.  An
+ * example would be a service that scrubs out illegal characters prior to
+ * executing the core business logic.
  * @class Do.AlterArgs
+ * @constructor
+ * @param msg {String} (optional) Explanation of the altered return value
+ * @param newArgs {Array} Call parameters to be used for the original method
+ *                        instead of the arguments originally passed in.
  */
 DO.AlterArgs = function(msg, newArgs) {
     this.msg = msg;
@@ -7468,8 +7587,12 @@ DO.AlterArgs = function(msg, newArgs) {
 
 /**
  * Return an AlterReturn object when you want to change the result returned
- * from the core method to the caller
+ * from the core method to the caller.  Useful for Do.after subscribers.
  * @class Do.AlterReturn
+ * @constructor
+ * @param msg {String} (optional) Explanation of the altered return value
+ * @param newRetVal {any} Return value passed to code that invoked the wrapped
+ *                      function.
  */
 DO.AlterReturn = function(msg, newRetVal) {
     this.msg = msg;
@@ -7479,8 +7602,12 @@ DO.AlterReturn = function(msg, newRetVal) {
 /**
  * Return a Halt object when you want to terminate the execution
  * of all subsequent subscribers as well as the wrapped method
- * if it has not exectued yet.
+ * if it has not exectued yet.  Useful for Do.before subscribers.
  * @class Do.Halt
+ * @constructor
+ * @param msg {String} (optional) Explanation of why the termination was done
+ * @param retVal {any} Return value passed to code that invoked the wrapped
+ *                      function.
  */
 DO.Halt = function(msg, retVal) {
     this.msg = msg;
@@ -7489,8 +7616,11 @@ DO.Halt = function(msg, retVal) {
 
 /**
  * Return a Prevent object when you want to prevent the wrapped function
- * from executing, but want the remaining listeners to execute
+ * from executing, but want the remaining listeners to execute.  Useful
+ * for Do.before subscribers.
  * @class Do.Prevent
+ * @constructor
+ * @param msg {String} (optional) Explanation of why the termination was done
  */
 DO.Prevent = function(msg) {
     this.msg = msg;
@@ -7500,6 +7630,10 @@ DO.Prevent = function(msg) {
  * Return an Error object when you want to terminate the execution
  * of all subsequent method calls.
  * @class Do.Error
+ * @constructor
+ * @param msg {String} (optional) Explanation of the altered return value
+ * @param retVal {any} Return value passed to code that invoked the wrapped
+ *                      function.
  * @deprecated use Y.Do.Halt or Y.Do.Prevent
  */
 DO.Error = DO.Halt;
@@ -10361,6 +10495,9 @@ Y.log(type + " attach call failed, invalid callback", "error", "event");
          */
         _unload: function(e) {
             Y.each(_wrappers, function(v, k) {
+                if (v.type == 'unload') {
+                    v.fire(e);
+                }
                 v.detachAll();
                 remove(v.el, v.type, v.fn, v.capture);
                 delete _wrappers[k];
@@ -10526,97 +10663,274 @@ YUI.add('event-base-ie', function(Y) {
  * @submodule event-base
  */
 
-var IEEventFacade = function() {
-        // IEEventFacade.superclass.constructor.apply(this, arguments);
-        Y.DOM2EventFacade.apply(this, arguments);
-    };
-
-Y.extend(IEEventFacade, Y.DOM2EventFacade, {
-
-    init: function() {
-
-        IEEventFacade.superclass.init.apply(this, arguments);
-
-        var e = this._event,
-            resolve = Y.DOM2EventFacade.resolve,
-            x, y, d, b, de, t;
-
-        this.target = resolve(e.srcElement);
-
-        if (('clientX' in e) && (!x) && (0 !== x)) {
-            x = e.clientX;
-            y = e.clientY;
-
-            d = Y.config.doc;
-            b = d.body;
-            de = d.documentElement;
-
-            x += (de.scrollLeft || (b && b.scrollLeft) || 0);
-            y += (de.scrollTop  || (b && b.scrollTop)  || 0);
-
-            this.pageX = x;
-            this.pageY = y;
-        }
-
-        if (e.type == "mouseout") {
-            t = e.toElement;
-        } else if (e.type == "mouseover") {
-            t = e.fromElement;
-        }
-
-        this.relatedTarget = resolve(t);
-
-        // which should contain the unicode key code if this is a key event
-        // if (e.charCode) {
-        //     this.which = e.charCode;
-        // }
-
-        // for click events, which is normalized for which mouse button was
-        // clicked.
-        if (e.button) {
-            switch (e.button) {
-                case 2:
-                    this.which = 3;
-                    break;
-                case 4:
-                    this.which = 2;
-                    break;
-                default:
-                    this.which = e.button;
-            }
-
-            this.button = this.which;
-        }
-
-    },
-
-    stopPropagation: function() {
-        var e = this._event;
-        e.cancelBubble = true;
-        this._wrapper.stopped = 1;
-        this.stopped = 1;
-    },
-
-    stopImmediatePropagation: function() {
-        this.stopPropagation();
-        this._wrapper.stopped = 2;
-        this.stopped = 2;
-    },
-
-    preventDefault: function(returnValue) {
-        this._event.returnValue = returnValue || false;
-        this._wrapper.prevented = 1;
-        this.prevented = 1;
-    }
-
-});
-
-var imp = Y.config.doc && Y.config.doc.implementation;
-
-if (imp && (!imp.hasFeature('Events', '2.0'))) {
-    Y.DOMEventFacade = IEEventFacade;
+function IEEventFacade() {
+    // IEEventFacade.superclass.constructor.apply(this, arguments);
+    Y.DOM2EventFacade.apply(this, arguments);
 }
 
+/*
+ * (intentially left out of API docs)
+ * Alternate Facade implementation that is based on Object.defineProperty, which
+ * is partially supported in IE8.  Properties that involve setup work are
+ * deferred to temporary getters using the static _define method.
+ */
+function IELazyFacade(e) {
+    var proxy = Y.config.doc.createEventObject(e),
+        proto = IELazyFacade.prototype;
+
+    // TODO: necessary?
+    proxy.hasOwnProperty = function () { return true; };
+
+    proxy.init = proto.init;
+    proxy.halt = proto.halt;
+    proxy.preventDefault           = proto.preventDefault;
+    proxy.stopPropagation          = proto.stopPropagation;
+    proxy.stopImmediatePropagation = proto.stopImmediatePropagation;
+
+    Y.DOM2EventFacade.apply(proxy, arguments);
+
+    return proxy;
+}
+
+
+var imp = Y.config.doc && Y.config.doc.implementation,
+    useLazyFacade = Y.config.lazyEventFacade,
+
+    buttonMap = {
+        2: 3,
+        4: 2
+    },
+    relatedTargetMap = {
+        mouseout: 'toElement',
+        mouseover: 'fromElement'
+    },
+
+    resolve = Y.DOM2EventFacade.resolve,
+
+    proto = {
+        init: function() {
+
+            IEEventFacade.superclass.init.apply(this, arguments);
+
+            var e = this._event,
+                x, y, d, b, de, t;
+
+            this.target = resolve(e.srcElement);
+
+            if (('clientX' in e) && (!x) && (0 !== x)) {
+                x = e.clientX;
+                y = e.clientY;
+
+                d = Y.config.doc;
+                b = d.body;
+                de = d.documentElement;
+
+                x += (de.scrollLeft || (b && b.scrollLeft) || 0);
+                y += (de.scrollTop  || (b && b.scrollTop)  || 0);
+
+                this.pageX = x;
+                this.pageY = y;
+            }
+
+            if (e.type == "mouseout") {
+                t = e.toElement;
+            } else if (e.type == "mouseover") {
+                t = e.fromElement;
+            }
+
+            // fallback to t.relatedTarget to support simulated events.
+            // IE doesn't support setting toElement or fromElement on generic
+            // events, so Y.Event.simulate sets relatedTarget instead.
+            this.relatedTarget = resolve(t || e.relatedTarget);
+
+            // which should contain the unicode key code if this is a key event
+            // if (e.charCode) {
+            //     this.which = e.charCode;
+            // }
+
+            // for click events, which is normalized for which mouse button was
+            // clicked.
+            if (e.button) {
+                this.which = this.button = buttonMap[e.button] || e.button;
+            }
+
+        },
+
+        stopPropagation: function() {
+            this._event.cancelBubble = true;
+            this._wrapper.stopped = 1;
+            this.stopped = 1;
+        },
+
+        stopImmediatePropagation: function() {
+            this.stopPropagation();
+            this._wrapper.stopped = 2;
+            this.stopped = 2;
+        },
+
+        preventDefault: function(returnValue) {
+            this._event.returnValue = returnValue || false;
+            this._wrapper.prevented = 1;
+            this.prevented = 1;
+        }
+    };
+
+Y.extend(IEEventFacade, Y.DOM2EventFacade, proto);
+
+Y.extend(IELazyFacade, Y.DOM2EventFacade, proto);
+IELazyFacade.prototype.init = function () {
+    var e         = this._event,
+        overrides = this._wrapper.overrides,
+        define    = IELazyFacade._define,
+        lazyProperties = IELazyFacade._lazyProperties,
+        prop;
+
+    this.altKey   = e.altKey;
+    this.ctrlKey  = e.ctrlKey;
+    this.metaKey  = e.metaKey;
+    this.shiftKey = e.shiftKey;
+    this.type     = (overrides && overrides.type) || e.type;
+    this.clientX  = e.clientX;
+    this.clientY  = e.clientY;
+
+    for (prop in lazyProperties) {
+        if (lazyProperties.hasOwnProperty(prop)) {
+            define(this, prop, lazyProperties[prop]);
+        }
+    }
+
+    if (this._touch) {
+        this._touch(e, this._currentTarget, this._wrapper);
+    }
+};
+
+IELazyFacade._lazyProperties = {
+    charCode: function () {
+        var e = this._event;
+
+        return e.keyCode || e.charCode;
+    },
+    keyCode: function () { return this.charCode; },
+
+    button: function () {
+        var e = this._event;
+
+        return (e.button) ?
+            (buttonMap[e.button] || e.button) :
+            (e.which || e.charCode || this.charCode);
+    },
+    which: function () { return this.button; },
+
+    target: function () {
+        return resolve(this._event.srcElement);
+    },
+    relatedTarget: function () {
+        var e = this._event,
+            targetProp = relatedTargetMap[e.type] || 'relatedTarget';
+
+        // fallback to t.relatedTarget to support simulated events.
+        // IE doesn't support setting toElement or fromElement on generic
+        // events, so Y.Event.simulate sets relatedTarget instead.
+        return resolve(e[targetProp] || e.relatedTarget);
+    },
+    currentTarget: function () {
+        return resolve(this._currentTarget);
+    },
+
+    wheelDelta: function () {
+        var e = this._event;
+
+        if (e.type === "mousewheel" || e.type === "DOMMouseScroll") {
+            return (e.detail) ?
+                (e.detail * -1) :
+                // wheelDelta between -80 and 80 result in -1 or 1
+                Math.round(e.wheelDelta / 80) || ((e.wheelDelta < 0) ? -1 : 1);
+        }
+    },
+
+    pageX: function () {
+        var e = this._event,
+            val = e.pageX,
+            doc, bodyScroll, docScroll;
+                
+        if (val === undefined) {
+            doc = Y.config.doc;
+            bodyScroll = doc.body && doc.body.scrollLeft;
+            docScroll = doc.documentElement.scrollLeft;
+
+            val = e.clientX + (docScroll || bodyScroll || 0);
+        }
+
+        return val;
+    },
+    pageY: function () {
+        var e = this._event,
+            val = e.pageY,
+            doc, bodyScroll, docScroll;
+                
+        if (val === undefined) {
+            doc = Y.config.doc;
+            bodyScroll = doc.body && doc.body.scrollTop;
+            docScroll = doc.documentElement.scrollTop;
+
+            val = e.clientY + (docScroll || bodyScroll || 0);
+        }
+
+        return val;
+    }
+};
+
+
+/**
+ * Wrapper function for Object.defineProperty that creates a property whose
+ * value will be calulated only when asked for.  After calculating the value,
+ * the getter wll be removed, so it will behave as a normal property beyond that
+ * point.  A setter is also assigned so assigning to the property will clear
+ * the getter, so foo.prop = 'a'; foo.prop; won't trigger the getter,
+ * overwriting value 'a'.
+ *
+ * Used only by the DOMEventFacades used by IE8 when the YUI configuration
+ * <code>lazyEventFacade</code> is set to true.
+ *
+ * @method _define
+ * @param o {DOMObject} A DOM object to add the property to
+ * @param prop {String} The name of the new property
+ * @param valueFn {Function} The function that will return the initial, default
+ *                  value for the property.
+ * @static
+ * @private
+ */
+IELazyFacade._define = function (o, prop, valueFn) {
+    function val(v) {
+        var ret = (arguments.length) ? v : valueFn.call(this);
+
+        delete o[prop];
+        Object.defineProperty(o, prop, {
+            value: ret,
+            configurable: true,
+            writable: true
+        });
+        return ret;
+    }
+    Object.defineProperty(o, prop, {
+        get: val,
+        set: val,
+        configurable: true
+    });
+};
+
+if (imp && (!imp.hasFeature('Events', '2.0'))) {
+    if (useLazyFacade) {
+        // Make sure we can use the lazy facade logic
+        try {
+            Object.defineProperty(Y.config.doc.createEventObject(), 'z', {});
+        } catch (e) {
+            useLazyFacade = false;
+        }
+    }
+        
+    Y.DOMEventFacade = (useLazyFacade) ? IELazyFacade : IEEventFacade;
+}
 
 
 }, '@VERSION@' );
@@ -10934,7 +11248,7 @@ YUI.add('node-base', function(Y) {
 /**
  * The Node class provides a wrapper for manipulating DOM Nodes.
  * Node properties can be accessed via the set/get methods.
- * Use Y.get() to retrieve Node instances.
+ * Use Y.one() to retrieve Node instances.
  *
  * <strong>NOTE:</strong> Node properties are accessed using
  * the <code>set</code> and <code>get</code> methods.
@@ -10952,6 +11266,7 @@ var DOT = '.',
     OWNER_DOCUMENT = 'ownerDocument',
     TAG_NAME = 'tagName',
     UID = '_yuid',
+    EMPTY_OBJ = {},
 
     _slice = Array.prototype.slice,
 
@@ -10977,7 +11292,6 @@ var DOT = '.',
          * @private
          */
         this._node = node;
-        Y_Node._instances[uid] = this;
 
         this._stateProxy = node; // when augmented with Attribute
 
@@ -11234,9 +11548,11 @@ Y_Node.one = function(node) {
             cachedNode = instance ? instance._node : null;
             if (!instance || (cachedNode && node !== cachedNode)) { // new Node when nodes don't match
                 instance = new Y_Node(node);
+                Y_Node._instances[instance[UID]] = instance; // cache node
             }
         }
     }
+
     return instance;
 };
 
@@ -11276,6 +11592,23 @@ Y_Node.ATTRS = {
         setter: function(content) {
             Y_DOM.setText(this._node, content);
             return content;
+        }
+    },
+
+    /**
+     * Allows for getting and setting the text of an element.
+     * Formatting is preserved and special characters are treated literally.
+     * @config text
+     * @type String
+     */
+    'for': {
+        getter: function() {
+            return Y_DOM.getAttribute(this._node, 'for');
+        },
+
+        setter: function(val) {
+            Y_DOM.setAttribute(this._node, 'for', val);
+            return val;
         }
     },
 
@@ -11407,7 +11740,7 @@ Y.mix(Y_Node.prototype, {
      * Returns an attribute value on the Node instance.
      * Unless pre-configured (via Node.ATTRS), get hands
      * off to the underlying DOM node.  Only valid
-     * attributes/properties for the node will be set.
+     * attributes/properties for the node will be queried.
      * @method get
      * @param {String} attr The attribute
      * @return {any} The current value of the attribute
@@ -11675,11 +12008,10 @@ Y.mix(Y_Node.prototype, {
      *
      */
     remove: function(destroy) {
-        var node = this._node,
-            parentNode = node.parentNode;
+        var node = this._node;
 
-        if (parentNode) {
-            parentNode.removeChild(node);
+        if (node && node.parentNode) {
+            node.parentNode.removeChild(node);
         }
 
         if (destroy) {
@@ -11882,6 +12214,7 @@ Y.mix(Y_Node.prototype, {
      */
     appendTo: function(node) {
         Y.one(node).append(this);
+        return this;
     },
 
     /**
@@ -12965,6 +13298,8 @@ Y.Node.prototype.focus = function () {
     } catch (e) {
         Y.log('error focusing node: ' + e.toString(), 'error', 'node');
     }
+
+    return this;
 };
 
 // IE throws error when setting input.type = 'hidden',
@@ -13109,7 +13444,7 @@ Y.Array.each(ArrayMethods, function(name) {
             i = 0,
             arg;
 
-        while ((arg = arguments[i++])) { // use DOM nodes/nodeLists 
+        while (typeof (arg = arguments[i++]) != 'undefined') { // use DOM nodes/nodeLists 
             args.push(arg._node || arg._nodes || arg);
         }
         return Y.Node.scrubVal(ArrayProto[name].apply(this._nodes, args));
@@ -13636,7 +13971,7 @@ function delegate(type, fn, el, filter) {
 
     if (typeBits.length > 1) {
         cat  = typeBits.shift();
-        type = typeBits.shift();
+        args[0] = type = typeBits.shift();
     }
 
     synth = Y.Node.DOM_EVENTS[type];
@@ -14029,6 +14364,7 @@ YUI.add('io-base', function(Y) {
         }
         else {
             o.c = {};
+			o.t = 'io:iframe';
         }
 
         return o;
@@ -14244,7 +14580,7 @@ YUI.add('io-base', function(Y) {
         _destroy(o);
         c.xdr.use = 'flash';
         // If the original request included serialized form data and
-        // additional data are defined in configuration.data, it must
+        // additional data are defined in the configuration, it must
         // be reset to prevent data duplication.
         c.data = c.form && d ? d : null;
 
@@ -14262,7 +14598,7 @@ YUI.add('io-base', function(Y) {
     * @return int
     */
     function _concat(s, d) {
-        s += ((s.indexOf('?') == -1) ? '?' : '&') + d;
+        s += (s.indexOf('?') === -1 ? '?' : '&') + d;
         return s;
     }
 
@@ -14303,16 +14639,6 @@ YUI.add('io-base', function(Y) {
 
         for (p in _headers) {
             if (_headers.hasOwnProperty(p)) {
-				/*
-                if (h[p]) {
-                    // Configuration headers will supersede preset io headers,
-                    // if headers match.
-                    continue;
-                }
-                else {
-                    h[p] = _headers[p];
-                }
-				*/
 				if (!h[p]) {
 					h[p] = _headers[p];
 				}
@@ -14392,7 +14718,7 @@ YUI.add('io-base', function(Y) {
         var status;
 
         try {
-			status = (o.c.status && o.c.status !== 0) ? o.c.status : 0;
+			status = (o.c && o.c.status !== 0) ? o.c.status : 0;
         }
         catch(e) {
             status = 0;
@@ -14529,12 +14855,9 @@ YUI.add('io-base', function(Y) {
             s = c.sync;
             oD = c.data;
 
-        //To serialize an object into a key-value string, add the
-        //QueryString module to the YUI instance's 'use' method.
-        if (Y.Lang.isObject(c.data) && Y.QueryString) {
-            c.data = Y.QueryString.stringify(c.data);
-            Y.log('Configuration property "data" is an object. The serialized value is: ' + c.data, 'info', 'io');
-        }
+        // Serialize an object into a key-value string using
+        // querystring-stringify-simple.
+		c.data = (Y.Lang.isObject(c.data) && Y.QueryString) ? Y.QueryString.stringify(c.data) : c.data;
 
         if (c.form) {
             if (c.form.upload) {
@@ -14543,7 +14866,7 @@ YUI.add('io-base', function(Y) {
                 return Y.io.upload(o, uri, c);
             }
             else {
-                // Serialize HTML form data.
+                // Serialize HTML form data into a key-value string.
                 f = Y.io._serialize(c.form, c.data);
                 if (m === 'POST' || m === 'PUT') {
                     c.data = f;
@@ -14554,14 +14877,22 @@ YUI.add('io-base', function(Y) {
             }
         }
 
-        if (c.data && m === 'GET') {
-            uri = _concat(uri, c.data);
-            Y.log('HTTP GET with configuration data.  The querystring is: ' + uri, 'info', 'io');
-        }
-
-        if (c.data && m === 'POST') {
-            c.headers = Y.merge({ 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }, c.headers);
-        }
+		if (c.data) {
+			switch (m) {
+				case 'GET':
+				case 'DELETE':
+					uri = _concat(uri, c.data);
+					Y.log('HTTP' + m + ' with data.  The querystring is: ' + uri, 'info', 'io');
+					break;
+				case 'POST':
+				case 'PUT':
+					// If Content-Type is defined in the configuration object, or
+					// or as a default header, it will be used instead of
+					// 'application/x-www-form-urlencoded; charset=UTF-8'
+					c.headers = Y.merge({ 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }, c.headers);
+					break;
+			}
+		}
 
         if (o.t) {
             return Y.io.xdr(uri, o, c);
@@ -14572,50 +14903,56 @@ YUI.add('io-base', function(Y) {
         }
 
         try {
+			// Determine if request is to be set as
+			// synchronous or asynchronous.
             o.c.open(m, uri, s ? false : true);
+			_setHeaders(o.c, c.headers);
+			_ioStart(o.id, c);
+
             // Will work only in browsers that implement the
             // Cross-Origin Resource Sharing draft.
             if (c.xdr && c.xdr.credentials) {
-                o.c.withCredentials = true;
+				if (!Y.UA.ie) {
+					o.c.withCredentials = true;
+				}
             }
-        }
-        catch(e1) {
-            if (c.xdr) {
-                // This exception is usually thrown by browsers
-                // that do not support native XDR transactions.
-                return _resend(o, u, c, oD);
-            }
-        }
 
-        _setHeaders(o.c, c.headers);
-        _ioStart(o.id, c);
-        try {
             // Using "null" with HTTP POST will  result in a request
             // with no Content-Length header defined.
             o.c.send(c.data || '');
+
             if (s) {
+				// Create a response object for synchronous transactions.
                 d = o.c;
                 a  = ['status', 'statusText', 'responseText', 'responseXML'];
                 r = c.arguments ? { id: o.id, arguments: c.arguments } : { id: o.id };
+                r.getAllResponseHeaders = function() { return d.getAllResponseHeaders(); };
+                r.getResponseHeader = function(h) { return d.getResponseHeader(h); };
 
                 for (j = 0; j < 4; j++) {
                     r[a[j]] = o.c[a[j]];
                 }
 
-                r.getAllResponseHeaders = function() { return d.getAllResponseHeaders(); };
-                r.getResponseHeader = function(h) { return d.getResponseHeader(h); };
                 _ioComplete(o, c);
                 _handleResponse(o, c);
 
                 return r;
             }
         }
-        catch(e2) {
-            if (c.xdr) {
+        catch(e) {
+            if (c.xdr && c.xdr.use === 'native') {
                 // This exception is usually thrown by browsers
-                // that do not support native XDR transactions.
+                // that do not support XMLHttpRequest Level 2.
+				// Retry the request with the XDR transport set
+				// to 'flash'.  If the Flash transport is not
+				// initialized or available, the transaction
+				// will resolve to a transport error.
                 return _resend(o, u, c, oD);
             }
+			else {
+                _ioComplete(o, c);
+				_handleResponse(o, c);
+			}
         }
 
         // If config.timeout is defined, and the request is standard XHR,
@@ -14678,6 +15015,68 @@ YUI.add('io-base', function(Y) {
 
 
 }, '@VERSION@' ,{requires:['event-custom-base', 'querystring-stringify-simple']});
+YUI.add('querystring-stringify-simple', function(Y) {
+
+/*global Y */
+/**
+ * <p>Provides Y.QueryString.stringify method for converting objects to Query Strings.
+ * This is a subset implementation of the full querystring-stringify.</p>
+ * <p>This module provides the bare minimum functionality (encoding a hash of simple values),
+ * without the additional support for nested data structures.  Every key-value pair is
+ * encoded by encodeURIComponent.</p>
+ * <p>This module provides a minimalistic way for io to handle  single-level objects
+ * as transaction data.</p>
+ *
+ * @module querystring
+ * @submodule querystring-stringify-simple
+ * @for QueryString
+ * @static
+ */
+
+var QueryString = Y.namespace("QueryString"),
+    EUC = encodeURIComponent;
+
+/**
+ * <p>Converts a simple object to a Query String representation.</p>
+ * <p>Nested objects, Arrays, and so on, are not supported.</p>
+ *
+ * @method stringify
+ * @for QueryString
+ * @public
+ * @submodule querystring-stringify-simple
+ * @param obj {Object} A single-level object to convert to a querystring.
+ * @param cfg {Object} (optional) Configuration object.  In the simple
+ *                                module, only the arrayKey setting is
+ *                                supported.  When set to true, the key of an
+ *                                array will have the '[]' notation appended
+ *                                to the key;.
+ * @static
+ */
+QueryString.stringify = function (obj, c) {
+    var qs = [],
+        // Default behavior is false; standard key notation.
+        s = c && c.arrayKey ? true : false,
+        key, i, l;
+
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            if (Y.Lang.isArray(obj[key])) {
+                for (i = 0, l = obj[key].length; i < l; i++) {
+                    qs.push(EUC(s ? key + '[]' : key) + '=' + EUC(obj[key][i]));
+                }
+            }
+            else {
+                qs.push(EUC(key) + '=' + EUC(obj[key]));
+            }
+        }
+    }
+
+    return qs.join('&');
+};
+
+
+
+}, '@VERSION@' );
 YUI.add('json-parse', function(Y) {
 
 /**
@@ -15488,36 +15887,41 @@ Y.NodeList.prototype.transition = function(config, callback) {
     return this;
 };
 
-Y.Node.prototype.toggleView = function(name, on) {
-    var callback;
+Y.Node.prototype.toggleView = function(name, on, callback) {
     this._toggles = this._toggles || [];
+    callback = arguments[arguments.length - 1];
 
     if (typeof name == 'boolean') { // no transition, just toggle
         on = name;
+        name = null;
     }
-    if (typeof on === 'undefined' && name in this._toggles) {
+
+    name = name || Y.Transition.DEFAULT_TOGGLE;
+
+    if (typeof on == 'undefined' && name in this._toggles) { // reverse current toggle
         on = ! this._toggles[name];
     }
 
     on = (on) ? 1 : 0;
-
     if (on) {
         this._show();
     }  else {
-        callback = _wrapCallBack(anim, this._hide);
+        callback = _wrapCallBack(this, this._hide, callback);
     }
 
     this._toggles[name] = on;
     this.transition(Y.Transition.toggles[name][on], callback);
+
+    return this;
 };
 
-Y.NodeList.prototype.toggleView = function(config, callback) {
+Y.NodeList.prototype.toggleView = function(name, on, callback) {
     var nodes = this._nodes,
         i = 0,
         node;
 
     while ((node = nodes[i++])) {
-        Y.one(node).toggleView(config, callback);
+        Y.one(node).toggleView(name, on, callback);
     }
 
     return this;
@@ -15565,6 +15969,7 @@ Y.mix(Transition.fx, {
             end: function() {
                 if (this._transitionOverflow) { // revert overridden value
                     this.setStyle('overflow', this._transitionOverflow);
+                    delete this._transitionOverflow;
                 }
             }
         } 
@@ -15572,9 +15977,12 @@ Y.mix(Transition.fx, {
 });
 
 Y.mix(Transition.toggles, {
-    size: ['sizeIn', 'sizeOut'],
+    size: ['sizeOut', 'sizeIn'],
     fade: ['fadeOut', 'fadeIn']
 });
+
+Transition.DEFAULT_TOGGLE = 'fade';
+
 
 
 }, '@VERSION@' ,{requires:['node-base']});

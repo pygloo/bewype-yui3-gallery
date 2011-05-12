@@ -64,7 +64,7 @@ suite.add( new Y.Test.Case({
         Y.assert( (span.get("offsetWidth") > 0) );
 
 		//Check for IE VML and set different number of objects 
-		var numObjs = (Y.config.doc.createElement('v:oval').strokeColor) ? 11 : 13;
+		var numObjs = (Y.UA.ie && Y.UA.ie < 9) ? 11 : 11;
 
 		Y.Assert.areEqual( numObjs, div.all("span,div").size() );
         Y.Assert.areEqual( numObjs, fl.all("span,div").size() );
@@ -98,7 +98,7 @@ suite.add( new Y.Test.Case({
         Y.assert( (span.get("offsetWidth") > 0) );
 
 		//Check for IE VML and set different number of objects 
-		var numObjs = (Y.config.doc.createElement('v:oval').strokeColor) ? 11 : 13;
+		var numObjs = (Y.UA.ie && Y.UA.ie < 9) ? 11 : 11;
 
 
 		Y.Assert.areEqual( numObjs, div.all("span,div").size() );
@@ -134,8 +134,7 @@ suite.add( new Y.Test.Case({
 
 
 		//Check for IE VML and set different number of objects 
-		var numObjs = (Y.config.doc.createElement('v:oval').strokeColor) ? 11 : 13;
-
+		var numObjs = (Y.UA.ie && Y.UA.ie < 9) ? 11 : 11;
         Y.Assert.areEqual( numObjs, div.all("span,div").size() );
         Y.Assert.areEqual( numObjs, fl.all("span,div").size() );
         Y.Assert.areEqual( numObjs, p.all("span,div").size() );
@@ -168,7 +167,7 @@ suite.add( new Y.Test.Case({
         Y.assert( (span.get("offsetWidth") > 0) );
 
 		//Check for IE VML and set different number of objects 
-		var numObjs = (Y.config.doc.createElement('v:oval').strokeColor) ? 11 : 13;
+		var numObjs = (Y.UA.ie && Y.UA.ie < 9) ? 11 : 11;
 
         Y.Assert.areEqual( numObjs, div.all("span,div").size() );
         Y.Assert.areEqual( numObjs, fl.all("span,div").size() );
@@ -182,7 +181,7 @@ suite.add( new Y.Test.Case({
         (new Y.Dial().render(container));
 
 		//Check for IE VML and set different number of objects 
-		var numObjs = (Y.config.doc.createElement('v:oval').strokeColor) ? 11 : 13;
+		var numObjs = (Y.UA.ie && Y.UA.ie < 9) ? 11 : 11;
 
 
 		Y.Assert.areEqual( numObjs, container.all("span,div").size() );
@@ -325,49 +324,47 @@ suite.add( new Y.Test.Case({
 
         d.set('value', 20);
         d.render("#testbed");
+		
 
-        Y.Assert.areEqual( 86, parseInt(d._handleNode.getStyle("left"),10) );
+        Y.Assert.areEqual( 76, parseInt(d._handleNode.getStyle("left"),10) );
     },
 
     "set('value', v) after render() should move the _handleNode": function () {
         var d = this.dial;
 
-        d.render('#testbed');
+		d.render('#testbed');
 
-        Y.Assert.areEqual( 50, parseInt(d._handleNode.getStyle('left'),10) );
-
+        Y.Assert.areEqual( 40, parseInt(d._handleNode.getStyle('left'),10) );
         d.set('value', 20);
-        Y.Assert.areEqual( 86, parseInt(d._handleNode.getStyle('left'),10) );
+        Y.Assert.areEqual( 76, parseInt(d._handleNode.getStyle('left'),10) );
 
         d.set('value', 0);
         Y.Assert.areEqual( 0, d.get('value') );
-        Y.Assert.areEqual( 50, parseInt(d._handleNode.getStyle('left'),10) );
+        Y.Assert.areEqual( 40, parseInt(d._handleNode.getStyle('left'),10) );
 
         d.set('value', -93);
         Y.Assert.areEqual( -93, d.get('value') );
-        Y.Assert.areEqual( 66, parseInt(d._handleNode.getStyle('left'),10) );
-    } // no comma *****************
+        Y.Assert.areEqual( 56, parseInt(d._handleNode.getStyle('left'),10) );
+    }// no comma *****************
 
-/* // FIX THIS IE, and other non-FF browser BUG. Try using setStyle in stead of setXY for moving handle and marker in all cases      
-    "setValue(v) when hidden should still move the handle-user": function () {
+/*
+	// This works in everything but IE9. I don't know why.
+	// compare to similar test in slider's testsuite.js
+	"setValue(v) when hidden should still move the handle-user": function () {
 		var d = this.dial;
 
-        Y.one('#testbed').setStyle('display','none');
+        Y.one('#testbed').setStyle('visibility','block');
 
         d.render('#testbed');
 
-		Y.Assert.areEqual( 50, parseInt(d._handleNode.getStyle('left'),10) ); 
-        d.set('value', 20);
-        Y.Assert.areEqual( 86, parseInt(d._handleNode.getStyle('left'),10) );
-
-
-        Y.one('#testbed').setStyle('display','');
-        Y.Assert.areEqual( 86, parseInt(d._handleNode.getStyle('left'),10) );
-	}
+		Y.Assert.areEqual( 40, parseInt(d._handleNode.getStyle('left'),10) ); 
+		d.set('value', 20);
+		Y.Assert.areEqual( 76, parseInt(d._handleNode.getStyle('left'),10) );
+		
+		Y.one('#testbed').setStyle('visibility','');
+		Y.Assert.areEqual( 76, parseInt(d._handleNode.getStyle('left'),10) );
+	} // no comma *****************
 */
-	
-	
-	
 }));
 
 suite.add( new Y.Test.Case({
@@ -421,6 +418,47 @@ suite.add( new Y.Test.Case({
 */
         dial.destroy();
 
+    },
+
+
+    "test handleDiameter": function () {
+        Y.one('#testbed').append('<div id="dial"></div><div id="ref"></div>');
+        var testbed = Y.one("#dial"),
+            ref     = Y.one("#ref"),
+            dial, calcSize, bb;
+        dial = new Y.Dial({handleDiameter: 0.53 }).render( testbed );
+        bb = testbed.get('firstChild');
+        calcSize = dial.get('diameter') * dial.get('handleDiameter');
+        Y.Assert.areEqual( calcSize, dial._handleNode.get('offsetWidth') );
+        dial.destroy();
+    },
+
+	// Would like to test markerDiameter 
+	// but it reads as zero I believe because _markerNode is hidden until the handle is dragged.
+
+    "test centerButtonDiameter": function () {
+        Y.one('#testbed').append('<div id="dial"></div><div id="ref"></div>');
+        var testbed = Y.one("#dial"),
+            ref     = Y.one("#ref"),
+            dial, calcSize, bb;
+        dial = new Y.Dial({centerButtonDiameter: 0.89 }).render( testbed );
+        bb = testbed.get('firstChild');
+        calcSize = dial.get('diameter') * dial.get('centerButtonDiameter');
+        Y.Assert.areEqual( calcSize, dial._centerButtonNode.get('offsetWidth') );
+        dial.destroy();
+    },
+
+
+    "test handleDistance": function () {
+        Y.one('#testbed').append('<div id="dial"></div><div id="ref"></div>');
+        var testbed = Y.one("#dial"),
+            ref     = Y.one("#ref"),
+            dial, calcHandleTop, bb;
+        dial = new Y.Dial({handleDistance: 1 }).render( testbed );
+        bb = testbed.get('firstChild');
+        calcHandleTop = -(dial.get('handleDiameter') * dial.get('diameter')) / 2;
+        Y.Assert.areEqual( calcHandleTop, parseInt(dial._handleNode.getStyle('top'),10) );
+        dial.destroy();
     },
 
 
@@ -485,10 +523,16 @@ suite.add( new Y.Test.Case({
 			tooltipStr = 'My new tooltip';
 			
 			dial = new Y.Dial().render("#testbed");
-			dial.setLabelString(labelStr);
-			dial.setTooltipString(tooltipStr);
+			dial._setLabelString(labelStr);
+			dial._setTooltipString(tooltipStr);
 			Y.Assert.areEqual( labelStr, Y.one('.' + dial._classes[0].CSS_CLASSES.labelString).get('innerHTML') );
-			Y.Assert.areEqual( tooltipStr, Y.one('.' + dial._classes[0].CSS_CLASSES.handleUser).get('title') );
+			
+			if(Y.UA.ie && Y.UA.ie < 9){
+				Y.Assert.areEqual( tooltipStr, Y.one('.' + dial._classes[0].CSS_CLASSES.handleVml).get('title') );
+			}else{
+				Y.Assert.areEqual( tooltipStr, Y.one('.' + dial._classes[0].CSS_CLASSES.handle).get('title') );
+			}
+			
 		}
 }));
 
@@ -513,7 +557,11 @@ suite.add( new Y.Test.Case({
 			//alert(Y.Intl.setLang('dial', 'xs'));
 			dial = new Y.Dial().render("#testbed");
 			Y.Assert.areEqual( Y.Intl.get('dial').label, Y.one('.' + dial._classes[0].CSS_CLASSES.labelString).get('innerHTML') );
-			Y.Assert.areEqual( Y.Intl.get('dial').tooltipHandle, Y.one('.' + dial._classes[0].CSS_CLASSES.handleUser).get('title') );
+			if(Y.UA.ie && Y.UA.ie < 9){
+				Y.Assert.areEqual( Y.Intl.get('dial').tooltipHandle, Y.one('.' + dial._classes[0].CSS_CLASSES.handleVml).get('title') );
+			}else{
+				Y.Assert.areEqual( Y.Intl.get('dial').tooltipHandle, Y.one('.' + dial._classes[0].CSS_CLASSES.handle).get('title') );
+			}
 		}
 }));
 

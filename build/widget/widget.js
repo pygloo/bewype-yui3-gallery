@@ -48,7 +48,7 @@ var L = Y.Lang,
     DIV = "<div></div>",
     CHANGE = "Change",
     LOADING = "loading",
- 
+
     _UISET = "_uiSet",
 
     EMPTY_STR = "",
@@ -185,7 +185,7 @@ ATTRS[BOUNDING_BOX] = {
 
 /**
  * @attribute contentBox
- * @description A DOM node that is a direct descendent of a Widget's bounding box that 
+ * @description A DOM node that is a direct descendant of a Widget's bounding box that 
  * houses its content.
  * @type String | Node
  * @writeOnce
@@ -205,7 +205,7 @@ ATTRS[CONTENT_BOX] = {
  * method), while being removed from the default tab flow.  A value of 
  * null removes the "tabIndex" attribute from the widget's bounding box.
  * @type Number
- * @default 0
+ * @default null
  */
 ATTRS[TAB_INDEX] = {
     value: null,
@@ -420,12 +420,35 @@ Y.extend(Widget, Y.Base, {
             delete _instances[bbGuid];
         }
 
+        this._destroyBox();
+    },
+
+    /**
+     * Removes and destroys the widgets rendered boundingBox, contentBox,
+     * and detaches bound UI events.
+     *
+     * @method _destroyBox
+     * @protected 
+     */
+    _destroyBox : function() {
+
+        var boundingBox = this.get(BOUNDING_BOX),
+            contentBox = this.get(CONTENT_BOX),
+            same = boundingBox && boundingBox.compareTo(contentBox);
+
         if (this.UI_EVENTS) {
             this._destroyUIEvents();
         }
 
         this._unbindUI(boundingBox);
-        boundingBox.remove(TRUE);
+
+        if (contentBox) {
+            contentBox.remove(TRUE);
+        }
+
+        if (!same) {
+            boundingBox.remove(TRUE);
+        }
     },
 
     /**
@@ -1121,7 +1144,7 @@ Y.extend(Widget, Y.Base, {
 Y.Widget = Widget;
 
 
-}, '@VERSION@' ,{requires:['attribute', 'event-focus', 'base-base', 'base-pluginhost', 'node-base', 'node-style', 'node-event-delegate', 'classnamemanager']});
+}, '@VERSION@' ,{requires:['attribute', 'event-focus', 'base-base', 'base-pluginhost', 'node-base', 'node-style', 'classnamemanager']});
 YUI.add('widget-uievents', function(Y) {
 
 /**
@@ -1223,7 +1246,12 @@ Y.mix(Widget.prototype, {
                 var widget = Widget.getByNode(this);
                 //  Make the DOM event a property of the custom event
                 //  so that developers still have access to it.
-                widget.fire(evt.type, { domEvent: evt });
+
+                // Quick workaround, until I figure out the multi instance
+                // issue. Theoretically, we should always get a widget
+                if (widget) {
+                    widget.fire(evt.type, { domEvent: evt });
+                }
 
             }, "." + Y.Widget.getClassName());
 

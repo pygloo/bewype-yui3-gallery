@@ -2,14 +2,11 @@
 
     /**
      * Plugin for Editor to normalize BR's.
-     * @module editor
-     * @submodule editor-br
-     */     
-    /**
-     * Plugin for Editor to normalize BR's.
      * @class Plugin.EditorBR
      * @extends Base
      * @constructor
+     * @module editor
+     * @submodule editor-br
      */
 
 
@@ -61,7 +58,7 @@
             var inst = this.get(HOST).getInstance();
             try {
                 inst.config.doc.execCommand('insertbronreturn', null, true);
-            } catch (bre) {};
+            } catch (bre) {}
 
             if (Y.UA.ie || Y.UA.webkit) {
                 inst.on('keydown', Y.bind(this._onKeyDown, this), inst.config.doc);

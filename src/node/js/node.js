@@ -7,7 +7,7 @@
 /**
  * The Node class provides a wrapper for manipulating DOM Nodes.
  * Node properties can be accessed via the set/get methods.
- * Use Y.get() to retrieve Node instances.
+ * Use Y.one() to retrieve Node instances.
  *
  * <strong>NOTE:</strong> Node properties are accessed using
  * the <code>set</code> and <code>get</code> methods.
@@ -25,12 +25,24 @@ var DOT = '.',
     OWNER_DOCUMENT = 'ownerDocument',
     TAG_NAME = 'tagName',
     UID = '_yuid',
+    EMPTY_OBJ = {},
 
     _slice = Array.prototype.slice,
 
     Y_DOM = Y.DOM,
 
     Y_Node = function(node) {
+        if (!Y.instanceOf(this, Y_Node)) { // support optional "new"
+            return new Y_Node(node);
+        }
+
+        if (typeof node == 'string') {
+            node = Y_Node._fromString(node);
+            if (!node) {
+                return null; // NOTE: return
+            }
+        }
+
         var uid = (node.nodeType !== 9) ? node.uniqueID : node[UID];
 
         if (uid && Y_Node._instances[uid] && Y_Node._instances[uid]._node !== node) {
@@ -50,7 +62,6 @@ var DOT = '.',
          * @private
          */
         this._node = node;
-        Y_Node._instances[uid] = this;
 
         this._stateProxy = node; // when augmented with Attribute
 
@@ -80,6 +91,20 @@ var DOT = '.',
         return ret;
     };
 // end "globals"
+
+Y_Node._fromString = function(node) {
+    if (node) {
+        if (node.indexOf('doc') === 0) { // doc OR document
+            node = Y.config.doc;
+        } else if (node.indexOf('win') === 0) { // win OR window
+            node = Y.config.win;
+        } else {
+            node = Y.Selector.query(node, null, true);
+        }
+    }
+
+    return node || null;
+};
 
 /**
  * The name of the component
@@ -287,15 +312,9 @@ Y_Node.one = function(node) {
 
     if (node) {
         if (typeof node == 'string') {
-            if (node.indexOf('doc') === 0) { // doc OR document
-                node = Y.config.doc;
-            } else if (node.indexOf('win') === 0) { // win OR window
-                node = Y.config.win;
-            } else {
-                node = Y.Selector.query(node, null, true);
-            }
+            node = Y_Node._fromString(node);
             if (!node) {
-                return null;
+                return null; // NOTE: return
             }
         } else if (Y.instanceOf(node, Y_Node)) {
             return node; // NOTE: return
@@ -307,9 +326,11 @@ Y_Node.one = function(node) {
             cachedNode = instance ? instance._node : null;
             if (!instance || (cachedNode && node !== cachedNode)) { // new Node when nodes don't match
                 instance = new Y_Node(node);
+                Y_Node._instances[instance[UID]] = instance; // cache node
             }
         }
     }
+
     return instance;
 };
 
@@ -349,6 +370,23 @@ Y_Node.ATTRS = {
         setter: function(content) {
             Y_DOM.setText(this._node, content);
             return content;
+        }
+    },
+
+    /**
+     * Allows for getting and setting the text of an element.
+     * Formatting is preserved and special characters are treated literally.
+     * @config text
+     * @type String
+     */
+    'for': {
+        getter: function() {
+            return Y_DOM.getAttribute(this._node, 'for');
+        },
+
+        setter: function(val) {
+            Y_DOM.setAttribute(this._node, 'for', val);
+            return val;
         }
     },
 
@@ -446,11 +484,11 @@ Y_Node.DEFAULT_GETTER = function(name) {
 Y.mix(Y_Node, Y.EventTarget, false, null, 1);
 
 Y.mix(Y_Node.prototype, {
-/**
- * The method called when outputting Node instances as strings
- * @method toString
- * @return {String} A string representation of the Node instance
- */
+    /**
+     * The method called when outputting Node instances as strings
+     * @method toString
+     * @return {String} A string representation of the Node instance
+     */
     toString: function() {
         var str = this[UID] + ': not bound to a node',
             node = this._node,
@@ -480,7 +518,7 @@ Y.mix(Y_Node.prototype, {
      * Returns an attribute value on the Node instance.
      * Unless pre-configured (via Node.ATTRS), get hands
      * off to the underlying DOM node.  Only valid
-     * attributes/properties for the node will be set.
+     * attributes/properties for the node will be queried.
      * @method get
      * @param {String} attr The attribute
      * @return {any} The current value of the attribute
@@ -748,11 +786,10 @@ Y.mix(Y_Node.prototype, {
      *
      */
     remove: function(destroy) {
-        var node = this._node,
-            parentNode = node.parentNode;
+        var node = this._node;
 
-        if (parentNode) {
-            parentNode.removeChild(node);
+        if (node && node.parentNode) {
+            node.parentNode.removeChild(node);
         }
 
         if (destroy) {
@@ -836,6 +873,9 @@ Y.mix(Y_Node.prototype, {
      *
      */
     destroy: function(recursive) {
+        var UID = Y.config.doc.uniqueID ? 'uniqueID' : '_yuid',
+            instance;
+
         this.purge(); // TODO: only remove events add via this Node
 
         if (this.unplug) { // may not be a PluginHost
@@ -845,13 +885,18 @@ Y.mix(Y_Node.prototype, {
         this.clearData();
 
         if (recursive) {
-            this.all('*').destroy();
+            Y.NodeList.each(this.all('*'), function(node) {
+                instance = Y_Node._instances[node[UID]];
+                if (instance) {
+                   instance.destroy(); 
+                }
+            });
         }
 
         this._node = null;
         this._stateProxy = null;
 
-        delete Y_Node._instances[this[UID]];
+        delete Y_Node._instances[this._yuid];
     },
 
     /**
@@ -955,6 +1000,7 @@ Y.mix(Y_Node.prototype, {
      */
     appendTo: function(node) {
         Y.one(node).append(this);
+        return this;
     },
 
     /**
@@ -1167,15 +1213,23 @@ Y.mix(Y_Node.prototype, {
     },
 
     /**
-     * Removes all of the child nodes from the node.
-     * @param {Boolean} destroy Whether the nodes should also be destroyed. 
+     * Removes and destroys all of the nodes within the node.
+     * @method empty
      * @chainable
      */
-    empty: function(destroy) {
-        this.get('childNodes').remove(destroy);
+    empty: function() {
+        this.get('childNodes').remove().destroy(true);
         return this;
-    }
+    },
 
+    /**
+     * Returns the DOM node bound to the Node instance 
+     * @method getDOMNode
+     * @return {DOMNode}
+     */
+    getDOMNode: function() {
+        return this._node;
+    }
 }, true);
 
 Y.Node = Y_Node;

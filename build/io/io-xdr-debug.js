@@ -186,7 +186,7 @@ YUI.add('io-xdr', function(Y) {
 				c.form = null;
 
 				w.setTimeout(function() {
-					if (o.c) {
+					if (o.c && o.c.send) {
 						o.c.send(uri, c, o.id);
 					}
 					else {
@@ -316,7 +316,6 @@ YUI.add('io-xdr', function(Y) {
 	* @type number
 	*/
 	Y.io.xdr.delay = 50;
-
 
 
 }, '@VERSION@' ,{requires:['io-base','datatype-xml']});

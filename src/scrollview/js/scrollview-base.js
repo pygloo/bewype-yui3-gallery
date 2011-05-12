@@ -49,7 +49,6 @@ Y.Node.DOM_EVENTS.DOMSubtreeModified = true;
  * ScrollView provides a scrollable widget, supporting flick gestures, across both touch and mouse based devices. 
  *
  * @class ScrollView
- * @namespace 
  * @param config {Object} Object literal with initial attribute values
  * @extends Widget
  * @constructor
@@ -923,7 +922,7 @@ Y.ScrollView = Y.extend(ScrollView, Y.Widget, {
     EASING : 'cubic-bezier(0, 0.1, 0, 1.0)',
 
     /**
-     * The default easing to use when animatiing the bounce snap back.
+     * The default easing to use when animating the bounce snap back.
      *
      * @property ScrollView.SNAP_EASING
      * @type String

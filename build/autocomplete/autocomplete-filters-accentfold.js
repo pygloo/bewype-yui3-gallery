@@ -37,6 +37,8 @@ Y.mix(Y.namespace('AutoCompleteFilters'), {
      * @static
      */
     charMatchFold: function (query, results) {
+        if (!query) { return results; }
+
         var queryChars = YArray.unique(AccentFold.fold(query).split(''));
 
         return YArray.filter(results, function (result) {
@@ -58,6 +60,8 @@ Y.mix(Y.namespace('AutoCompleteFilters'), {
      * @static
      */
     phraseMatchFold: function (query, results) {
+        if (!query) { return results; }
+
         query = AccentFold.fold(query);
 
         return YArray.filter(results, function (result) {
@@ -66,7 +70,7 @@ Y.mix(Y.namespace('AutoCompleteFilters'), {
     },
 
     /**
-     * Accent folding version of <code>startsWithFold()</code>.
+     * Accent folding version of <code>startsWith()</code>.
      *
      * @method startsWithFold
      * @param {String} query Query to match
@@ -75,6 +79,8 @@ Y.mix(Y.namespace('AutoCompleteFilters'), {
      * @static
      */
     startsWithFold: function (query, results) {
+        if (!query) { return results; }
+
         query = AccentFold.fold(query);
 
         return YArray.filter(results, function (result) {
@@ -83,7 +89,30 @@ Y.mix(Y.namespace('AutoCompleteFilters'), {
     },
 
     /**
-     * Accent folding version of <code>wordMatchFold()</code>.
+     * Accent folding version of <code>subWordMatch()</code>.
+     *
+     * @method subWordMatchFolde
+     * @param {String} query Query to match
+     * @param {Array} results Results to filter
+     * @return {Array} Filtered results
+     * @static
+     */
+    subWordMatchFold: function (query, results) {
+        if (!query) { return results; }
+
+        var queryWords = WordBreak.getUniqueWords(AccentFold.fold(query));
+
+        return YArray.filter(results, function (result) {
+            var resultText = AccentFold.fold(result.text);
+
+            return YArray.every(queryWords, function (queryWord) {
+                return resultText.indexOf(queryWord) !== -1;
+            });
+        });
+    },
+
+    /**
+     * Accent folding version of <code>wordMatch()</code>.
      *
      * @method wordMatchFold
      * @param {String} query Query to match
@@ -92,6 +121,8 @@ Y.mix(Y.namespace('AutoCompleteFilters'), {
      * @static
      */
     wordMatchFold: function (query, results) {
+        if (!query) { return results; }
+
         var queryWords = WordBreak.getUniqueWords(AccentFold.fold(query));
 
         return YArray.filter(results, function (result) {
